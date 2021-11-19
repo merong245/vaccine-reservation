@@ -12,7 +12,7 @@ const LoginForm = ({ history }) => {
     form: auth.login,
     auth: auth.auth,
     authError: auth.authError,
-    //    user: user.user,
+    user: user.user,
   }));
 
   // 인풋 변경 이벤트 핸들러
@@ -31,7 +31,7 @@ const LoginForm = ({ history }) => {
   const onSubmit = (e) => {
     e.preventDefault();
     const { id, password } = form;
-    //    dispatch(login({ username, password }));
+    dispatch(login({ id, password }));
   };
 
   // 컴포넌트 렌더링 시 form 초기화

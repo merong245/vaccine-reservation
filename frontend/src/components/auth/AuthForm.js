@@ -21,14 +21,15 @@ const AuthFormBlock = styled.div`
  */
 const StyledInput = styled.input`
   font-size: 1rem;
-  border: none;
-  border-bottom: 1px solid ${palette.gray[5]};
-  padding-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid ${palette.gray[5]};
   outline: none;
+  height: 3rem;
   width: 100%;
+  padding: 1rem;
   &:focus {
     color: $oc-teal-7;
-    border-bottom: 1px solid ${palette.gray[7]};
+    border: 1px solid ${palette.gray[7]};
   }
   & + & {
     margin-top: 1rem;
@@ -36,7 +37,7 @@ const StyledInput = styled.input`
 `;
 
 /**
- * 폼 하단에 로그인 혹은 회원가입 링크를 보여줌
+ * 폼 하단의 로그인/회원가입 링크
  */
 const Footer = styled.div`
   margin-top: 2rem;
@@ -60,7 +61,7 @@ const textMap = {
 };
 
 /**
- * 에러를 보여줍니다
+ * 에러
  */
 const ErrorMessage = styled.div`
   color: red;
@@ -75,38 +76,6 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
     <AuthFormBlock>
       <h3>{text}</h3>
       <form onSubmit={onSubmit}>
-        {type === 'register' && (
-          <>
-            <StyledInput
-              name="name"
-              placeholder="이름"
-              type="name"
-              onChange={onChange}
-              value={form.name}
-            />
-            <StyledInput
-              name="registration_number"
-              placeholder="주민번호"
-              type="registration_number"
-              onChange={onChange}
-              value={form.registration_number}
-            />
-            <StyledInput
-              name="age"
-              placeholder="나이"
-              type="age"
-              onChange={onChange}
-              value={form.age}
-            />
-            <StyledInput
-              name="sex"
-              placeholder="성별"
-              type="sex"
-              onChange={onChange}
-              value={form.sex}
-            />
-          </>
-        )}
         <StyledInput
           autoComplete="id"
           name="id"
@@ -133,23 +102,48 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
               value={form.passwordConfirm}
             />
             <StyledInput
+              name="name"
+              placeholder="이름"
+              onChange={onChange}
+              value={form.name}
+            />
+            <StyledInput
+              name="registration_number"
+              placeholder="주민번호"
+              type="registration_number"
+              onChange={onChange}
+              value={form.registration_number}
+            />
+            <StyledInput
+              name="age"
+              placeholder="나이"
+              type="number"
+              min="1"
+              max="150"
+              onChange={onChange}
+              value={form.age}
+            />
+            <StyledInput
+              name="sex"
+              placeholder="성별"
+              onChange={onChange}
+              value={form.sex}
+            />
+            <StyledInput
               name="phone_number"
               placeholder="휴대전화 번호"
-              type="phone_number"
               onChange={onChange}
               value={form.phone_number}
             />
             <StyledInput
               name="residence"
               placeholder="거주지역"
-              type="residence"
               onChange={onChange}
               value={form.residence}
             />
             <StyledInput
               name="terms"
               placeholder="약관동의"
-              type="terms"
               onChange={onChange}
               value={form.terms}
             />
