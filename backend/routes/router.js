@@ -60,7 +60,7 @@ router.post('/login',(req,res)=> {
         var sqlForSelectList = "SELECT * FROM login WHERE id=" + "'" + req.body.id + "'";
 
         connection.query(sqlForSelectList,(err, row) => {
-            if (err) console.log(err)
+            if (err) console.log(err);
             if(!row.length){
                 console.log('로그인 실패');
                 console.log('아이디와 비밀번호를 확인하세요.');
@@ -84,5 +84,52 @@ router.post('/login',(req,res)=> {
 
 });
 
+//잔여 백신 조회
+router.get('/remaining_vaccine',(req,res)=>{
+    res.render('remaining_vaccine');
+});
+
+router.post('/remaining_vaccine',(req,res)=> {
+    const vaccine_type = req.body.vaccine_type;
+    const province = req.body.province;
+    /*const vaccine_type = "화이자";
+    const province = "수도권";*/
+
+    pool.getConnection(function (err, connection) {
+
+        if(province == "수도권") {
+            var sqlForSelectList = "SELECT * FROM vaccine JOIN hospital ON " +
+                "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
+                " WHERE vaccine_type=" + "'" + vaccine_type + "'" + "AND (province='서울시' OR province='경기도' OR province='인천시')";
+        }
+        else
+        {
+            var sqlForSelectList = "SELECT * FROM vaccine JOIN hospital ON " +
+                "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
+                " WHERE vaccine_type=" + "'" + vaccine_type + "'" + "AND province=" + "'" + province + "'";
+        }
+        console.log(sqlForSelectList);
+        connection.query(sqlForSelectList,(err, row) => {
+            if (err) console.log(err);
+            if(!row.length){
+                console.log('조건에 맞는 병원이 없습니다.');
+                res.render('remaining_vaccine');
+            }
+            else
+            {
+                for(var i=0; i< row.length; i++)
+                {
+                    console.log(row[i]);
+                }
+                    console.log('조회 성공');
+                    res.redirect('/');
+
+            }
+        })
+        connection.release();
+    })
+
+
+});
 
 module.exports = router;

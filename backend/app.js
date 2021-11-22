@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var register=require('./routes/router');
 var login=require('./routes/router');
+var remaining_vaccine=require('./routes/router');
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/register',register);
 app.use('/login',login);
+app.use('/remaining_vaccine',remaining_vaccine);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
