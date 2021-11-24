@@ -16,6 +16,13 @@ const AuthFormBlock = styled.div`
   }
 `;
 
+const InputBlcok = styled.div`
+  display: flex;
+  & + & {
+    margin-top: 1rem;
+  }
+`;
+
 /**
  * styled input
  */
@@ -30,9 +37,6 @@ const StyledInput = styled.input`
   &:focus {
     color: $oc-teal-7;
     border: 1px solid ${palette.gray[7]};
-  }
-  & + & {
-    margin-top: 1rem;
   }
 `;
 
@@ -76,77 +80,106 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
     <AuthFormBlock>
       <h3>{text}</h3>
       <form onSubmit={onSubmit}>
-        <StyledInput
-          autoComplete="id"
-          name="id"
-          placeholder="아이디"
-          onChange={onChange}
-          value={form.id}
-        />
-        <StyledInput
-          autoComplete="new-password"
-          name="password"
-          placeholder="비밀번호"
-          type="password"
-          onChange={onChange}
-          value={form.password}
-        />
+        <InputBlcok>
+          <StyledInput
+            autoComplete="id"
+            name="id"
+            placeholder="아이디"
+            onChange={onChange}
+            value={form.id}
+          />
+        </InputBlcok>
+        <InputBlcok>
+          <StyledInput
+            autoComplete="new-password"
+            name="password"
+            placeholder="비밀번호"
+            type="password"
+            onChange={onChange}
+            value={form.password}
+          />
+        </InputBlcok>
         {type === 'register' && (
           <>
-            <StyledInput
-              autoComplete="new-password"
-              name="passwordConfirm"
-              placeholder="비밀번호 확인"
-              type="password"
-              onChange={onChange}
-              value={form.passwordConfirm}
-            />
-            <StyledInput
-              name="name"
-              placeholder="이름"
-              onChange={onChange}
-              value={form.name}
-            />
-            <StyledInput
-              name="registration_number"
-              placeholder="주민번호"
-              type="registration_number"
-              onChange={onChange}
-              value={form.registration_number}
-            />
-            <StyledInput
-              name="age"
-              placeholder="나이"
-              type="number"
-              min="1"
-              max="150"
-              onChange={onChange}
-              value={form.age}
-            />
-            <StyledInput
-              name="sex"
-              placeholder="성별"
-              onChange={onChange}
-              value={form.sex}
-            />
-            <StyledInput
-              name="phone_number"
-              placeholder="휴대전화 번호"
-              onChange={onChange}
-              value={form.phone_number}
-            />
-            <StyledInput
-              name="residence"
-              placeholder="거주지역"
-              onChange={onChange}
-              value={form.residence}
-            />
-            <StyledInput
-              name="terms"
-              placeholder="약관동의"
-              onChange={onChange}
-              value={form.terms}
-            />
+            <InputBlcok>
+              <StyledInput
+                autoComplete="new-password"
+                name="passwordConfirm"
+                placeholder="비밀번호 확인"
+                type="password"
+                onChange={onChange}
+                value={form.passwordConfirm}
+              />
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="name"
+                placeholder="이름"
+                onChange={onChange}
+                value={form.name}
+              />
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="registration_number"
+                placeholder="주민번호"
+                type="registration_number"
+                onChange={onChange}
+                value={form.registration_number}
+              />
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="age"
+                placeholder="나이"
+                type="number"
+                min="1"
+                max="150"
+                onChange={onChange}
+                value={form.age}
+                style={{ width: '50%' }}
+              />
+              <InputBlcok style={{ width: '50%' }}>
+                <StyledInput
+                  name="sex"
+                  type="checkbox"
+                  onSelect={onChange}
+                  value="M"
+                  style={{ width: '50%' }}
+                />
+                <StyledInput
+                  name="sex"
+                  type="checkbox"
+                  onChange={onChange}
+                  value="F"
+                  style={{ width: '50%', display: 'flex' }}
+                />
+              </InputBlcok>
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="phone_number"
+                placeholder="휴대전화 번호"
+                onChange={onChange}
+                value={form.phone_number}
+              />
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="residence"
+                placeholder="거주지역"
+                onChange={onChange}
+                value={form.residence}
+              />
+            </InputBlcok>
+            <InputBlcok>
+              <StyledInput
+                name="terms"
+                placeholder="약관동의"
+                onChange={onChange}
+                value={form.terms}
+              />
+            </InputBlcok>
           </>
         )}
         {error && <ErrorMessage>{error}</ErrorMessage>}
