@@ -40,6 +40,7 @@ const RegisterForm = ({ history }) => {
       sex,
       phone_number,
     } = form;
+
     // 하나라도 비어있다면
     if (
       [
@@ -56,6 +57,7 @@ const RegisterForm = ({ history }) => {
       setError('빈 칸을 모두 입력하세요.');
       return;
     }
+
     // 비밀번호가 일치하지 않는다면
     if (password !== passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.');
@@ -63,6 +65,7 @@ const RegisterForm = ({ history }) => {
       changeField({ form: 'register', key: 'passwordConfirm', value: '' });
       return;
     }
+
     dispatch(register({ id, password }));
   };
 
