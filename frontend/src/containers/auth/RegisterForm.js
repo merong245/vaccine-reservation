@@ -27,6 +27,16 @@ const RegisterForm = ({ history }) => {
     );
   };
 
+  const handleSex = (value) => {
+    dispatch(
+      changeField({
+        form: 'register',
+        key: 'sex',
+        value,
+      }),
+    );
+  };
+
   // 폼 등록 이벤트 핸들러
   const onSubmit = (e) => {
     e.preventDefault();
@@ -36,9 +46,9 @@ const RegisterForm = ({ history }) => {
       passwordConfirm,
       name,
       registration_number,
-      age,
       sex,
       phone_number,
+      residence,
     } = form;
 
     // 하나라도 비어있다면
@@ -49,9 +59,9 @@ const RegisterForm = ({ history }) => {
         passwordConfirm,
         name,
         registration_number,
-        age,
         sex,
         phone_number,
+        residence,
       ].includes('')
     ) {
       setError('빈 칸을 모두 입력하세요.');
@@ -97,7 +107,7 @@ const RegisterForm = ({ history }) => {
   // user 값이 잘 설정되었는지 확인
   useEffect(() => {
     if (user) {
-      history.push('/'); // 홈 화면으로 이동
+      history.push('/home'); // 홈 화면으로 이동
       try {
         localStorage.setItem('user', JSON.stringify(user));
       } catch (e) {
@@ -113,6 +123,7 @@ const RegisterForm = ({ history }) => {
       onChange={onChange}
       onSubmit={onSubmit}
       error={error}
+      handleSex={handleSex}
     />
   );
 };

@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import palette from '../../lib/styles/palette';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import palette from "../../lib/styles/palette";
+import Navbar from "react-bootstrap/Navbar";
 
 /**
  * 회원가입 / 로그인 페이지의 레이아웃을 담당하는 컴포넌트입니다.
@@ -29,7 +29,8 @@ const WhiteBox = styled.div`
     padding-bottom: 2rem;
     text-align: center;
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    font-size: 20px;
   }
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.025);
   padding: 2rem;
@@ -41,12 +42,10 @@ const WhiteBox = styled.div`
 const AuthTemplate = ({ children }) => {
   return (
     <AuthTemplateBlock>
-      <WhiteBox>
-        <div className="logo-area">
-          <Link to="/">REACTERS</Link>
-        </div>
-        {children}
-      </WhiteBox>
+      <Navbar bg="dark" variant="dark" fixed="top">
+        <Navbar.Brand href="/">　백신 접종 예약 시스템</Navbar.Brand>
+      </Navbar>
+      <WhiteBox>{children}</WhiteBox>
     </AuthTemplateBlock>
   );
 };
