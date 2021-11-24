@@ -57,6 +57,37 @@ const StyledInput = styled.input`
 `;
 
 /**
+ * styled box
+ */
+const StyledBox = styled.div`
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid ${palette.gray[5]};
+  outline: none;
+  width: 100%;
+  padding: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  &:focus {
+    color: $oc-teal-7;
+    border: 1px solid ${palette.gray[7]};
+  }
+`;
+
+/**
+ * styled click box
+ * 약관보기
+ */
+const StyledClickBox = styled.div`
+  font-size: 0.8rem;
+  color: ${palette.gray[5]};
+  &:hover {
+    color: ${palette.gray[7]};
+  }
+`;
+
+/**
  * 폼 하단의 로그인/회원가입 링크
  */
 const Footer = styled.div`
@@ -96,6 +127,7 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [available, setAvailable] = useState(true);
+  const [agreeContents, setAgreeContents] = useState(false);
 
   // 주민번호 변경 이벤트 핸들러
   const onChangeRegNumber = (e) => {
@@ -141,6 +173,11 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
   // 약관 체크 이벤트 핸들러
   const handleCheck = () => {
     setAvailable(!available);
+  };
+
+  // 약관 내용 클릭 이벤트 핸들러
+  const handleAgreeContents = () => {
+    setAgreeContents(!agreeContents);
   };
 
   return (
@@ -226,13 +263,27 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
               />
             </InputBlock>
             <InputBlock>
-              <Form.Check
-                type="checkbox"
-                id="agreement"
-                label="약관동의"
-                onChange={handleCheck}
-              />
+              <StyledBox style={{ height: '3rem' }}>
+                <Form.Check
+                  type="checkbox"
+                  id="agreement"
+                  label="약관동의"
+                  onChange={handleCheck}
+                />
+                <StyledClickBox onClick={handleAgreeContents}>
+                  약관보기
+                </StyledClickBox>
+              </StyledBox>
             </InputBlock>
+            {
+              /* 약관 내용 표시는 새 창을 띄우기 등으로 변경가능 */
+              agreeContents && (
+                <StyledBox style={{ marginTop: '-1px' }}>
+                  약관에 동의함으로서 회원가입 시 수집한 개인정보의 보관 및
+                  이용에 동의함.
+                </StyledBox>
+              )
+            }
           </>
         )}
         {error && <ErrorMessage>{error}</ErrorMessage>}
