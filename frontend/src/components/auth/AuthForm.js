@@ -57,48 +57,6 @@ const StyledInput = styled.input`
 `;
 
 /**
- * checkbox block
- */
-const CheckboxBlcok = styled.label`
-  font-size: 1rem;
-  border: 1px solid ${palette.gray[5]};
-  outline: none;
-  height: 3rem;
-  width: 100%;
-  padding: 1rem;
-  align-items: center;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  -moz-box-align: center;
-  -moz-box-pack: center;
-  &:hover {
-    color: $oc-teal-7;
-    border: 1px solid ${palette.gray[6]};
-    box-shadow: rgba(115, 128, 150, 0.2) 0px 1px 2px 0px inset;
-  }
-`;
-
-/**
- * styled checkbox
- */
-const StyledCheckbox = styled.input`
-  height: 1px;
-  border: 0px none;
-  clip: rect(0px, 0px, 0px, 0px);
-  position: absolute;
-  width: 1px;
-  margin: -1px;
-  padding: 0px;
-  overflow: hidden;
-  &:focus {
-    color: $oc-teal-7;
-    border: 1px solid ${palette.gray[7]};
-  }
-`;
-
-/**
  * 폼 하단의 로그인/회원가입 링크
  */
 const Footer = styled.div`
@@ -135,8 +93,27 @@ const ErrorMessage = styled.div`
 const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
   const text = textMap[type];
 
+  const [registrationNumber, setRegistrationNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [available, setAvailable] = useState(true);
+
+  // 주민번호 변경 이벤트 핸들러
+  const onChangeRegNumber = (e) => {
+    const regex = /^[0-9\b -]{0,14}$/;
+    if (regex.test(e.target.value)) {
+      setRegistrationNumber(e.target.value);
+    }
+    onChange(e);
+  };
+
+  // 주민번호에 - 자동 삽입
+  useEffect(() => {
+    if (registrationNumber.length === 13) {
+      setRegistrationNumber(
+        registrationNumber.replace(/-/g, '').replace(/(\d{6})(\d{7})/, '$1-$2'),
+      );
+    }
+  }, [registrationNumber]);
 
   // 전화번호 변경 이벤트 핸들러
   const onChangePhoneNumber = (e) => {
@@ -145,11 +122,6 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
       setPhoneNumber(e.target.value);
     }
     onChange(e);
-  };
-
-  // 약관 체크 이벤트 핸들러
-  const handleCheck = () => {
-    setAvailable(!available);
   };
 
   // 전화번호에 - 자동 삽입
@@ -165,6 +137,11 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
       );
     }
   }, [phoneNumber]);
+
+  // 약관 체크 이벤트 핸들러
+  const handleCheck = () => {
+    setAvailable(!available);
+  };
 
   return (
     <AuthFormBlock>
@@ -213,86 +190,9 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
               <StyledInput
                 name="registration_number"
                 placeholder="주민번호"
-                type="registration_number"
-                onChange={onChange}
-                value={form.registration_number}
+                onChange={onChangeRegNumber}
+                value={registrationNumber}
               />
-              {/* // </InputBlcok>
-            // <InputBlcok>
-            //   <StyledInput
-            //     name="age"
-            //     placeholder="나이"
-            //     type="number"
-            //     min="1"
-            //     max="150"
-            //     onChange={onChange}
-            //     value={form.age}
-            //     style={{ width: '50%' }}
-            //   />
-            //   <div
-            //     style={{
-            //       width: '50%',
-            //       height: '3rem',
-            //       display: 'flex',
-            //       alignItems: 'center',
-            //       paddingLeft: '6px',
-            //     }}
-            //   >
-            //     <CheckboxBlcok
-            //       style={
-            //         checkedGender === 'M'
-            //           ? {
-            //               borderTopLeftRadius: '4px',
-            //               borderBottomLeftRadius: '4px',
-            //               backgroundColor: palette.gray[3],
-            //             }
-            //           : {
-            //               borderTopLeftRadius: '4px',
-            //               borderBottomLeftRadius: '4px',
-            //               backgroundColor: '#ffffff',
-            //             }
-            //       }
-            //     >
-            //       <StyledCheckbox
-            //         name="sex"
-            //         type="checkbox"
-            //         aria-label="남"
-            //         onClick={genderClick}
-            //         onChange={onChange}
-            //         value="M"
-            //         style={{ width: '50%' }}
-            //       />
-            //       <span style={{}}>남</span>
-            //     </CheckboxBlcok>
-            //     <CheckboxBlcok
-            //       style={
-            //         checkedGender === 'F'
-            //           ? {
-            //               borderTopRightRadius: '4px',
-            //               borderBottomRightRadius: '4px',
-            //               backgroundColor: palette.gray[3],
-            //             }
-            //           : {
-            //               borderTopRightRadius: '4px',
-            //               borderBottomRightRadius: '4px',
-            //               backgroundColor: '#ffffff',
-            //             }
-            //       }
-            //     >
-            //       <StyledCheckbox
-            //         name="sex"
-            //         type="checkbox"
-            //         aria-label="여"
-            //         onClick={genderClick}
-            //         onChange={onChange}
-            //         value="F"
-            //         style={{ width: '50%' }}
-            //       />
-            //       <span style={{}}>여</span>
-            //     </CheckboxBlcok>
-            //   </div>
-            // </InputBlcok>
-            // <InputBlcok> */}
             </InputBlock>
             {/* 나이는 주민번호로 계산 */}
             <InputBlock>
