@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
+import { ToggleButton, ToggleButtonGroup, Form } from 'react-bootstrap';
 
 /**
  * login form
@@ -16,11 +17,23 @@ const AuthFormBlock = styled.div`
   }
 `;
 
-const InputBlcok = styled.div`
+const InputBlock = styled.div`
   display: flex;
   & + & {
     margin-top: 1rem;
   }
+`;
+
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
+  width: 100%;
+`;
+
+const StyledToggleButton = styled(ToggleButton)`
+  height: 3rem;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 /**
@@ -74,13 +87,19 @@ const ErrorMessage = styled.div`
   margin-top: 1rem;
 `;
 
-const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
+const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
   const text = textMap[type];
+
+  const [available, setAvailable] = useState(true);
+  const handleCheck = () => {
+    setAvailable(!available);
+  };
+
   return (
     <AuthFormBlock>
       <h3>{text}</h3>
       <form onSubmit={onSubmit}>
-        <InputBlcok>
+        <InputBlock>
           <StyledInput
             autoComplete="id"
             name="id"
@@ -88,8 +107,8 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
             onChange={onChange}
             value={form.id}
           />
-        </InputBlcok>
-        <InputBlcok>
+        </InputBlock>
+        <InputBlock>
           <StyledInput
             autoComplete="new-password"
             name="password"
@@ -98,10 +117,10 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
             onChange={onChange}
             value={form.password}
           />
-        </InputBlcok>
+        </InputBlock>
         {type === 'register' && (
           <>
-            <InputBlcok>
+            <InputBlock>
               <StyledInput
                 autoComplete="new-password"
                 name="passwordConfirm"
@@ -110,16 +129,16 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
                 onChange={onChange}
                 value={form.passwordConfirm}
               />
-            </InputBlcok>
-            <InputBlcok>
+            </InputBlock>
+            <InputBlock>
               <StyledInput
                 name="name"
                 placeholder="이름"
                 onChange={onChange}
                 value={form.name}
               />
-            </InputBlcok>
-            <InputBlcok>
+            </InputBlock>
+            <InputBlock>
               <StyledInput
                 name="registration_number"
                 placeholder="주민번호"
@@ -127,63 +146,55 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
                 onChange={onChange}
                 value={form.registration_number}
               />
-            </InputBlcok>
-            <InputBlcok>
-              <StyledInput
-                name="age"
-                placeholder="나이"
-                type="number"
-                min="1"
-                max="150"
-                onChange={onChange}
-                value={form.age}
-                style={{ width: '50%' }}
-              />
-              <InputBlcok style={{ width: '50%' }}>
-                <StyledInput
-                  name="sex"
-                  type="checkbox"
-                  onSelect={onChange}
-                  value="M"
-                  style={{ width: '50%' }}
-                />
-                <StyledInput
-                  name="sex"
-                  type="checkbox"
-                  onChange={onChange}
+            </InputBlock>
+            {/* 나이는 주민번호로 계산 */}
+            <InputBlock>
+              <StyledToggleButtonGroup name="sex" onChange={handleSex}>
+                <StyledToggleButton id="male" variant="outline-info" value="M">
+                  Male
+                </StyledToggleButton>
+                <StyledToggleButton
+                  id="female"
+                  variant="outline-info"
                   value="F"
-                  style={{ width: '50%', display: 'flex' }}
-                />
-              </InputBlcok>
-            </InputBlcok>
-            <InputBlcok>
+                >
+                  Female
+                </StyledToggleButton>
+              </StyledToggleButtonGroup>
+            </InputBlock>
+            <InputBlock>
               <StyledInput
                 name="phone_number"
                 placeholder="휴대전화 번호"
                 onChange={onChange}
                 value={form.phone_number}
               />
-            </InputBlcok>
-            <InputBlcok>
+            </InputBlock>
+            <InputBlock>
               <StyledInput
                 name="residence"
                 placeholder="거주지역"
                 onChange={onChange}
                 value={form.residence}
               />
-            </InputBlcok>
-            <InputBlcok>
-              <StyledInput
-                name="terms"
-                placeholder="약관동의"
-                onChange={onChange}
-                value={form.terms}
+            </InputBlock>
+            <InputBlock>
+              <Form.Check
+                type="checkbox"
+                id="agreement"
+                label="약관동의"
+                onChange={handleCheck}
               />
-            </InputBlcok>
+            </InputBlock>
           </>
         )}
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ButtonWithMarginTop cyan fullWidth style={{ marginTop: '1rem' }}>
+        <ButtonWithMarginTop
+          cyan
+          fullWidth
+          style={{ marginTop: '1rem' }}
+          disabled={type === 'register' ? available : false}
+        >
           {text}
         </ButtonWithMarginTop>
       </form>

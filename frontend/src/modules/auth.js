@@ -26,14 +26,22 @@ export const changeField = createAction(
 export const initializeForm = createAction(INITIALIZE_FORM, (form) => form); // reg login
 export const register = createAction(
   REGISTER,
-  ({ id, password, name, registration_number, age, sex, phone_number }) => ({
+  ({
     id,
     password,
     name,
     registration_number,
-    age,
     sex,
     phone_number,
+    residence,
+  }) => ({
+    id,
+    password,
+    name,
+    registration_number,
+    sex,
+    phone_number,
+    residence,
   }),
 );
 export const login = createAction(LOGIN, ({ id, password }) => ({
@@ -54,11 +62,12 @@ const initialState = {
   register: {
     id: '',
     password: '',
+    passwordConfirm: '',
     name: '',
     registration_number: '',
-    age: '',
     sex: '',
     phone_number: '',
+    residence: '',
   },
   login: {
     id: '',
