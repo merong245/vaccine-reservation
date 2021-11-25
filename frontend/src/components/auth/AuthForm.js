@@ -129,7 +129,9 @@ const AuthForm = ({
   onSubmit,
   error,
   handleSex,
-  handleAddress,
+  handleChangePhoneNum,
+  handleChangeRegNum,
+  handleChangeResidence,
 }) => {
   const text = textMap[type];
 
@@ -156,7 +158,11 @@ const AuthForm = ({
         registrationNumber.replace(/-/g, '').replace(/(\d{6})(\d{7})/, '$1-$2'),
       );
     }
-  }, [registrationNumber]);
+
+    if (typeof handleChangeRegNum !== 'undefined') {
+      handleChangeRegNum(registrationNumber);
+    }
+  }, [registrationNumber, handleChangeRegNum]);
 
   // 전화번호 변경 이벤트 핸들러
   const onChangePhoneNumber = (e) => {
@@ -179,7 +185,11 @@ const AuthForm = ({
           .replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'),
       );
     }
-  }, [phoneNumber]);
+
+    if (typeof handleChangePhoneNum !== 'undefined') {
+      handleChangePhoneNum(phoneNumber);
+    }
+  }, [phoneNumber, handleChangePhoneNum]);
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleComplete = (data) => {
@@ -189,10 +199,10 @@ const AuthForm = ({
 
   // 주소정보 삽입
   useEffect(() => {
-    if (typeof handleAddress !== 'undefined') {
-      handleAddress(address);
+    if (typeof handleChangeResidence !== 'undefined') {
+      handleChangeResidence(address);
     }
-  }, [address, handleAddress]);
+  }, [address, handleChangeResidence]);
 
   // 약관 체크 이벤트 핸들러
   const handleCheck = () => {

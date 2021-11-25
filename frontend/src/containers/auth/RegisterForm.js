@@ -37,7 +37,25 @@ const RegisterForm = ({ history }) => {
     );
   };
 
-  const handleAddress = (value) => {
+  const handleChangeRegNum = (value) => {
+    dispatch(
+      changeField({
+        form: 'register',
+        key: 'registration_number',
+        value,
+      }),
+    );
+  };
+  const handleChangePhoneNum = (value) => {
+    dispatch(
+      changeField({
+        form: 'register',
+        key: 'phone_number',
+        value,
+      }),
+    );
+  };
+  const handleChangeResidence = (value) => {
     dispatch(
       changeField({
         form: 'register',
@@ -46,7 +64,6 @@ const RegisterForm = ({ history }) => {
       }),
     );
   };
-
   // 폼 등록 이벤트 핸들러
   const onSubmit = (e) => {
     e.preventDefault();
@@ -83,6 +100,18 @@ const RegisterForm = ({ history }) => {
       setError('비밀번호가 일치하지 않습니다.');
       changeField({ form: 'register', key: 'password', value: '' });
       changeField({ form: 'register', key: 'passwordConfirm', value: '' });
+      return;
+    }
+
+    // 잘못된 주민번호
+    if (registration_number.length !== 14) {
+      setError('올바른 주민번호 형식이 아닙니다.');
+      return;
+    }
+
+    // 잘못된 전화번호
+    if (phone_number.length !== 13 || phone_number.length !== 12) {
+      setError('올바른 전화번호 형식이 아닙니다.');
       return;
     }
 
@@ -134,7 +163,9 @@ const RegisterForm = ({ history }) => {
       onSubmit={onSubmit}
       error={error}
       handleSex={handleSex}
-      handleAddress={handleAddress}
+      handleChangePhoneNum={handleChangePhoneNum}
+      handleChangeRegNum={handleChangeRegNum}
+      handleChangeResidence={handleChangeResidence}
     />
   );
 };
