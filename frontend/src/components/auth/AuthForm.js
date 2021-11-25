@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
 import { ToggleButton, ToggleButtonGroup, Form } from 'react-bootstrap';
+import DaumPostcode from '../../../node_modules/react-daum-postcode/lib/DaumPostcode';
 
 /**
  * login form
@@ -121,11 +122,21 @@ const ErrorMessage = styled.div`
   margin-top: 1rem;
 `;
 
-const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
+const AuthForm = ({
+  type,
+  form,
+  onChange,
+  onSubmit,
+  error,
+  handleSex,
+  handleAddress,
+}) => {
   const text = textMap[type];
 
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [viewAddress, setViewAddress] = useState(false);
   const [available, setAvailable] = useState(true);
   const [agreeContents, setAgreeContents] = useState(false);
 
@@ -169,6 +180,17 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
       );
     }
   }, [phoneNumber]);
+
+  // 주소정보 검색 완료 이벤트 헨들러
+  const handleComplete = (data) => {
+    setAddress(data.address);
+    setViewAddress(true);
+  };
+
+  // 주소정보 삽입
+  useEffect(() => {
+    handleAddress(address);
+  }, [address, handleAddress]);
 
   // 약관 체크 이벤트 핸들러
   const handleCheck = () => {
@@ -255,12 +277,24 @@ const AuthForm = ({ type, form, onChange, onSubmit, error, handleSex }) => {
               />
             </InputBlock>
             <InputBlock>
-              <StyledInput
-                name="residence"
-                placeholder="거주지역"
-                onChange={onChange}
-                value={form.residence}
-              />
+              {viewAddress ? (
+                <StyledBox
+                  name="residence"
+                  style={{ height: '3rem', overflow: 'hidden' }}
+                >
+                  {address}
+                  <StyledClickBox
+                    onClick={() => {
+                      setAddress('');
+                      setViewAddress(!viewAddress);
+                    }}
+                  >
+                    주소수정
+                  </StyledClickBox>
+                </StyledBox>
+              ) : (
+                <DaumPostcode onComplete={handleComplete} autoClose={false} />
+              )}
             </InputBlock>
             <InputBlock>
               <StyledBox style={{ height: '3rem' }}>

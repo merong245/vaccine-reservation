@@ -37,6 +37,16 @@ const RegisterForm = ({ history }) => {
     );
   };
 
+  const handleAddress = (value) => {
+    dispatch(
+      changeField({
+        form: 'register',
+        key: 'residence',
+        value,
+      }),
+    );
+  };
+
   // 폼 등록 이벤트 핸들러
   const onSubmit = (e) => {
     e.preventDefault();
@@ -124,6 +134,7 @@ const RegisterForm = ({ history }) => {
       onSubmit={onSubmit}
       error={error}
       handleSex={handleSex}
+      handleAddress={handleAddress}
     />
   );
 };
