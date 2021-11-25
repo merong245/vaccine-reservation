@@ -4,7 +4,7 @@ import LoginForm from '../containers/auth/LoginForm';
 
 const LoginPage = () => {
   return (
-    <AuthTemplate>
+    <AuthTemplate center>
       <LoginForm />
     </AuthTemplate>
   );
