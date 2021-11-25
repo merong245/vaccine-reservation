@@ -10,18 +10,18 @@ export const register = ({
   password,
   name,
   registration_number,
-  age,
   sex,
   phone_number,
+  residence,
 }) =>
   client.post('/api/auth/register', {
     id,
     password,
     name,
     registration_number,
-    age,
     sex,
     phone_number,
+    residence,
   });
 
 // 로그인 상태 확인

@@ -61,6 +61,9 @@ const StyledInput = styled.input`
  * styled box
  */
 const StyledBox = styled.div`
+  .initial {
+    color: #777777;
+  }
   font-size: 1rem;
   border-radius: 4px;
   border: 1px solid ${palette.gray[5]};
@@ -83,6 +86,7 @@ const StyledBox = styled.div`
 const StyledClickBox = styled.div`
   font-size: 0.8rem;
   color: ${palette.gray[5]};
+  user-select: none;
   &:hover {
     color: ${palette.gray[7]};
   }
@@ -138,7 +142,7 @@ const AuthForm = ({
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
-  const [viewAddress, setViewAddress] = useState(false);
+  const [viewAddress, setViewAddress] = useState(true);
   const [available, setAvailable] = useState(true);
   const [agreeContents, setAgreeContents] = useState(false);
 
@@ -294,18 +298,26 @@ const AuthForm = ({
                   name="residence"
                   style={{ height: '3rem', overflow: 'hidden' }}
                 >
-                  {address}
+                  {address === '' ? (
+                    <div className="initial">거주지</div>
+                  ) : (
+                    address
+                  )}
                   <StyledClickBox
                     onClick={() => {
                       setAddress('');
                       setViewAddress(!viewAddress);
                     }}
                   >
-                    주소수정
+                    {address === '' ? '입력' : '수정'}
                   </StyledClickBox>
                 </StyledBox>
               ) : (
-                <DaumPostcode onComplete={handleComplete} autoClose={false} />
+                <DaumPostcode
+                  onComplete={handleComplete}
+                  autoClose={false}
+                  style={{ height: 100 }}
+                />
               )}
             </InputBlock>
             <InputBlock>
@@ -324,7 +336,7 @@ const AuthForm = ({
             {
               /* 약관 내용 표시는 새 창을 띄우기 등으로 변경가능 */
               agreeContents && (
-                <StyledBox style={{ marginTop: '-1px' }}>
+                <StyledBox style={{ marginTop: '-1px', fontSize: '11px' }}>
                   약관에 동의함으로서 회원가입 시 수집한 개인정보의 보관 및
                   이용에 동의함.
                 </StyledBox>

@@ -110,7 +110,7 @@ const RegisterForm = ({ history }) => {
     }
 
     // 잘못된 전화번호
-    if (phone_number.length !== 13 || phone_number.length !== 12) {
+    if (phone_number.length !== 13 && phone_number.length !== 12) {
       setError('올바른 전화번호 형식이 아닙니다.');
       return;
     }
