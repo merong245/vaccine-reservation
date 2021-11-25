@@ -32,18 +32,27 @@ router.post('/register',(req,res,next)=>{
                         if(err1) console.log(err1)
 
                         if(!row1.length){
-                            const user=[req.body.name,req.body.registration_number,req.body.age,req.body.sex,req.body.phone_number];
 
                             connection.query('INSERT INTO location(`province`,`city`,`district`) VALUES (?,?,?)',location,(err2,row2)=>{
                                 if(err2) console.log(err2);
                             });
+                            sqlForSelectList = "SELECT location_id FROM location WHERE " +
+                                "province=" + "'" + req.body.province + "' AND " +
+                                "city = " + "'" + req.body.city + "' AND " +
+                                "district = " + "'" + req.body.district + "'";
 
-                            connection.query('INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)',user,(err2,row2)=>{
-                                if(err2) console.log(err2)
-                            })
+                            connection.query(sqlForSelectList, (err3, row3) => {
+                                if(err3) console.log(err3);
+                                const user=[req.body.name,req.body.registration_number,req.body.age,req.body.sex,req.body.phone_number, row3[0].location_id];
 
-                            connection.query('INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)',login,(err2,row2)=>{
-                                if(err2) console.log(err2);
+                                connection.query('INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)',user,(err4,row4)=>{
+                                    if(err4) console.log(err4)
+                                });
+
+                                connection.query('INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)',login,(err4,row4)=>{
+                                    if(err4) console.log(err4);
+                                });
+
                             });
 
 
