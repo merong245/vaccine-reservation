@@ -189,7 +189,9 @@ const AuthForm = ({
 
   // 주소정보 삽입
   useEffect(() => {
-    handleAddress(address);
+    if (typeof handleAddress !== 'undefined') {
+      handleAddress(address);
+    }
   }, [address, handleAddress]);
 
   // 약관 체크 이벤트 핸들러
