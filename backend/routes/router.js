@@ -2,6 +2,7 @@ const pool=require('./config')
 
 
 const router = require('.')
+const {NULL} = require("mysql/lib/protocol/constants/types");
 
 // 회원가입
 router.get('/register',(req,res)=>{
@@ -36,7 +37,6 @@ router.post('/register',(req,res,next)=>{
         pool.getConnection(function(err,connection){
 
             var sqlForSelectList = "SELECT * FROM login WHERE id=" +"'" + req.body.id + "'";
-            console.log(sqlForSelectList);
             connection.query(sqlForSelectList,(err, row) => {
                 if (err) console.log(err);
                 if (!row.length) {
@@ -44,7 +44,6 @@ router.post('/register',(req,res,next)=>{
                         "province=" + "'" + province + "' AND " +
                         "city = " + "'" + city + "' AND " +
                         "district = " + "'" + district + "'";
-                    console.log(sqlForSelectList);
 
                     connection.query(sqlForSelectList, (err1, row1) => {
                         if(err1) console.log(err1)
@@ -155,23 +154,23 @@ router.get('/my_vaccine',(req,res)=>{
 });
 router.post('/my_vaccine',(req,res)=> {
 
-    const login=["asdasd","asdasd","191919-5555555"];
+    // 세션 로그인 아이디로 추후 수정
+    const id = "zxczxc";
 
     pool.getConnection(function (err, connection) {
 
         var sqlForSelectList = "SELECT u.name, u.registration_number AS reg, v.vaccine_type, MAX(v.vaccination_number) AS n " +
             "FROM login AS l JOIN user AS u ON " +
             "l.fk_registration_number = u.registration_number "+
-            "JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
-            "WHERE l.id=" + "'" + login[0] + "'";
+            "LEFT JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
+            "WHERE l.id=" + "'" + id + "'";
 
 
-        console.log(sqlForSelectList);
         connection.query(sqlForSelectList,(err, row) => {
             if (err) console.log(err);
-            if(!row.length){
+            if(row.n != NULL){
                 console.log(row[0].name + "님은 미접종자 입니다.");
-                res.render('/');
+                res.redirect('/');
             }
             else
             {
@@ -182,12 +181,12 @@ router.post('/my_vaccine',(req,res)=> {
                     sqlForSelectList = "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
                         "FROM user AS u " +
                         "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-                        "WHERE u.name=" + "'" + row[0].name + "'";
-                    console.log(sqlForSelectList);
+                        "WHERE u.name=" + "'" + row[0].name + "'"
+                        "ORDER BY date";
 
                     connection.query(sqlForSelectList,(err1, row1) => {
                         // 날짜 주소 백신타입 출력
-                        console.log(row1);
+                        console.log(row1[0].date, row1[0].h_name,row1[0].type);
 
                     });
                 }
