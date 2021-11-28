@@ -40,14 +40,12 @@ const SideNavigation = ({ history }) => {
   ];
 
   return (
-    <>
-      <Navigation
-        onSelect={({ itemId }) => {
-          history.push(itemId);
-        }}
-        items={items}
-      />
-    </>
+    <Navigation
+      onSelect={({ itemId }) => {
+        history.push(itemId);
+      }}
+      items={items}
+    />
   );
 };
 
