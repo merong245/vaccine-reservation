@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 const App = () => {
   return (
     <>
-      <Route component={LoginPage} path="/" exact />
+      <Route component={HomePage} path="/" exact />
       <Route component={LoginPage} path="/login" />
       <Route component={RegisterPage} path="/register" />
       <Route component={HomePage} path="/home" />
