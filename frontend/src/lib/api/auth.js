@@ -2,7 +2,7 @@ import client from './client';
 
 // 로그인
 export const login = ({ id, password }) =>
-  client.post('/api/auth/login', { id, password });
+  client.post('/login', { id, password });
 
 // 회원가입
 export const register = ({
@@ -14,7 +14,7 @@ export const register = ({
   phone_number,
   residence,
 }) =>
-  client.post('/api/auth/register', {
+  client.post('/register', {
     id,
     password,
     name,
@@ -25,7 +25,7 @@ export const register = ({
   });
 
 // 로그인 상태 확인
-export const check = () => client.get('/api/auth/check');
+export const check = () => client.get('/check');
 
 // 로그아웃
-export const logout = () => client.post('/api/auth/logout');
+export const logout = () => client.post('/logout');
