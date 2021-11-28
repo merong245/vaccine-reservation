@@ -42,14 +42,14 @@ const StyledLink = styled(Link)`
 /**
  * 밑줄 없는 redirect 버튼
  */
-const StyledButton = styled(Button)`
+const HeaderButton = styled(Button)`
   text-decoration: none;
-  border: 1px solid ${palette.gray[5]};
+  border: 1px solid ${palette.gray[8]};
   background-color: #ffffff;
   color: inherit;
   &:hover {
     color: ${palette.gray[8]};
-    border: 1px solid ${palette.gray[8]};
+    border: 1px solid ${palette.gray[5]};
     background-color: #ffffff;
   }
 `;
@@ -100,14 +100,14 @@ const Header = ({ user, onLogout, title }) => {
           {user ? (
             <ItemContainer className="right">
               <UserInfo>{user.username}</UserInfo>
-              <StyledButton onClick={onLogout}>로그아웃</StyledButton>
+              <HeaderButton onClick={onLogout}>로그아웃</HeaderButton>
             </ItemContainer>
           ) : (
             <ItemContainer
               className="right"
               style={{ justifyContent: 'flex-end' }}
             >
-              <StyledButton to="/login">로그인</StyledButton>
+              <HeaderButton to="/login">로그인</HeaderButton>
             </ItemContainer>
           )}
         </Wrapper>
