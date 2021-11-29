@@ -1,26 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Responsive from '../common/Responsive';
-import SideNavigator from '../common/SideNavigator';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
-
-const ContentsBox = styled.div`
-  flex-direction: row;
-  display: flex;
-`;
-
-const ContentsBlock = styled(Responsive)`
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  align-items: center;
-  justify-content: center;
-  margin-top: 8rem;
-  width: 500px;
-`;
+import { ContentsBlock } from '../common/Contents';
 
 const InfoBlock = styled.div`
   font-size: 1rem;
@@ -81,30 +63,27 @@ const InfoButton = styled(Button)`
 
 const VaccinInfo = () => {
   return (
-    <ContentsBox>
-      <SideNavigator />
-      <ContentsBlock>
-        <InfoBlock>
-          <InfoText>###님은 1차 접종을 완료하셨습니다.</InfoText>
-        </InfoBlock>
-        <InfoBlock>
-          <InfoTag>n차 접종 예약 날짜</InfoTag>
-          <InfoContent>2021년 12월 3일 11:00</InfoContent>
-        </InfoBlock>
-        <InfoBlock>
-          <InfoTag>n차 접종 예약 장소</InfoTag>
-          <InfoContent>광운대학병원</InfoContent>
-        </InfoBlock>
-        <InfoBlock>
-          <InfoTag>n차 접종 백신 종류</InfoTag>
-          <InfoContent>화이자</InfoContent>
-        </InfoBlock>
-        <ButtonBlock>
-          <InfoButton fullWidth>접종완료</InfoButton>
-          <InfoButton fullWidth>예약변경</InfoButton>
-        </ButtonBlock>
-      </ContentsBlock>
-    </ContentsBox>
+    <ContentsBlock>
+      <InfoBlock>
+        <InfoText>###님은 1차 접종을 완료하셨습니다.</InfoText>
+      </InfoBlock>
+      <InfoBlock>
+        <InfoTag>n차 접종 예약 날짜</InfoTag>
+        <InfoContent>2021년 12월 3일 11:00</InfoContent>
+      </InfoBlock>
+      <InfoBlock>
+        <InfoTag>n차 접종 예약 장소</InfoTag>
+        <InfoContent>광운대학병원</InfoContent>
+      </InfoBlock>
+      <InfoBlock>
+        <InfoTag>n차 접종 백신 종류</InfoTag>
+        <InfoContent>화이자</InfoContent>
+      </InfoBlock>
+      <ButtonBlock>
+        <InfoButton fullWidth>접종완료</InfoButton>
+        <InfoButton fullWidth>예약변경</InfoButton>
+      </ButtonBlock>
+    </ContentsBlock>
   );
 };
 

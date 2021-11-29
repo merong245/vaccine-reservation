@@ -18,21 +18,21 @@ const SideNavigation = ({ history }) => {
     },
     {
       title: '병원별 잔여백신 현황',
-      itemId: '/login',
+      itemId: '/vaccinStatus',
       elemBefore: () => {
         return <MdOutlineLocalHospital />;
       },
     },
     {
       title: '예약가능 의료기관 조회',
-      itemId: '/register',
+      itemId: '/reservation',
       elemBefore: () => {
         return <FaRegCalendarTimes />;
       },
     },
     {
       title: '접종결과',
-      itemId: '/home',
+      itemId: '/result',
       elemBefore: () => {
         return <BsTable />;
       },

@@ -4,14 +4,20 @@ import { Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import VaccinStatusPage from './pages/VaccinStatusPage';
+import ReservationPage from './pages/ReservationPage';
+import ResultPage from './pages/ResultPage';
 
 const App = () => {
   return (
     <>
       <Route component={HomePage} path="/" exact />
+      <Route component={HomePage} path="/home" />
       <Route component={LoginPage} path="/login" />
       <Route component={RegisterPage} path="/register" />
-      <Route component={HomePage} path="/home" />
+      <Route component={VaccinStatusPage} path="/vaccinStatus" />
+      <Route component={ReservationPage} path="/reservation" />
+      <Route component={ResultPage} path="/result" />
     </>
   );
 };
