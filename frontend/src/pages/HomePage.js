@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../components/common/Header';
-import HomeContainer from '../containers/vaccin/HomeContainer';
+import HomeContainer from '../containers/vaccine/HomeContainer';
 
 const HomePage = () => {
   return (

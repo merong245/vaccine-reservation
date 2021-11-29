@@ -1,9 +1,9 @@
 import React from 'react';
 import { ContentsBox, ContentsBlock } from '../../components/common/Contents';
 import SideNavigator from '../../components/common/SideNavigator';
-import HospitalList from '../../components/vaccin/HospitalList';
+import HospitalList from '../../components/vaccine/HospitalList';
 
-const VaccinStatusContainer = () => {
+const VaccineStatusContainer = () => {
   return (
     <ContentsBox>
       <SideNavigator />
@@ -14,4 +14,4 @@ const VaccinStatusContainer = () => {
   );
 };
 
-export default VaccinStatusContainer;
+export default VaccineStatusContainer;

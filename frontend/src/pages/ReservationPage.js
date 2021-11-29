@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from '../components/common/Header';
-import ReservationContainer from '../containers/vaccin/ReservationContainer';
+import ReservationContainer from '../containers/vaccine/ReservationContainer';
 
 const ReservationPage = () => {
   return (
     <>
-      <Header title="n차 백신 예약" />
+      <Header title="백신 예약" />
       <ReservationContainer />
     </>
   );

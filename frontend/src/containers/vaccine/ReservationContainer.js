@@ -1,15 +1,15 @@
 import React from 'react';
 import { ContentsBox } from '../../components/common/Contents';
 import SideNavigator from '../../components/common/SideNavigator';
-import VaccinInfo from '../../components/vaccin/VaccinInfo';
+import ReservationForm from '../../components/vaccine/ReservationForm';
 
-const HomeContainer = () => {
+const ReservationContainer = () => {
   return (
     <ContentsBox>
       <SideNavigator />
-      <VaccinInfo />
+      <ReservationForm />
     </ContentsBox>
   );
 };
 
-export default HomeContainer;
+export default ReservationContainer;

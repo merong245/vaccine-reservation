@@ -5,6 +5,8 @@ import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
 import { ToggleButton, ToggleButtonGroup, Form } from 'react-bootstrap';
 import DaumPostcode from '../../../node_modules/react-daum-postcode/lib/DaumPostcode';
+import { StyledInput, InputBlock } from '../common/Input';
+import { StyledBox, StyledClickBox } from '../common/Contents';
 
 /**
  * login form
@@ -18,16 +20,6 @@ const AuthFormBlock = styled.div`
   }
 `;
 
-/**
- * innput container
- */
-const InputBlock = styled.div`
-  display: flex;
-  & + & {
-    margin-top: 1rem;
-  }
-`;
-
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
   width: 100%;
 `;
@@ -38,58 +30,6 @@ const StyledToggleButton = styled(ToggleButton)`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-/**
- * styled input
- */
-const StyledInput = styled.input`
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid ${palette.gray[5]};
-  outline: none;
-  height: 3rem;
-  width: 100%;
-  padding: 1rem;
-  &:focus {
-    color: $oc-teal-7;
-    border: 1px solid ${palette.gray[7]};
-  }
-`;
-
-/**
- * styled box
- */
-const StyledBox = styled.div`
-  .initial {
-    color: #777777;
-  }
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid ${palette.gray[5]};
-  outline: none;
-  width: 100%;
-  padding: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  display: flex;
-  &:focus {
-    color: $oc-teal-7;
-    border: 1px solid ${palette.gray[7]};
-  }
-`;
-
-/**
- * styled click box
- * 약관보기
- */
-const StyledClickBox = styled.div`
-  font-size: 0.8rem;
-  color: ${palette.gray[5]};
-  user-select: none;
-  &:hover {
-    color: ${palette.gray[7]};
-  }
 `;
 
 /**

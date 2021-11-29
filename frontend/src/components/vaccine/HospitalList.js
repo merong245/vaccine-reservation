@@ -4,6 +4,9 @@ import styled, { css } from 'styled-components';
 import Button from '../common/Button';
 import { ItemBlock } from '../common/Contents';
 
+/**
+ * 병원명/지역/백신/운영시간
+ */
 const HospitalItem = styled.div`
   border: 1px solid #ffffff;
   outline: none;
@@ -11,10 +14,11 @@ const HospitalItem = styled.div`
   text-align: center;
   width: 20%;
   background-color: ${palette.gray[3]};
+
   ${(props) =>
     props.even &&
     css`
-      background-color: ${palette.gray[1]};
+      background-color: ${palette.gray[1]}; // 홀짝 색 다르게
     `}
   ${(props) =>
     props.endLeft &&
@@ -33,6 +37,9 @@ const HospitalItem = styled.div`
     `}
 `;
 
+/**
+ * 병원명/지역/백신/운영시간
+ */
 const HospitalTag = styled.div`
   background-color: ${palette.gray[7]};
   font-weight: bold;
@@ -96,9 +103,9 @@ const HospitalList = () => {
           0900~1500
         </HospitalItem>
       </ItemBlock>
+      {/* 접종 완료자의 경우 안보이게 */}
       <ItemBlock style={{ marginTop: '1rem' }}>
-        {/* 접종 완료자의 경우 disabled */}
-        <ReserveButton fullWidth to="/reservation" disabled={false}>
+        <ReserveButton to="/reservation" fullWidth>
           백신접종 예약하러 가기
         </ReserveButton>
       </ItemBlock>

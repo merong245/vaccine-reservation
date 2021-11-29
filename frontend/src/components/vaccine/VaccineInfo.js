@@ -56,12 +56,16 @@ const ButtonBlock = styled.div`
 `;
 
 const InfoButton = styled(Button)`
+  text-align: center;
+  &:hover {
+    color: #ffffff;
+  }
   & + & {
     margin-left: 3rem;
   }
 `;
 
-const VaccinInfo = () => {
+const VaccineInfo = () => {
   return (
     <ContentsBlock>
       <InfoBlock>
@@ -81,10 +85,12 @@ const VaccinInfo = () => {
       </InfoBlock>
       <ButtonBlock>
         <InfoButton fullWidth>접종완료</InfoButton>
-        <InfoButton fullWidth>예약변경</InfoButton>
+        <InfoButton fullWidth to="/reservation">
+          예약변경
+        </InfoButton>
       </ButtonBlock>
     </ContentsBlock>
   );
 };
 
-export default VaccinInfo;
+export default VaccineInfo;

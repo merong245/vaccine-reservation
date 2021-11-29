@@ -7,7 +7,7 @@ import { MdOutlineLocalHospital } from 'react-icons/md';
 import { FaRegCalendarTimes } from 'react-icons/fa';
 import { BsTable } from 'react-icons/bs';
 
-const SideNavigation = ({ history }) => {
+const SideNavigation = ({ history, location }) => {
   const items = [
     {
       title: '홈',
@@ -18,7 +18,7 @@ const SideNavigation = ({ history }) => {
     },
     {
       title: '병원별 잔여백신 현황',
-      itemId: '/vaccinStatus',
+      itemId: '/vaccineStatus',
       elemBefore: () => {
         return <MdOutlineLocalHospital />;
       },
@@ -44,6 +44,7 @@ const SideNavigation = ({ history }) => {
       onSelect={({ itemId }) => {
         history.push(itemId);
       }}
+      activeItemId={location.pathname}
       items={items}
     />
   );
