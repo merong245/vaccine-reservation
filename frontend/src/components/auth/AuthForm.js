@@ -287,7 +287,7 @@ const AuthForm = ({
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <ButtonWithMarginTop
           cyan
-          fullWidth
+          fullwidth="true"
           style={{ marginTop: '1rem' }}
           disabled={type === 'register' ? available : false}
         >

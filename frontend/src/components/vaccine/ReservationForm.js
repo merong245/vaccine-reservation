@@ -6,30 +6,39 @@ import { InputBlock, StyledInput } from '../common/Input';
 import DaumPostcode from '../../../node_modules/react-daum-postcode/lib/DaumPostcode';
 import { StyledBox, StyledClickBox } from '../common/Contents';
 import Select from 'react-select';
-import DatePicker from 'react-datepicker';
+import Button from '../common/Button';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import ko from 'date-fns/locale/ko';
+registerLocale('ko', ko);
+
+const SelectBlock = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const DateWrapper = styled.div`
+  width: 33%;
+  margin-right: 1rem;
+  margin-left: 1rem;
+`;
 
 const StyledSelect = styled(Select)`
-  font-size: 1rem;
-  height: 3rem;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-
-  .react-select-container {
-    flex-direction: column;
-    display: flex;
-    width: 100%;
-  }
-  .css-319lph-ValueContainer {
-    width: 80%;
-    display: flex;
-  }
+  width: 34%;
 `;
 
 const ReservationForm = (onSubmit) => {
+  const today = new Date();
   const [viewAddress, setViewAddress] = useState(true);
   const [address, setAddress] = useState('');
+  const [reserveDate, setReserveDate] = useState(
+    new Date(today.setDate(today.getDate() + 1)),
+  );
+  const [viewList, setViewList] = useState(false);
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleComplete = (data) => {
@@ -63,50 +72,88 @@ const ReservationForm = (onSubmit) => {
     [],
   );
 
+  // const getFormattedDate = (date) => {
+  //   const month = date.toLocaleDateString('ko-KR', {
+  //     month: 'long',
+  //   });
+
+  //   const day = date.toLocaleDateString('ko-KR', {
+  //     day: 'numeric',
+  //   });
+
+  //   return `${month.substr(0, month.length - 1)}/${day.substr(
+  //     0,
+  //     day.length - 1,
+  //   )}`;
+  // };
+
   return (
     <ContentsBlock>
-      <InputBlock>
-        {viewAddress ? (
-          <StyledBox
-            name="residence"
-            style={{ height: '3rem', overflow: 'hidden' }}
-          >
-            {address === '' ? (
-              <div className="initial">지역 선택</div>
-            ) : (
-              address
-            )}
-            <StyledClickBox
-              onClick={() => {
-                setAddress('');
-                setViewAddress(!viewAddress);
-              }}
+      <form>
+        <InputBlock>
+          {viewAddress ? (
+            <StyledBox
+              name="residence"
+              style={{ height: '3rem', overflow: 'hidden' }}
             >
-              {address === '' ? '입력' : '수정'}
-            </StyledClickBox>
-          </StyledBox>
-        ) : (
-          <DaumPostcode
-            onComplete={handleComplete}
-            autoClose={false}
-            style={{ height: 100 }}
+              {address === '' ? (
+                <div className="initial">지역 선택</div>
+              ) : (
+                address
+              )}
+              <StyledClickBox
+                onClick={() => {
+                  setAddress('');
+                  setViewAddress(!viewAddress);
+                }}
+              >
+                {address === '' ? '입력' : '수정'}
+              </StyledClickBox>
+            </StyledBox>
+          ) : (
+            <DaumPostcode
+              onComplete={handleComplete}
+              autoClose={false}
+              style={{ height: 100 }}
+            />
+          )}
+        </InputBlock>
+        <SelectBlock>
+          <StyledSelect
+            options={vaccines}
+            placeholder="백신 선택"
+            isClearable
           />
+          <DateWrapper>
+            {/* Thu Dec 16 2021 00:11:38 GMT+0900 (대한민국 표준시) */}
+            <DatePicker
+              style={{ width: '30%' }}
+              locale="ko"
+              selected={reserveDate}
+              onChange={(date) => {
+                setReserveDate(date);
+              }}
+              minDate={new Date(today.setDate(today.getDate() + 1))} // 과거 날짜 disable
+            />
+          </DateWrapper>
+          <StyledSelect options={hours} placeholder="시간 선택" isClearable />
+        </SelectBlock>
+        {!viewList && (
+          <Button onClick={() => setViewList(true)} fullwidth="true">
+            예약가능 병원 보기
+          </Button>
         )}
-      </InputBlock>
-      <InputBlock>
-        <StyledSelect options={vaccines} placeholder="백신 선택" isClearable />
-      </InputBlock>
-      <InputBlock>
-        <DatePicker />
-      </InputBlock>
-      <InputBlock>
-        <StyledSelect options={hours} placeholder="시간 선택" isClearable />
-      </InputBlock>
-      <InputBlock>
-        <StyledInput placeholder="병원명으로 검색" style={{ width: '100%' }} />
-      </InputBlock>
-      <form style={{ marginTop: '1rem' }}>
-        <HospitalList />
+        {viewList && (
+          <>
+            <InputBlock style={{ marginTop: '1rem' }}>
+              <StyledInput
+                placeholder="병원명으로 검색"
+                style={{ width: '100%' }}
+              />
+            </InputBlock>
+            <HospitalList type="reservation" />
+          </>
+        )}
       </form>
     </ContentsBlock>
   );

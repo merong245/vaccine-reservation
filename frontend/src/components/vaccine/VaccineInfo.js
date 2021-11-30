@@ -84,8 +84,8 @@ const VaccineInfo = () => {
         <InfoContent>화이자</InfoContent>
       </InfoBlock>
       <ButtonBlock>
-        <InfoButton fullWidth>접종완료</InfoButton>
-        <InfoButton fullWidth to="/reservation">
+        <InfoButton fullwidth="true">접종완료</InfoButton>
+        <InfoButton fullwidth="true" to="/reservation">
           예약변경
         </InfoButton>
       </ButtonBlock>

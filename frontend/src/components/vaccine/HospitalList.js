@@ -74,7 +74,7 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-const HospitalList = () => {
+const HospitalList = ({ type }) => {
   return (
     <>
       <ItemBlock>
@@ -105,9 +105,13 @@ const HospitalList = () => {
       </ItemBlock>
       {/* 접종 완료자의 경우 안보이게 */}
       <ItemBlock style={{ marginTop: '1rem' }}>
-        <ReserveButton to="/reservation" fullWidth>
-          백신접종 예약하러 가기
-        </ReserveButton>
+        {type === 'reservation' ? (
+          <ReserveButton fullwidth="true">백신 예약</ReserveButton>
+        ) : (
+          <ReserveButton to="/reservation" fullwidth="true">
+            백신 예약하러 가기
+          </ReserveButton>
+        )}
       </ItemBlock>
     </>
   );

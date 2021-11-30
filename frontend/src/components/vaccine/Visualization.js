@@ -6,13 +6,6 @@ import PieGraph from '../graph/PieGraph';
 import { ContentsBlock } from '../common/Contents';
 import Select from 'react-select';
 
-const GraphBox = styled.div`
-  flex-direction: row;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const SelectBox = styled.div`
   flex-direction: row;
   display: flex;
