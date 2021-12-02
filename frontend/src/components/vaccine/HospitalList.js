@@ -106,7 +106,9 @@ const HospitalList = ({ type }) => {
       {/* 접종 완료자의 경우 안보이게 */}
       <ItemBlock style={{ marginTop: '1rem' }}>
         {type === 'reservation' ? (
-          <ReserveButton fullwidth="true">백신 예약</ReserveButton>
+          <ReserveButton fullwidth="true" cyan>
+            백신 예약
+          </ReserveButton>
         ) : (
           <ReserveButton to="/reservation" fullwidth="true">
             백신 예약하러 가기

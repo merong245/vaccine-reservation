@@ -11,7 +11,7 @@ const SideNavigation = ({ history, location }) => {
   const items = [
     {
       title: '홈',
-      itemId: '/',
+      itemId: '/home',
       elemBefore: () => {
         return <RiHomeLine />;
       },

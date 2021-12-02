@@ -1,11 +1,11 @@
 import React from 'react';
-import Header from '../components/common/Header';
+import HeaderContainer from '../containers/common/HeaderContainer';
 import HomeContainer from '../containers/vaccine/HomeContainer';
 
 const HomePage = () => {
   return (
     <>
-      <Header title="나의 접종현황" />
+      <HeaderContainer title="나의 접종현황" />
       <HomeContainer />
     </>
   );
