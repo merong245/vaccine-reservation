@@ -208,15 +208,16 @@ router.get("/login", (req, res) => {
 
 router.post("/login", (req, res) => {
   const id = req.body.id;
-  const passwd = req.body.password;
+  const passwd = req.body.passwd;
 
   pool.getConnection(function (err, connection) {
     // login, user 조인해서 name 얻기
     var sqlForSelectList =
-      "SELECT * FROM user, login WHERE id=" + "'" + req.body.id + "'";
+      "SELECT * FROM user, login WHERE id=" + "'" + req.body.id + "' AND fk_registration_number = registration_number";
 
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
+
       if (!row.length) {
         console.log("로그인 실패");
         console.log("아이디와 비밀번호를 확인하세요.");
@@ -280,8 +281,8 @@ router.get("/my_vaccine", (req, res) => {
   res.render("my_vaccine");
 });
 router.post("/my_vaccine", (req, res) => {
-  // 세션 로그인 아이디로 추후 수정
-  const id = "zxczxc";
+
+  const id = req.user.id;
 
   pool.getConnection(function (err, connection) {
     var sqlForSelectList =
@@ -433,13 +434,22 @@ router.post("/reservationlist", (req, res, next) => {
 /*예약*/
 router.post("/reservation", (req, res, next) => {
   pool.getConnection(function (err, connection) {
-    const reserv = [
-      req.body.hospital_name,
-      req.body.registration_number,
-      req.body.date,
-      req.body.vaccine_type,
-      "완료",
-    ];
+    // 유저 id 에서 주민번호 받기
+    connection.query(
+        "SELECT fk_registration_number AS reg FROM login WHERE id = " + req.user.id,(err, row) => {
+          if (err) console.log(err);
+
+          // (default)대기, 취소, 완료
+          const reserv = [
+            req.body.hospital_name,
+            row[0].reg,
+            req.body.date,
+            req.body.vaccine_type,
+            "대기"
+          ];
+        }
+    );
+
     connection.query(
       "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
       reserv,
@@ -450,4 +460,83 @@ router.post("/reservation", (req, res, next) => {
   });
 });
 
+// 접종 결과 조회
+router.post('/vaccine_result',(req,res)=> {
+  // 날짜별, 백신별, 지역별
+  const option = req.body.option;
+  var sqlForSelectList= "";
+  pool.getConnection(function (err, connection) {
+
+    // timestamp 형식 수정필요
+    if(option == "날짜별") {
+      // 1차 접종
+      sqlForSelectList = "SELECT * FROM reservation r, vaccination v, user u" +
+          "WHERE r.state = '완료' AND " +
+          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
+          "AND v.vaccination = 1 " +
+          "ORDER BY r.reservation_date";
+      connection.query(sqlForSelectList,(err, row1) => {
+        if (err) console.log(err);
+        console.log(row1);
+      });
+      // 2차 접종
+      sqlForSelectList = "SELECT * FROM reservation r, vaccination v, user u" +
+          "WHERE r.state = '완료' AND " +
+          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
+          "AND v.vaccination = 2 " +
+          "ORDER BY r.reservation_date";
+      connection.query(sqlForSelectList,(err, row2) => {
+        if (err) console.log(err);
+        console.log(row2);
+      });
+    }
+    else if(option == "백신별") {
+      // 1차접종
+      sqlForSelectList = "SELECT vaccine_type,COUNT(fk_registration_number) FROM vaccination " +
+          "WHERE vaccination_number = 1 " +
+          "GROUP BY vaccine_type";
+
+      connection.query(sqlForSelectList,(err, row3) => {
+        if (err) console.log(err);
+        console.log(row3);
+      });
+
+      // 2차접종
+      sqlForSelectList = "SELECT vaccine_type, COUNT(fk_registration_number) FROM vaccination " +
+          "WHERE vaccination_number = 2 " +
+          "GROUP BY vaccine_type";
+      connection.query(sqlForSelectList,(err, row4) => {
+        if (err) console.log(err);
+        console.log(row4);
+      });
+
+    }
+    else if(option == "지역별") {
+      // 1차 접종
+      sqlForSelectList = "SELECT l.province, COUNT(DISTINCT fk_registration_number) FROM location l, reservation r, user u" +
+          "WHERE l.location_id = u.fk_location_id " +
+          "AND u.registration_id = l.fk_registration_id " +
+          "AND r.state = '완료'" +
+          "GROUP BY l.province";
+      connection.query(sqlForSelectList,(err, row5) => {
+        if (err) console.log(err);
+        console.log(row5);
+      });
+      // 2차 접종
+      sqlForSelectList = "SELECT l.province, COUNT(fk_registration_number) FROM location l, reservation r, user u" +
+          "WHERE l.location_id = u.fk_location_id " +
+          "AND u.registration_id = l.fk_registration_id " +
+          "AND r.state = '완료' " +
+          "GROUP BY l.province " +
+          "HAVING COUNT(fk_registration_number) > 1";
+      connection.query(sqlForSelectList,(err, row6) => {
+        if (err) console.log(err);
+        console.log(row6);
+      });
+    }
+    connection.release();
+  })
+
+
+});
 module.exports = router;
