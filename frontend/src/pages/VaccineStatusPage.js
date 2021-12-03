@@ -1,11 +1,11 @@
 import React from 'react';
-import Header from '../components/common/Header';
+import HeaderContainer from '../containers/common/HeaderContainer';
 import VaccineStatusContainer from '../containers/vaccine/VaccineStatusContainer';
 
 const VaccineStatusPage = () => {
   return (
     <>
-      <Header title="잔여 백신 현황" />
+      <HeaderContainer title="잔여 백신 현황" />
       <VaccineStatusContainer />
     </>
   );

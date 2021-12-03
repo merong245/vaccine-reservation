@@ -4,6 +4,8 @@ const pool=require('./config')
 const router = require('.')
 const {NULL} = require("mysql/lib/protocol/constants/types");
 
+const jwt = require("jsonwebtoken");
+
 // 회원가입
 router.get('/register',(req,res)=>{
     console.log('회원가입 페이지');
@@ -117,35 +119,73 @@ router.get('/login',(req,res)=>{
 
 router.post('/login',(req,res)=> {
     const id = req.body.id;
-    const passwd = req.body.passwd;
-
+    const passwd = req.body.password;
 
     pool.getConnection(function (err, connection) {
 
-        var sqlForSelectList = "SELECT * FROM login WHERE id=" + "'" + req.body.id + "'";
+        // login, user 조인해서 name 얻기
+        var sqlForSelectList = "SELECT * FROM user, login WHERE id=" + "'" + req.body.id + "'";
 
         connection.query(sqlForSelectList,(err, row) => {
             if (err) console.log(err);
             if(!row.length){
                 console.log('로그인 실패');
                 console.log('아이디와 비밀번호를 확인하세요.');
-                res.render('login');
+                res.status(401).json({
+                  error: "LOGIN FAILED",
+                  code: 1
+              });
             }
             else if (id == row[0].id && passwd == row[0].passwd) {
                 console.log('로그인 성공');
-                res.redirect('/');
+
+                // 데이터에 패스워드 제거
+                delete row[0].passwd;
+
+                const token = jwt.sign(
+                  {
+                    "id": row[0].id, "name": row[0].name  // 토큰의 내용(payload)
+                  },
+                  "temp",    // 비밀 키
+                  {
+                    expiresIn: '7d'    // 유효 기간 7일
+                  }
+                );
+          
+                res.cookie("access_token", token, {
+                  maxAge: 1000*60*60*24*7, // 7일
+                  httpOnly: true,
+                  SameSite: "secure",
+                });
+                res.json({tkoen:token})
             }
             else{
                 console.log('로그인 실패');
                 console.log('아이디와 비밀번호를 확인하세요.');
-                res.render('login');
+                res.status(401).json({
+                  error: "LOGIN FAILED",
+                  code: 1
+              });
             }
-            console.log(JSON.stringify(row));
+//            console.log(JSON.stringify(row));
         })
 
         connection.release();
     })
 
+});
+
+/*
+  로그인 체크
+*/
+router.get('/check',(req,res)=>{
+  const user = req.user;
+  if(!user) {
+    // 로그인 X
+    res.status(401); // unauthorized
+    return;
+  }
+  res.send(user);
 });
 
 //나의 접종현황
