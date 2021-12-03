@@ -281,8 +281,8 @@ router.get("/my_vaccine", (req, res) => {
   res.render("my_vaccine");
 });
 router.post("/my_vaccine", (req, res) => {
-  // 세션 로그인 아이디로 추후 수정
-  const id = "zxczxc";
+
+  const id = req.user.id;
 
   pool.getConnection(function (err, connection) {
     var sqlForSelectList =
@@ -434,13 +434,22 @@ router.post("/reservationlist", (req, res, next) => {
 /*예약*/
 router.post("/reservation", (req, res, next) => {
   pool.getConnection(function (err, connection) {
-    const reserv = [
-      req.body.hospital_name,
-      req.body.registration_number,
-      req.body.date,
-      req.body.vaccine_type,
-      "완료",
-    ];
+    // 유저 id 에서 주민번호 받기
+    connection.query(
+        "SELECT fk_registration_number AS reg FROM login WHERE id = " + req.user.id,(err, row) => {
+          if (err) console.log(err);
+
+          // (default)대기, 취소, 완료
+          const reserv = [
+            req.body.hospital_name,
+            row[0].reg,
+            req.body.date,
+            req.body.vaccine_type,
+            "대기"
+          ];
+        }
+    );
+
     connection.query(
       "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
       reserv,
@@ -484,7 +493,8 @@ router.post('/vaccine_result',(req,res)=> {
     else if(option == "백신별") {
       // 1차접종
       sqlForSelectList = "SELECT vaccine_type,COUNT(fk_registration_number) FROM vaccination " +
-          "WHERE vaccination_number = 1 GROUP BY vaccine_type";
+          "WHERE vaccination_number = 1 " +
+          "GROUP BY vaccine_type";
 
       connection.query(sqlForSelectList,(err, row3) => {
         if (err) console.log(err);
@@ -493,7 +503,8 @@ router.post('/vaccine_result',(req,res)=> {
 
       // 2차접종
       sqlForSelectList = "SELECT vaccine_type, COUNT(fk_registration_number) FROM vaccination " +
-          "WHERE vaccination_number = 2 GROUP BY vaccine_type";
+          "WHERE vaccination_number = 2 " +
+          "GROUP BY vaccine_type";
       connection.query(sqlForSelectList,(err, row4) => {
         if (err) console.log(err);
         console.log(row4);
