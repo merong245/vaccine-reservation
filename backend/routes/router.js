@@ -549,7 +549,6 @@ router.post("/vaccine_result", (req, res) => {
     // timestamp 형식 수정필요
     if (option == "날짜별") {
       // 1차 접종
-<<<<<<< HEAD
       sqlForSelectList =
         "SELECT * FROM reservation r, vaccination v, user u" +
         "WHERE r.state = '완료' AND " +
@@ -557,19 +556,10 @@ router.post("/vaccine_result", (req, res) => {
         "AND v.vaccination = 1 " +
         "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row1) => {
-=======
-      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
-          "WHERE r.state = '완료' AND " +
-          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-          "AND v.vaccination = 1 " +
-          "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList,(err, row1) => {
->>>>>>> 91f98ab994206774c82ec2e90d4cbff9d2feb210
         if (err) console.log(err);
         console.log(row1);
       });
       // 2차 접종
-<<<<<<< HEAD
       sqlForSelectList =
         "SELECT * FROM reservation r, vaccination v, user u" +
         "WHERE r.state = '완료' AND " +
@@ -577,14 +567,6 @@ router.post("/vaccine_result", (req, res) => {
         "AND v.vaccination = 2 " +
         "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row2) => {
-=======
-      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
-          "WHERE r.state = '완료' AND " +
-          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-          "AND v.vaccination = 2 " +
-          "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList,(err, row2) => {
->>>>>>> 91f98ab994206774c82ec2e90d4cbff9d2feb210
         if (err) console.log(err);
         console.log(row2);
       });
