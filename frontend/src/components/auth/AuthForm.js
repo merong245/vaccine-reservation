@@ -137,7 +137,7 @@ const AuthForm = ({
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleComplete = (data) => {
-    setAddress(data.sido + ' ' + data.sigungu);
+    setAddress(data.sigunguCode + ' ' + data.sido + ' ' + data.sigungu);
     setViewAddress(true);
   };
 

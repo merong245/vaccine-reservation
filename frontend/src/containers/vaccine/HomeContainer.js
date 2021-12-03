@@ -3,29 +3,23 @@ import { ContentsBox } from '../../components/common/Contents';
 import SideNavigator from '../../components/common/SideNavigator';
 import VaccineInfo from '../../components/vaccine/VaccineInfo';
 import { useDispatch, useSelector } from 'react-redux';
-import { getInfo, unloadInfo } from '../../modules/info';
+import { getUserInfo } from '../../modules/info';
 import { withRouter } from 'react-router-dom';
 
-const HomeContainer = ({ match }) => {
+const HomeContainer = () => {
   const dispatch = useDispatch();
   const { info, error, loading, user } = useSelector(
     ({ info, loading, user }) => ({
       info: info.info,
       error: info.error,
-      loading: loading['vaccine/GET_INFO'],
+      loading: loading['vaccine/GET_USER_INFO'],
       user: user.user,
     }),
   );
 
   useEffect(() => {
-    //    const { id } = match.params;
-    //    dispatch(getInfo(id));
-
-    // 언마운트 시 백신정보 없애기
-    return () => {
-      dispatch(unloadInfo());
-    };
-  }, [dispatch, match]);
+    dispatch(getUserInfo());
+  }, [dispatch]);
 
   return (
     <ContentsBox>

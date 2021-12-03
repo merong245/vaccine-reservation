@@ -115,7 +115,18 @@ const RegisterForm = ({ history }) => {
       return;
     }
 
-    dispatch(register({ id, password }));
+    dispatch(
+      register({
+        id,
+        password,
+        passwordConfirm,
+        name,
+        registration_number,
+        sex,
+        phone_number,
+        residence,
+      }),
+    );
   };
 
   // 컴포넌트가 처음 렌더링 될 때 form 을 초기화함

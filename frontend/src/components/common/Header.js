@@ -99,7 +99,7 @@ const Header = ({ user, onLogout, title }) => {
           <Title>{title}</Title>
           {user ? (
             <ItemContainer className="right">
-              <UserInfo>{user.name}</UserInfo>
+              <UserInfo>{user.id}</UserInfo>
               <HeaderButton onClick={onLogout}>로그아웃</HeaderButton>
             </ItemContainer>
           ) : (

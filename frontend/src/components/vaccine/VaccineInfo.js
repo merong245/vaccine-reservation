@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
 import { ContentsBlock } from '../common/Contents';
-import { complete } from '../../modules/info';
 
 const InfoBlock = styled.div`
   font-size: 1rem;
@@ -69,7 +68,7 @@ const InfoButton = styled(Button)`
 const VaccineInfo = ({ info, loading, error, user }) => {
   return (
     <ContentsBlock>
-      {error ? (
+      {error || !user ? (
         <InfoBlock>
           <InfoText>
             {error} : 사용자 정보를 불러오는데 실패하였습니다.
@@ -82,15 +81,15 @@ const VaccineInfo = ({ info, loading, error, user }) => {
           </InfoBlock>
           <InfoBlock>
             <InfoTag>{info.vaccination_number}차 접종 예약 날짜</InfoTag>
-            <InfoContent>{2021}년 12월 3일 11:00</InfoContent>
+            <InfoContent>{info.reservation_date}</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>n차 접종 예약 장소</InfoTag>
-            <InfoContent>광운대학병원</InfoContent>
+            <InfoTag>{info.vaccination_number}차 접종 예약 장소</InfoTag>
+            <InfoContent>{info.hospital_name}</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>n차 접종 백신 종류</InfoTag>
-            <InfoContent>화이자</InfoContent>
+            <InfoTag>{info.vaccination_number}차 접종 백신 종류</InfoTag>
+            <InfoContent>{info.vaccine_type}</InfoContent>
           </InfoBlock>
           <ButtonBlock>
             <InfoButton fullwidth="true">접종완료</InfoButton>
