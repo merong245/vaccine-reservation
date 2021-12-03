@@ -208,15 +208,16 @@ router.get("/login", (req, res) => {
 
 router.post("/login", (req, res) => {
   const id = req.body.id;
-  const passwd = req.body.password;
+  const passwd = req.body.passwd;
 
   pool.getConnection(function (err, connection) {
     // login, user 조인해서 name 얻기
     var sqlForSelectList =
-      "SELECT * FROM user, login WHERE id=" + "'" + req.body.id + "'";
+      "SELECT * FROM user, login WHERE id=" + "'" + req.body.id + "' AND fk_registration_number = registration_number";
 
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
+
       if (!row.length) {
         console.log("로그인 실패");
         console.log("아이디와 비밀번호를 확인하세요.");
