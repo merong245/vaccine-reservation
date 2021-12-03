@@ -201,9 +201,16 @@ router.post("/register", (req, res, next) => {
   });
 });
 
+
 // 로그인
 router.get("/login", (req, res) => {
-  res.render("login");
+
+  if(req.user.id)
+  {
+    console.log("이미 로그인 되어있습니다.");
+    res.render("index");
+  }else
+    res.render("login");
 });
 
 router.post("/login", (req, res) => {
@@ -247,7 +254,7 @@ router.post("/login", (req, res) => {
           SameSite: "secure",
         });
 
-        res.json({ tkoen: token });
+        res.json({ token: token });
       } else {
         console.log("로그인 실패");
         console.log("아이디와 비밀번호를 확인하세요.");
@@ -339,8 +346,6 @@ router.get("/remaining_vaccine", (req, res) => {
 router.post("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.body.vaccine_type;
   const province = req.body.province;
-  /*const vaccine_type = "화이자";
-    const province = "수도권";*/
 
   pool.getConnection(function (err, connection) {
     if (province == "수도권") {
@@ -365,6 +370,7 @@ router.post("/remaining_vaccine", (req, res) => {
         province +
         "'";
     }
+
     console.log(sqlForSelectList);
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
@@ -453,7 +459,7 @@ router.post("/reservation", (req, res, next) => {
     connection.query(
       "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
       reserv,
-      (err, row) => {
+      (err) => {
         if (err) console.log(err);
       }
     );
@@ -470,7 +476,7 @@ router.post('/vaccine_result',(req,res)=> {
     // timestamp 형식 수정필요
     if(option == "날짜별") {
       // 1차 접종
-      sqlForSelectList = "SELECT * FROM reservation r, vaccination v, user u" +
+      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
           "WHERE r.state = '완료' AND " +
           "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
           "AND v.vaccination = 1 " +
@@ -480,7 +486,7 @@ router.post('/vaccine_result',(req,res)=> {
         console.log(row1);
       });
       // 2차 접종
-      sqlForSelectList = "SELECT * FROM reservation r, vaccination v, user u" +
+      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
           "WHERE r.state = '완료' AND " +
           "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
           "AND v.vaccination = 2 " +
