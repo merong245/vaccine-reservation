@@ -21,6 +21,10 @@ const HomeContainer = () => {
     dispatch(getUserInfo());
   }, [dispatch]);
 
+  useEffect(() => {
+    console.log(info);
+  }, [info]);
+
   return (
     <ContentsBox>
       <SideNavigator />

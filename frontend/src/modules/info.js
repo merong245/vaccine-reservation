@@ -23,17 +23,19 @@ const initialState = {
   error: null,
 };
 
-const info = handleActions({
-  [GET_USER_INFO_SUCCESS]: (state, { payload: info }) => ({
-    ...state,
-    info,
-  }),
-  // 회원가입 실패
-  [GET_USER_INFO_FAILURE]: (state, { payload: error }) => ({
-    ...state,
-    error: error,
-  }),
+const info = handleActions(
+  {
+    [GET_USER_INFO_SUCCESS]: (state, { payload: info }) => ({
+      ...state,
+      info,
+    }),
+    // 회원가입 실패
+    [GET_USER_INFO_FAILURE]: (state, { payload: error }) => ({
+      ...state,
+      error: error,
+    }),
+  },
   initialState,
-});
+);
 
 export default info;

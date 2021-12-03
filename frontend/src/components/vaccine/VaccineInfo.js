@@ -70,26 +70,35 @@ const VaccineInfo = ({ info, loading, error, user }) => {
     <ContentsBlock>
       {error || !user ? (
         <InfoBlock>
+          <InfoText>사용자 정보를 불러오는데 실패하였습니다.</InfoText>
+        </InfoBlock>
+      ) : !loading && user && info ? (
+        <InfoBlock>
           <InfoText>
-            {error} : 사용자 정보를 불러오는데 실패하였습니다.
+            <span style={{ color: palette.cyan[9], fontWeight: 'bold' }}>
+              {user.name}
+            </span>
+            님은 {info.vaccination_number}차 접종을 완료하셨습니다.
           </InfoText>
         </InfoBlock>
-      ) : !loading && user ? (
+      ) : (
+        <InfoBlock>
+          <InfoText>로딩중입니다...</InfoText>
+        </InfoBlock>
+      )}
+      {info && info.reservation && (
         <>
           <InfoBlock>
-            <InfoText>{user.name}님은 1차 접종을 완료하셨습니다.</InfoText>
+            <InfoTag>{info.vaccination_number + 1}차 접종 예약 날짜</InfoTag>
+            <InfoContent>{info.reservation.date}</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>{info.vaccination_number}차 접종 예약 날짜</InfoTag>
-            <InfoContent>{info.reservation_date}</InfoContent>
+            <InfoTag>{info.vaccination_number + 1}차 접종 예약 장소</InfoTag>
+            <InfoContent>{info.reservation.hospital_name}</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>{info.vaccination_number}차 접종 예약 장소</InfoTag>
-            <InfoContent>{info.hospital_name}</InfoContent>
-          </InfoBlock>
-          <InfoBlock>
-            <InfoTag>{info.vaccination_number}차 접종 백신 종류</InfoTag>
-            <InfoContent>{info.vaccine_type}</InfoContent>
+            <InfoTag>{info.vaccination_number + 1}차 접종 백신 종류</InfoTag>
+            <InfoContent>{info.reservation.vaccine_type}</InfoContent>
           </InfoBlock>
           <ButtonBlock>
             <InfoButton fullwidth="true">접종완료</InfoButton>
@@ -98,10 +107,6 @@ const VaccineInfo = ({ info, loading, error, user }) => {
             </InfoButton>
           </ButtonBlock>
         </>
-      ) : (
-        <InfoBlock>
-          <InfoText>로딩중입니다...</InfoText>
-        </InfoBlock>
       )}
     </ContentsBlock>
   );
