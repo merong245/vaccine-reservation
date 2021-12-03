@@ -418,7 +418,7 @@ router.post("/done_vaccine", (req, res) => {
       },
     );
 
-    // 기존 예약상태를 완료로 변경
+    // 기존의 예약상태를 완료로 변경
     connection.query(
       "UPDATE reservation " +
         "SET state = '완료' " +
@@ -680,6 +680,7 @@ router.post("/vaccine_result", (req, res) => {
         "AND r.state = '완료' " +
         "AND v.vaccination_number = 2 " +
         "GROUP BY l.province";
+
       connection.query(sqlForSelectList, (err, row6) => {
         if (err) console.log(err);
         console.log(row6);
