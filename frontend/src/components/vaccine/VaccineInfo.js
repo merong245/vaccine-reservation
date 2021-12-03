@@ -78,7 +78,9 @@ const VaccineInfo = ({ info, loading, error, user }) => {
             <span style={{ color: palette.cyan[9], fontWeight: 'bold' }}>
               {user.name}
             </span>
-            님은 {info.vaccination_number}차 접종을 완료하셨습니다.
+            {info.num !== null
+              ? `님은 ${info.num}차 접종을 완료하셨습니다.`
+              : '님은 접종 내역이 없습니다.'}
           </InfoText>
         </InfoBlock>
       ) : (
@@ -86,19 +88,19 @@ const VaccineInfo = ({ info, loading, error, user }) => {
           <InfoText>로딩중입니다...</InfoText>
         </InfoBlock>
       )}
-      {info && info.reservation && (
+      {info && info.date !== undefined && (
         <>
           <InfoBlock>
-            <InfoTag>{info.vaccination_number + 1}차 접종 예약 날짜</InfoTag>
-            <InfoContent>{info.reservation.date}</InfoContent>
+            <InfoTag>{info.num + 1}차 접종 예약 날짜</InfoTag>
+            <InfoContent>테스트</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>{info.vaccination_number + 1}차 접종 예약 장소</InfoTag>
-            <InfoContent>{info.reservation.hospital_name}</InfoContent>
+            <InfoTag>{info.num + 1}차 접종 예약 장소</InfoTag>
+            <InfoContent>{info.hospital}</InfoContent>
           </InfoBlock>
           <InfoBlock>
-            <InfoTag>{info.vaccination_number + 1}차 접종 백신 종류</InfoTag>
-            <InfoContent>{info.reservation.vaccine_type}</InfoContent>
+            <InfoTag>{info.num + 1}차 접종 백신 종류</InfoTag>
+            <InfoContent>{info.vaccineType}</InfoContent>
           </InfoBlock>
           <ButtonBlock>
             <InfoButton fullwidth="true">접종완료</InfoButton>

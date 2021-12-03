@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import { ContentsBox } from '../../components/common/Contents';
-import SideNavigator from '../../components/common/SideNavigator';
 import VaccineInfo from '../../components/vaccine/VaccineInfo';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from '../../modules/info';
@@ -22,14 +20,14 @@ const HomeContainer = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log(info);
-  }, [info]);
+    console.log('info', info);
+    console.log('error', error);
+    console.log('loading', loading);
+    console.log('user', user);
+  }, [info, error, loading, user]);
 
   return (
-    <ContentsBox>
-      <SideNavigator />
-      <VaccineInfo info={info} loading={loading} error={error} user={user} />
-    </ContentsBox>
+    <VaccineInfo info={info} loading={loading} error={error} user={user} />
   );
 };
 
