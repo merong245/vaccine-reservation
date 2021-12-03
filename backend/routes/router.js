@@ -439,9 +439,9 @@ router.post("/done_vaccine",(req,res)=>{
           if (err) console.log(err);
         }
     );
+    
+    // 1차 접종인 경우는 2차 자동 예약
     if(req.body.vaccination_number == 1) {
-
-
       // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
       const reserv_date = new Date();
       if (row[0].vaccine_type == "모더나")
@@ -466,6 +466,16 @@ router.post("/done_vaccine",(req,res)=>{
           }
       );
     }
+
+    // 접종 기록에 추가
+    const vaccination = [row[0].reg, req.body.vaccination_number, req.body.vaccine_type];
+    connection.query(
+        "INSERT INTO vaccination(`fk_registration_number`,`vaccination_number`,`vaccine_type`) VALUES (?,?,?)",
+        vaccination,
+        (err) => {
+          if (err) console.log(err);
+        }
+    );
     connection.release();
   });
   res.redirect("/info");
