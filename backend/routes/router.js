@@ -201,29 +201,25 @@ router.post("/register", (req, res, next) => {
   });
 });
 
-
 // 로그인
 router.get("/login", (req, res) => {
-
-  if(req.user.id)
-  {
+  if (req.user.id) {
     console.log("이미 로그인 되어있습니다.");
     res.render("index");
-  }else
-    res.render("login");
+  } else res.render("login");
 });
 
 router.post("/login", (req, res) => {
   const id = req.body.id;
-  const passwd = req.body.passwd;
+  const passwd = req.body.password;
 
   pool.getConnection(function (err, connection) {
     // login, user 조인해서 name 얻기
     var sqlForSelectList =
-      "SELECT * FROM user, login WHERE id=" +
+      "SELECT * FROM user, login WHERE user.registration_number = login.fk_registration_number AND id=" +
       "'" +
-      req.body.id +
-      "' AND fk_registration_number = registration_number";
+      id +
+      "'";
 
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
@@ -236,7 +232,7 @@ router.post("/login", (req, res) => {
           code: 1,
         });
       } else if (id == row[0].id && passwd == row[0].passwd) {
-        console.log("로그인 성공");
+        console.log("로그인 성공", id, row[0].name);
 
         // 토큰 생성
         const token = jwt.sign(
@@ -549,42 +545,24 @@ router.post("/vaccine_result", (req, res) => {
     // timestamp 형식 수정필요
     if (option == "날짜별") {
       // 1차 접종
-<<<<<<< HEAD
       sqlForSelectList =
-        "SELECT * FROM reservation r, vaccination v, user u" +
+        "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
         "WHERE r.state = '완료' AND " +
         "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
         "AND v.vaccination = 1 " +
         "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row1) => {
-=======
-      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
-          "WHERE r.state = '완료' AND " +
-          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-          "AND v.vaccination = 1 " +
-          "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList,(err, row1) => {
->>>>>>> 91f98ab994206774c82ec2e90d4cbff9d2feb210
         if (err) console.log(err);
         console.log(row1);
       });
       // 2차 접종
-<<<<<<< HEAD
       sqlForSelectList =
-        "SELECT * FROM reservation r, vaccination v, user u" +
+        "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
         "WHERE r.state = '완료' AND " +
         "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
         "AND v.vaccination = 2 " +
         "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row2) => {
-=======
-      sqlForSelectList = "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
-          "WHERE r.state = '완료' AND " +
-          "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-          "AND v.vaccination = 2 " +
-          "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList,(err, row2) => {
->>>>>>> 91f98ab994206774c82ec2e90d4cbff9d2feb210
         if (err) console.log(err);
         console.log(row2);
       });
