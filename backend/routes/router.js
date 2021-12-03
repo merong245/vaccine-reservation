@@ -1,7 +1,7 @@
 const pool = require("./config");
 const mysql = require("mysql");
 const router = require(".");
-const { NULL } = require("mysql/lib/protocol/constants/types");
+const { NULL, TIMESTAMP} = require("mysql/lib/protocol/constants/types");
 
 const jwt = require("jsonwebtoken");
 
@@ -611,7 +611,6 @@ router.post("/vaccine_result", (req, res) => {
   var sqlForSelectList = "";
   pool.getConnection(function (err, connection) {
 
-    // timestamp 형식 수정필요
     if (option == "날짜별") {
       // 1차 접종
       sqlForSelectList =
@@ -624,7 +623,9 @@ router.post("/vaccine_result", (req, res) => {
           "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row1) => {
         if (err) console.log(err);
-        console.log(row1);
+        var d = new Date(row1[0].reservation_date);
+        // 년 월 일 
+        console.log(d.getFullYear(), (d.getMonth() + 1) , d.getDate());
       });
       // 2차 접종
       sqlForSelectList =

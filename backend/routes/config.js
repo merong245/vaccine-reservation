@@ -6,6 +6,7 @@ var pool = mysql.createPool({
   user: "root",
   database: "vaccine",
   password: "1234",
+  dateStrings: 'date'
 });
 
 // 커넥션 확인
