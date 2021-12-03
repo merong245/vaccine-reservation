@@ -1,5 +1,5 @@
 const pool = require("./config");
-
+const mysql = require("mysql");
 const router = require(".");
 const { NULL } = require("mysql/lib/protocol/constants/types");
 
@@ -61,143 +61,149 @@ router.post("/register", (req, res, next) => {
   console.log("지역정보", location);
 
   pool.getConnection(function (err, connection) {
-    var sqlForSelectList =
-      "SELECT * FROM login WHERE id=" + "'" + req.body.id + "'";
+    if (err) console.log(err);
+    else {
+      var sqlForSelectList = "SELECT * FROM login WHERE id=?";
 
-    // 중복 id 확인
-    connection.query(sqlForSelectList, (err, row) => {
-      if (err) console.log(err);
-
-      // 중복 아이디 없음
-      if (!row.length) {
-        sqlForSelectList =
-          "SELECT location_id FROM location WHERE " +
-          "province=" +
-          "'" +
-          province +
-          "' AND " +
-          "city = " +
-          "'" +
-          city +
-          "' AND " +
-          "district ";
-        sqlForSelectList +=
-          district === null ? "IS NULL" : "= " + district + "'";
-
-        // 지역정보 있는지 확인
-        connection.query(sqlForSelectList, (err1, row1) => {
-          if (err1) console.log(err1);
-
-          // 지역정보 없으면 삽입
-          if (!row1.length) {
-            connection.query(
-              "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
-              location,
-              (err2, row2) => {
-                if (err2) console.log(err2);
-              }
-            );
-
-            // sqlForSelectList =
-            //   "SELECT location_id FROM location WHERE " +
-            //   "province=" +
-            //   "'" +
-            //   province +
-            //   "' AND " +
-            //   "city = " +
-            //   "'" +
-            //   city +
-            //   "' AND " +
-            //   "district = " +
-            //   "'" +
-            //   district +
-            //   "'";
-
-            // // 지역정보 id 받기
-            // connection.query(sqlForSelectList, (err3, row3) => {
-            //   if (err3) console.log(err3);
-            //   const user = [
-            //     req.body.name,
-            //     req.body.registration_number,
-            //     req.body.age,
-            //     req.body.sex,
-            //     req.body.phone_number,
-            //     row3[0].location_id,
-            //   ];
-
-            // 유저정보 삽입
-            user.push(parseInt(location_id));
-            connection.query(
-              "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
-              user,
-              (err4, row4) => {
-                if (err4) console.log(err4);
-              }
-            );
-
-            // 로그인정보 삽입
-            connection.query(
-              "INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
-              login,
-              (err4, row4) => {
-                if (err4) console.log(err4);
-              }
-            );
-            //});
-          } else {
-            // 지역정보 이미 있으면
-
-            // 유저정보 삽입
-            user.push(parseInt(row1[0].location_id));
-            connection.query(
-              "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
-              user,
-              (err2, row2) => {
-                if (err2) console.log(err2);
-              }
-            );
-            console.log(login);
-            // 로그인정보 삽입
-            connection.query(
-              "INSERT INTO login (`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
-              login,
-              (err2, row2) => {
-                if (err2) console.log(err2);
-              }
-            );
-          }
-
-          // 토큰 생성
-          const token = jwt.sign(
-            {
-              id: row[0].id,
-              name: row[0].name, // 토큰의 내용(payload)
-            },
-            "temp", // 비밀 키
-            {
-              expiresIn: "7d", // 유효 기간 7일
+      // 중복 id 확인
+      connection.query(sqlForSelectList, [req.body.id], (err, row) => {
+        if (err) console.log(err);
+        else {
+          // 중복 아이디 없음
+          if (!row.length) {
+            if (district !== null) {
+              sqlForSelectList =
+                "SELECT location_id FROM location WHERE province=? AND city=? AND district=?";
+              sqlForSelectList = mysql.format(sqlForSelectList, [
+                province,
+                city,
+                district,
+              ]);
+            } else {
+              sqlForSelectList =
+                "SELECT location_id FROM location WHERE province=? AND city=? AND district IS NULL";
+              sqlForSelectList = mysql.format(sqlForSelectList, [
+                province,
+                city,
+              ]);
             }
-          );
 
-          // 쿠키 설정
-          res.cookie("access_token", token, {
-            maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-            httpOnly: true,
-            SameSite: "secure",
-          });
+            // 지역정보 있는지 확인
+            connection.query(sqlForSelectList, (err1, row1) => {
+              if (err1) console.log(err1);
+              else {
+                // 지역정보 없으면 삽입
+                if (!row1.length) {
+                  connection.query(
+                    "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
+                    location,
+                    (err2, row2) => {
+                      if (err2) console.log(err2);
+                    },
+                  );
 
-          res.json({ tkoen: token });
-        });
-      } else {
-        console.log("이미 존재하는 아이디입니다.");
-        res.status(409).json({
-          error: "LOGIN FAILED",
-          code: 9,
-        });
-      }
-    });
+                  // sqlForSelectList =
+                  //   "SELECT location_id FROM location WHERE " +
+                  //   "province=" +
+                  //   "'" +
+                  //   province +
+                  //   "' AND " +
+                  //   "city = " +
+                  //   "'" +
+                  //   city +
+                  //   "' AND " +
+                  //   "district = " +
+                  //   "'" +
+                  //   district +
+                  //   "'";
 
-    connection.release();
+                  // // 지역정보 id 받기
+                  // connection.query(sqlForSelectList, (err3, row3) => {
+                  //   if (err3) console.log(err3);
+                  //   const user = [
+                  //     req.body.name,
+                  //     req.body.registration_number,
+                  //     req.body.age,
+                  //     req.body.sex,
+                  //     req.body.phone_number,
+                  //     row3[0].location_id,
+                  //   ];
+
+                  // 유저정보 삽입
+                  user.push(parseInt(location_id));
+                  connection.query(
+                    "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
+                    user,
+                    (err4, row4) => {
+                      if (err4) console.log(err4);
+                    },
+                  );
+
+                  // 로그인정보 삽입
+                  connection.query(
+                    "INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
+                    login,
+                    (err4, row4) => {
+                      if (err4) console.log(err4);
+                    },
+                  );
+                  //});
+                } else {
+                  // 지역정보 이미 있으면
+
+                  // 유저정보 삽입
+                  user.push(parseInt(row1[0].location_id));
+                  connection.query(
+                    "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
+                    user,
+                    (err2, row2) => {
+                      if (err2) console.log(err2);
+                    },
+                  );
+                  console.log(login);
+                  // 로그인정보 삽입
+                  connection.query(
+                    "INSERT INTO login (`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
+                    login,
+                    (err2, row2) => {
+                      if (err2) console.log(err2);
+                    },
+                  );
+                }
+
+                // 토큰 생성
+                const token = jwt.sign(
+                  {
+                    id: req.body.id,
+                    name: req.body.name, // 토큰의 내용(payload)
+                  },
+                  "temp", // 비밀 키
+                  {
+                    expiresIn: "7d", // 유효 기간 7일
+                  },
+                );
+
+                // 쿠키 설정
+                res.cookie("access_token", token, {
+                  maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+                  httpOnly: true,
+                  SameSite: "secure",
+                });
+
+                res.json({ token: token });
+              }
+            });
+          } else {
+            console.log("이미 존재하는 아이디입니다.");
+            res.status(409).json({
+              error: "LOGIN FAILED",
+              code: 9,
+            });
+          }
+        }
+      });
+      connection.release();
+    }
   });
 });
 
@@ -216,12 +222,9 @@ router.post("/login", (req, res) => {
   pool.getConnection(function (err, connection) {
     // login, user 조인해서 name 얻기
     var sqlForSelectList =
-      "SELECT * FROM user, login WHERE user.registration_number = login.fk_registration_number AND id=" +
-      "'" +
-      id +
-      "'";
+      "SELECT * FROM user, login WHERE user.registration_number = login.fk_registration_number AND id=?";
 
-    connection.query(sqlForSelectList, (err, row) => {
+    connection.query(sqlForSelectList, [id], (err, row) => {
       if (err) console.log(err);
 
       if (!row.length) {
@@ -243,7 +246,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          }
+          },
         );
 
         // 쿠키 설정
@@ -289,16 +292,12 @@ router.get("/info", (req, res) => {
   pool.getConnection(function (err, connection) {
     var sqlForSelectList =
       "SELECT u.name, u.registration_number AS reg, v.vaccine_type, MAX(v.vaccination_number) AS n " +
-      "FROM login AS l JOIN user AS u ON " +
-      "l.fk_registration_number = u.registration_number " +
+      "FROM login AS l JOIN user AS u ON l.fk_registration_number = u.registration_number " +
       "LEFT JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
-      "WHERE l.id=" +
-      "'" +
-      id +
-      "'";
+      "WHERE l.id=?";
 
     // 사용자 접종정보
-    connection.query(sqlForSelectList, (err, row) => {
+    connection.query(sqlForSelectList, [id], (err, row) => {
       if (err) console.log(err);
 
       // 접종정보 없음
@@ -308,20 +307,17 @@ router.get("/info", (req, res) => {
       } else {
         // 접종접보 있음
         console.log(
-          row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+          row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
         );
         sqlForSelectList =
           "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
           "FROM user AS u " +
           "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-          "WHERE u.registration_number=" +
-          "'" +
-          row[0].reg +
-          "'";
-        ("ORDER BY date");
+          "WHERE u.registration_number=? " +
+          "ORDER BY date";
 
         // 예약백신정보
-        connection.query(sqlForSelectList, (err1, row1) => {
+        connection.query(sqlForSelectList, [row[0].reg], (err1, row1) => {
           // 날짜 주소 백신타입 출력
           console.log(row1[0].date, row1[0].h_name, row1[0].type);
 
@@ -352,13 +348,10 @@ router.post("/info", (req, res) => {
       "FROM login AS l JOIN user AS u ON " +
       "l.fk_registration_number = u.registration_number " +
       "LEFT JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
-      "WHERE l.id=" +
-      "'" +
-      id +
-      "'";
+      "WHERE l.id=?";
 
     // 사용자 접종정보
-    connection.query(sqlForSelectList, (err, row) => {
+    connection.query(sqlForSelectList, [id], (err, row) => {
       if (err) console.log(err);
 
       // 접종정보 없음
@@ -371,20 +364,17 @@ router.post("/info", (req, res) => {
         // 1차만
         if (row[0].n == 1) {
           console.log(
-              row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
           sqlForSelectList =
-              "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
-              "FROM user AS u " +
-              "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-              "WHERE u.name=" +
-              "'" +
-              row[0].name +
-              "'";
-          ("ORDER BY date");
+            "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
+            "FROM user AS u " +
+            "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
+            "WHERE u.name=? " +
+            "ORDER BY date";
 
           // 예약백신정보
-          connection.query(sqlForSelectList, (err1, row1) => {
+          connection.query(sqlForSelectList, [row[0].name], (err1, row1) => {
             // 날짜 주소 백신타입 출력
             console.log(row1[0].date, row1[0].h_name, row1[0].type);
 
@@ -394,7 +384,7 @@ router.post("/info", (req, res) => {
         } else if (row[0].n == 2) {
           // 접종완료
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
 
           console.log(row[0]);
@@ -412,42 +402,41 @@ router.get("/done_vaccine", (req, res) => {
 });
 /* 자동 2차 접종 예약 */
 /* 최근 예약 기록한 병원에서 같은 백신으로 예약 */
-router.post("/done_vaccine",(req,res)=>{
+router.post("/done_vaccine", (req, res) => {
   pool.getConnection(function (err, connection) {
-
     // 유저 id 에서 주민번호 받아서 접종 기록 가져오기
     connection.query(
-        "SELECT r.reservation_id AS r_id, l.fk_registration_number AS reg, " +
-        "r.fk_hospital_name AS hospital_name, " +
-        "r.vaccine_type AS vaccine_type " +
+      "SELECT r.reservation_id AS r_id, l.fk_registration_number AS reg, " +
+        "r.fk_hospital_name AS hospital_name, r.vaccine_type AS vaccine_type " +
         "FROM login l, reservation r  " +
-        "WHERE l.id = " + "'"+ req.user.id + "' " +
+        "WHERE l.id = ? " +
         "AND r.fk_registration_number = l.fk_registration_number " +
-        "AND r.state = " + "'대기' " +
-        "ORDER BY r.reservation_id DESC" ,
-        (err, row) => {
-          if (err) console.log(err);
-        }
+        "AND r.state = '대기' " +
+        "ORDER BY r.reservation_id DESC",
+      [req.user.id],
+      (err, row) => {
+        if (err) console.log(err);
+      },
     );
 
     // 기존 예약 완료로 변경
     connection.query(
-        "UPDATE reservation " +
+      "UPDATE reservation " +
         "SET state = '완료' " +
-        "WHERE reservation_id = " + row[0].r_id,
-        (err) => {
-          if (err) console.log(err);
-        }
+        "WHERE reservation_id = ?",
+      [row[0].r_id],
+      (err) => {
+        if (err) console.log(err);
+      },
     );
-    
+
     // 1차 접종인 경우는 2차 자동 예약
-    if(req.body.vaccination_number == 1) {
+    if (req.body.vaccination_number == 1) {
       // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
       const reserv_date = new Date();
       if (row[0].vaccine_type == "모더나")
         reserv_date.setDate(today.getDate() + 28);
-      else
-        reserv_date.setDate(today.getDate() + 21);
+      else reserv_date.setDate(today.getDate() + 21);
       // 새로운 예약 정보
       // (default)대기, 취소, 완료
       const reserv = [
@@ -459,31 +448,31 @@ router.post("/done_vaccine",(req,res)=>{
       ];
 
       connection.query(
-          "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
-          reserv,
-          (err) => {
-            if (err) console.log(err);
-          }
+        "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
+        reserv,
+        (err) => {
+          if (err) console.log(err);
+        },
       );
     }
 
     // 접종 기록에 추가
-    const vaccination = [row[0].reg, req.body.vaccination_number, req.body.vaccine_type];
+    const vaccination = [
+      row[0].reg,
+      req.body.vaccination_number,
+      req.body.vaccine_type,
+    ];
     connection.query(
-        "INSERT INTO vaccination(`fk_registration_number`,`vaccination_number`,`vaccine_type`) VALUES (?,?,?)",
-        vaccination,
-        (err) => {
-          if (err) console.log(err);
-        }
+      "INSERT INTO vaccination(`fk_registration_number`,`vaccination_number`,`vaccine_type`) VALUES (?,?,?)",
+      vaccination,
+      (err) => {
+        if (err) console.log(err);
+      },
     );
     connection.release();
   });
   res.redirect("/info");
-
 });
-
-
-
 
 //잔여 백신 조회
 router.get("/remaining_vaccine", (req, res) => {
@@ -498,24 +487,20 @@ router.post("/remaining_vaccine", (req, res) => {
     if (province == "수도권") {
       var sqlForSelectList =
         "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND (province='서울시' OR province='경기도' OR province='인천시')";
+        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id " +
+        "WHERE vaccine_type=? " +
+        "AND (province='서울' OR province='경기도' OR province='인천')";
+      sqlForSelectList = mysql.format(sqlForSelectList, [vaccine_type]);
     } else {
       var sqlForSelectList =
         "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND province=" +
-        "'" +
-        province +
-        "'";
+        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id " +
+        "WHERE vaccine_type=? " +
+        "AND province=?";
+      sqlForSelectList = mysql.format(sqlForSelectList, [
+        vaccine_type,
+        province,
+      ]);
     }
 
     console.log(sqlForSelectList);
@@ -602,7 +587,7 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      }
+      },
     );
 
     connection.query(
@@ -610,7 +595,7 @@ router.post("/reservation", (req, res, next) => {
       reserv,
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
   });
 });
@@ -625,7 +610,7 @@ router.post("/vaccine_result", (req, res) => {
     if (option == "날짜별") {
       // 1차 접종
       sqlForSelectList =
-        "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
+        "SELECT r.reservation_date FROM reservation r, vaccination v, user u " +
         "WHERE r.state = '완료' AND " +
         "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
         "AND v.vaccination = 1 " +
@@ -636,7 +621,7 @@ router.post("/vaccine_result", (req, res) => {
       });
       // 2차 접종
       sqlForSelectList =
-        "SELECT r.reservation_date FROM reservation r, vaccination v, user u" +
+        "SELECT r.reservation_date FROM reservation r, vaccination v, user u " +
         "WHERE r.state = '완료' AND " +
         "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
         "AND v.vaccination = 2 " +
@@ -669,7 +654,7 @@ router.post("/vaccine_result", (req, res) => {
     } else if (option == "지역별") {
       // 1차 접종
       sqlForSelectList =
-        "SELECT l.province, COUNT(DISTINCT fk_registration_number) FROM location l, reservation r, user u" +
+        "SELECT l.province, COUNT(DISTINCT fk_registration_number) FROM location l, reservation r, user u " +
         "WHERE l.location_id = u.fk_location_id " +
         "AND u.registration_id = l.fk_registration_id " +
         "AND r.state = '완료'" +
@@ -680,7 +665,7 @@ router.post("/vaccine_result", (req, res) => {
       });
       // 2차 접종
       sqlForSelectList =
-        "SELECT l.province, COUNT(fk_registration_number) FROM location l, reservation r, user u" +
+        "SELECT l.province, COUNT(fk_registration_number) FROM location l, reservation r, user u " +
         "WHERE l.location_id = u.fk_location_id " +
         "AND u.registration_id = l.fk_registration_id " +
         "AND r.state = '완료' " +
