@@ -304,7 +304,7 @@ router.get("/info", (req, res) => {
       // 접종정보 없음
       if (row.n === NULL) {
         console.log(row[0].name + "님은 미접종자 입니다.");
-        res.redirect("/");
+        res.send({});
       } else {
         // 접종접보 있음
         console.log(
