@@ -288,6 +288,14 @@ router.get("/check", (req, res) => {
   res.send(user);
 });
 
+/**
+ * 로그아웃
+ */
+router.post("/logout", (req, res) => {
+  res.clearCookie("access_token"); //쿠키 초기화
+  res.status(204); // No Content
+});
+
 //나의 접종현황
 router.get("/info", (req, res) => {
   const id = req.user.id;
