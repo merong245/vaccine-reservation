@@ -102,7 +102,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
 
                   // sqlForSelectList =
@@ -139,7 +139,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    },
+                    }
                   );
 
                   // 로그인정보 삽입
@@ -148,7 +148,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    },
+                    }
                   );
                   //});
                 } else {
@@ -161,7 +161,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -170,7 +170,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
                 }
 
@@ -183,7 +183,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  },
+                  }
                 );
 
                 // 쿠키 설정
@@ -249,7 +249,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          },
+          }
         );
 
         // 쿠키 설정
@@ -306,44 +306,42 @@ router.get("/info", (req, res) => {
         if (err) console.log(err);
         const { name, reg, vaccineType = null, num = null } = row[0];
 
-<<<<<<< HEAD
-      // 접종정보 없음
-      if (row.n === NULL) {
-        console.log(row[0].name + "님은 미접종자 입니다.");
-        res.send({});
-      } else {
-        // 접종접보 있음
-        console.log(
-          row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
-        );
-=======
->>>>>>> 9015daca617331e89cf57b5b643c335ca835a3b4
-        sqlForSelectList =
-          "SELECT reservation_date AS date, fk_hospital_name AS h_name " +
-          "FROM user AS u " +
-          "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-          "WHERE u.registration_number=? " +
-          "ORDER BY date";
+        // 접종정보 없음
+        if (row.n === NULL) {
+          console.log(row[0].name + "님은 미접종자 입니다.");
+          res.send({});
+        } else {
+          // 접종접보 있음
+          console.log(
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+          );
+          sqlForSelectList =
+            "SELECT reservation_date AS date, fk_hospital_name AS h_name " +
+            "FROM user AS u " +
+            "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
+            "WHERE u.registration_number=? " +
+            "ORDER BY date";
 
-        // 예약백신정보
-        connection.query(sqlForSelectList, [reg], (err1, row1) => {
-          if (!row1.length) {
-            // 예약정보 X
-            const info = { name: name, type: vaccineType, num: num };
-            res.send(info);
-          } else {
-            // 예약정보 존재
-            const { date, hospital } = row1[0];
-            const info = {
-              name: name,
-              type: vaccineType,
-              num: num,
-              date: date,
-              hospital: hospital,
-            };
-            res.send(info);
-          }
-        });
+          // 예약백신정보
+          connection.query(sqlForSelectList, [reg], (err1, row1) => {
+            if (!row1.length) {
+              // 예약정보 X
+              const info = { name: name, type: vaccineType, num: num };
+              res.send(info);
+            } else {
+              // 예약정보 존재
+              const { date, hospital } = row1[0];
+              const info = {
+                name: name,
+                type: vaccineType,
+                num: num,
+                date: date,
+                hospital: hospital,
+              };
+              res.send(info);
+            }
+          });
+        }
       });
       connection.release();
     }
@@ -375,7 +373,7 @@ router.post("/info", (req, res) => {
         // 1차만
         if (row[0].n == 1) {
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
@@ -395,7 +393,7 @@ router.post("/info", (req, res) => {
         } else if (row[0].n == 2) {
           // 접종완료
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
           );
 
           console.log(row[0]);
@@ -427,7 +425,7 @@ router.post("/done_vaccine", (req, res) => {
       [req.user.id],
       (err, row) => {
         if (err) console.log(err);
-      },
+      }
     );
 
     // 기존의 예약상태를 완료로 변경
@@ -438,7 +436,7 @@ router.post("/done_vaccine", (req, res) => {
       [row[0].r_id],
       (err) => {
         if (err) console.log(err);
-      },
+      }
     );
 
     // 1차 접종인 경우는 2차 자동 예약
@@ -463,7 +461,7 @@ router.post("/done_vaccine", (req, res) => {
         reserv,
         (err) => {
           if (err) console.log(err);
-        },
+        }
       );
     }
 
@@ -478,7 +476,7 @@ router.post("/done_vaccine", (req, res) => {
       vaccination,
       (err) => {
         if (err) console.log(err);
-      },
+      }
     );
     connection.release();
   });
@@ -497,7 +495,6 @@ router.get("/remaining_vaccine", (req, res) => {
   console.log(vaccine_type, province);
 
   pool.getConnection(function (err, connection) {
-<<<<<<< HEAD
     var sqlForSelectList =
       "SELECT * FROM vaccine JOIN hospital ON " +
       "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id";
@@ -527,25 +524,6 @@ router.get("/remaining_vaccine", (req, res) => {
         "'" +
         province +
         "'";
-=======
-    if (province == "수도권") {
-      var sqlForSelectList =
-        "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id " +
-        "WHERE vaccine_type=? " +
-        "AND (province='서울' OR province='경기도' OR province='인천')";
-      sqlForSelectList = mysql.format(sqlForSelectList, [vaccine_type]);
-    } else {
-      var sqlForSelectList =
-        "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id " +
-        "WHERE vaccine_type=? " +
-        "AND province=?";
-      sqlForSelectList = mysql.format(sqlForSelectList, [
-        vaccine_type,
-        province,
-      ]);
->>>>>>> 9015daca617331e89cf57b5b643c335ca835a3b4
     }
 
     // else if (province == "수도권") {
@@ -643,7 +621,7 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      },
+      }
     );
 
     connection.query(
@@ -651,7 +629,7 @@ router.post("/reservation", (req, res, next) => {
       reserv,
       (err) => {
         if (err) console.log(err);
-      },
+      }
     );
   });
 });
