@@ -102,7 +102,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
 
                   // sqlForSelectList =
@@ -139,7 +139,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
 
                   // 로그인정보 삽입
@@ -148,7 +148,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
                   //});
                 } else {
@@ -161,7 +161,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -170,7 +170,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                 }
 
@@ -183,7 +183,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  }
+                  },
                 );
 
                 // 쿠키 설정
@@ -249,7 +249,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          }
+          },
         );
 
         // 쿠키 설정
@@ -288,6 +288,10 @@ router.get("/check", (req, res) => {
   res.send(user);
 });
 
+router.post("/logout", (req, res) => {
+  res.cookie("access_token", "").json({ logoutSuccess: true });
+});
+
 //나의 접종현황
 router.get("/info", (req, res) => {
   const id = req.user.id;
@@ -311,7 +315,7 @@ router.get("/info", (req, res) => {
         } else {
           // 접종접보 있음
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
@@ -368,7 +372,7 @@ router.post("/done_vaccine", (req, res) => {
       [req.user.id],
       (err, row) => {
         if (err) console.log(err);
-      }
+      },
     );
 
     // 기존의 예약상태를 완료로 변경
@@ -379,7 +383,7 @@ router.post("/done_vaccine", (req, res) => {
       [row[0].r_id],
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
 
     // 1차 접종인 경우는 2차 자동 예약
@@ -404,7 +408,7 @@ router.post("/done_vaccine", (req, res) => {
         reserv,
         (err) => {
           if (err) console.log(err);
-        }
+        },
       );
     }
 
@@ -419,7 +423,7 @@ router.post("/done_vaccine", (req, res) => {
       vaccination,
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
     connection.release();
   });
@@ -566,7 +570,7 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      }
+      },
     );
 
     connection.query(
@@ -574,7 +578,7 @@ router.post("/reservation", (req, res, next) => {
       reserv,
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
   });
 });

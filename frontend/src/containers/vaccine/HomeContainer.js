@@ -15,15 +15,15 @@ const HomeContainer = () => {
   );
 
   useEffect(() => {
-    dispatch(getUserInfo());
-  }, [dispatch]);
+    if (user !== null) dispatch(getUserInfo());
+  }, [dispatch, user]);
 
-  useEffect(() => {
-    console.log('info', info);
-    console.log('error', error);
-    console.log('loading', loading);
-    console.log('user', user);
-  }, [info, error, loading, user]);
+  // useEffect(() => {
+  //   console.log('info', info);
+  //   console.log('error', error);
+  //   console.log('loading', loading);
+  //   console.log('user', user);
+  // }, [info, error, loading, user]);
 
   return (
     <VaccineInfo info={info} loading={loading} error={error} user={user} />
