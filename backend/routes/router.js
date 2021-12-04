@@ -475,8 +475,13 @@ router.get("/remaining_vaccine", (req, res) => {
 
   // router.post("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
-  const province = req.query.province;
+  const residence = req.query.residence;
 
+  if(!residence)
+    var province = NULL;
+  else{
+    var province = residence.split(" ")[0];
+  }
   console.log(vaccine_type, province);
 
   pool.getConnection(function (err, connection) {
