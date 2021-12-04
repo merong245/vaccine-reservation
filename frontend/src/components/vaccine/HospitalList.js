@@ -12,7 +12,7 @@ const HospitalItem = styled.div`
   outline: none;
   padding: 1rem;
   text-align: center;
-  width: 20%;
+  width: 21%;
   background-color: ${palette.gray[3]};
 
   ${(props) =>
@@ -48,7 +48,7 @@ const HospitalTag = styled.div`
   padding: 1rem;
   align-items: center;
   text-align: center;
-  width: 20%;
+  width: 21%;
 
   ${(props) =>
     props.right &&
@@ -74,7 +74,7 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-const HospitalList = ({ type }) => {
+const HospitalList = ({ type, list, error, loading, user }) => {
   return (
     <>
       <ItemBlock>
@@ -83,26 +83,29 @@ const HospitalList = ({ type }) => {
         <HospitalTag>백신</HospitalTag>
         <HospitalTag right>운영시간</HospitalTag>
       </ItemBlock>
-      <ItemBlock>
-        <HospitalItem>희망병원</HospitalItem>
-        <HospitalItem location>
-          매우 긴 주소가 들어오면 어떻게 되나
-        </HospitalItem>
-        <HospitalItem>모더나</HospitalItem>
-        <HospitalItem>0900~1500</HospitalItem>
-      </ItemBlock>
-      <ItemBlock>
-        <HospitalItem even endLeft>
-          희망병원
-        </HospitalItem>
-        <HospitalItem location even>
-          경기도 안양시 덕양구
-        </HospitalItem>
-        <HospitalItem even>모더나</HospitalItem>
-        <HospitalItem even endRight>
-          0900~1500
-        </HospitalItem>
-      </ItemBlock>
+      {!loading && list && (
+        <>
+          {list.map((hospital) => (
+            <ItemBlock>
+              <HospitalItem>{hospital.fk_hospital_name}</HospitalItem>
+              <HospitalItem location>
+                {hospital.district
+                  ? hospital.province +
+                    ' ' +
+                    hospital.city +
+                    ' ' +
+                    hospital.district
+                  : hospital.province + ' ' + hospital.city}
+              </HospitalItem>
+              <HospitalItem>{hospital.vaccine_type}</HospitalItem>
+              <HospitalItem>
+                <span>{hospital.opening_time}</span>
+                <span> {hospital.closing_time}</span>
+              </HospitalItem>
+            </ItemBlock>
+          ))}
+        </>
+      )}
       {/* 접종 완료자의 경우 안보이게 */}
       <ItemBlock style={{ marginTop: '1rem' }}>
         {type === 'reservation' ? (

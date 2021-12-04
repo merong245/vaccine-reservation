@@ -6,7 +6,7 @@ import * as vaccineAPI from '../lib/api/vaccine';
 import { takeLatest } from 'redux-saga/effects';
 
 const [GET_USER_INFO, GET_USER_INFO_SUCCESS, GET_USER_INFO_FAILURE] =
-  createRequestActionTypes('vaccine/GET_USER_INFO');
+  createRequestActionTypes('info/GET_USER_INFO');
 
 export const getUserInfo = createAction(GET_USER_INFO);
 

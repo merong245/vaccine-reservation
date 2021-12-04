@@ -25,7 +25,6 @@ const jwtMiddleware = (req, res, next) => {
       id: decoded.id,
       name: decoded.name,
     };
-    console.log("리퀘스트 토큰", decoded);
     return next();
   } catch (e) {
     // 토큰 검증 실패

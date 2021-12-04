@@ -4,7 +4,6 @@ import SideNavigator from '../../components/common/SideNavigator';
 import VaccineInfo from '../../components/vaccine/VaccineInfo';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from '../../modules/info';
-import { withRouter } from 'react-router-dom';
 
 const HomeContainer = () => {
   const dispatch = useDispatch();
@@ -33,4 +32,4 @@ const HomeContainer = () => {
   );
 };
 
-export default withRouter(HomeContainer);
+export default HomeContainer;

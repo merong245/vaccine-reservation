@@ -408,27 +408,37 @@ router.post("/info", (req, res) => {
 
 //잔여 백신 조회
 router.get("/remaining_vaccine", (req, res) => {
-  res.render("remaining_vaccine");
-});
+  //   //res.render("remaining_vaccine");
+  // });
 
-router.post("/remaining_vaccine", (req, res) => {
-  const vaccine_type = req.body.vaccine_type;
-  const province = req.body.province;
+  // router.post("/remaining_vaccine", (req, res) => {
+  const vaccine_type = req.query.vaccine_type;
+  const province = req.query.province;
+
+  console.log(vaccine_type, province);
 
   pool.getConnection(function (err, connection) {
-    if (province == "수도권") {
-      var sqlForSelectList =
-        "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND (province='서울시' OR province='경기도' OR province='인천시')";
-    } else {
-      var sqlForSelectList =
-        "SELECT * FROM vaccine JOIN hospital ON " +
-        "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
+    var sqlForSelectList =
+      "SELECT * FROM vaccine JOIN hospital ON " +
+      "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id";
+
+    // 지역,백신 선택안함
+    if (!province && !vaccine_type) {
+    }
+    // 지역 선택안함
+    else if (!province) {
+      sqlForSelectList =
+        sqlForSelectList + " WHERE vaccine_type=" + "'" + vaccine_type + "'";
+    }
+    // 백신 선택안함
+    else if (!vaccine_type) {
+      sqlForSelectList =
+        sqlForSelectList + " WHERE province=" + "'" + province + "'";
+    }
+    // 지역,백신 선택
+    else {
+      sqlForSelectList =
+        sqlForSelectList +
         " WHERE vaccine_type=" +
         "'" +
         vaccine_type +
@@ -439,20 +449,31 @@ router.post("/remaining_vaccine", (req, res) => {
         "'";
     }
 
+    // else if (province == "수도권") {
+    //   var sqlForSelectList =
+    //     "SELECT * FROM vaccine JOIN hospital ON " +
+    //     "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
+    //     " WHERE vaccine_type=" +
+    //     "'" +
+    //     vaccine_type +
+    //     "'" +
+    //     "AND (province='서울시' OR province='경기도' OR province='인천시')";
+    // }
+
     console.log(sqlForSelectList);
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
       if (!row.length) {
         console.log("조건에 맞는 병원이 없습니다.");
-        res.render("remaining_vaccine");
       } else {
         for (var i = 0; i < row.length; i++) {
           console.log(row[i]);
         }
         console.log("조회 성공");
-        res.redirect("/");
       }
+      res.send(row);
     });
+
     connection.release();
   });
 });
