@@ -11,6 +11,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ko from 'date-fns/locale/ko';
 import palette from '../../lib/styles/palette';
+import { InfoBlock, InfoText } from '../common/Info';
 registerLocale('ko', ko);
 
 const SearchButton = styled(StyledBox)`
@@ -37,14 +38,17 @@ const SelectBlock = styled.div`
   margin-bottom: 1rem;
 `;
 
-const DateWrapper = styled.div`
-  width: 33%;
+const StyledDatePicker = styled(DatePicker)`
   margin-right: 1rem;
   margin-left: 1rem;
+  height: 38px;
+  width: auto;
+  border-radius: 4px;
+  border: 1px solid ${palette.gray[4]};
 `;
 
 const StyledSelect = styled(Select)`
-  width: 34%;
+  width: 33%;
 `;
 
 const ReservationForm = ({
@@ -115,7 +119,7 @@ const ReservationForm = ({
   //   )}`;
   // };
 
-  return (
+  return user ? (
     <ContentsBlock>
       <form>
         <InputBlock>
@@ -156,18 +160,20 @@ const ReservationForm = ({
             isClearable
             isDisabled={disable}
           />
-          <DateWrapper>
+          <div>
             {/* Thu Dec 16 2021 00:11:38 GMT+0900 (대한민국 표준시) */}
-            <DatePicker
+            <StyledDatePicker
               dateFormat="yyyy/MM/dd"
               disabled={disable}
-              style={{ width: '30%' }}
               locale="ko"
               selected={options.date} //new Date(today.setDate(today.getDate() + 1))
               onChange={handleDate}
               minDate={new Date(today.setDate(today.getDate() + 1))} // 과거 날짜 disable
+              placeholderText=" 날짜 선택"
+              fixedHeight
+              withPortal
             />
-          </DateWrapper>
+          </div>
           <StyledSelect
             onChange={handleTime}
             options={hours}
@@ -216,6 +222,12 @@ const ReservationForm = ({
           </>
         )}
       </form>
+    </ContentsBlock>
+  ) : (
+    <ContentsBlock>
+      <InfoBlock>
+        <InfoText>로그인이 필요한 서비스입니다.</InfoText>
+      </InfoBlock>
     </ContentsBlock>
   );
 };

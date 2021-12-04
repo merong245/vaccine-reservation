@@ -102,7 +102,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
 
                   // sqlForSelectList =
@@ -139,7 +139,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
 
                   // 로그인정보 삽입
@@ -148,7 +148,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
                   //});
                 } else {
@@ -161,7 +161,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -170,7 +170,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                 }
 
@@ -183,7 +183,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  }
+                  },
                 );
 
                 // 쿠키 설정
@@ -249,7 +249,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          }
+          },
         );
 
         // 쿠키 설정
@@ -292,8 +292,7 @@ router.get("/check", (req, res) => {
  * 로그아웃
  */
 router.post("/logout", (req, res) => {
-  res.clearCookie("access_token"); //쿠키 초기화
-  res.status(204); // No Content
+  res.cookie("access_token", "").json({ logoutSuccess: true });
 });
 
 //나의 접종현황
@@ -303,7 +302,6 @@ router.get("/info", (req, res) => {
   pool.getConnection(function (err, connection) {
     if (err) console.log(err);
     else {
-
       var sqlForSelectList =
         "SELECT u.name, u.registration_number AS reg, MAX(v.vaccination_number) AS n " +
         "FROM login AS l JOIN user AS u ON l.fk_registration_number = u.registration_number " +
@@ -320,7 +318,7 @@ router.get("/info", (req, res) => {
         } else {
           // 접종접보 있음
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
@@ -388,7 +386,7 @@ router.post("/done_vaccine", (req, res) => {
           [row[0].r_id],
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
 
         // 1차 접종인 경우는 2차 자동 예약
@@ -413,7 +411,7 @@ router.post("/done_vaccine", (req, res) => {
             reserv,
             (err) => {
               if (err) console.log(err);
-            }
+            },
           );
           info = {
             vaccination_number: req.body.vaccination_number,
@@ -439,11 +437,11 @@ router.post("/done_vaccine", (req, res) => {
           vaccination,
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
         res.send(info);
         connection.release();
-      }
+      },
     );
   });
 });
@@ -588,7 +586,7 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      }
+      },
     );
 
     connection.query(
@@ -596,7 +594,7 @@ router.post("/reservation", (req, res, next) => {
       reserv,
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
   });
 });
@@ -610,14 +608,13 @@ router.get("/vaccine_result", (req, res) => {
 
   var sqlForSelectList = "";
 
-  pool.getConnection(function (err, connection){
-
+  pool.getConnection(function (err, connection) {
     // 2차 접종 이상 맞은 사람들
     sqlForSelectList =
-        "SELECT l.province ,COUNT(v.fk_registration_number) AS cnt " +
-        "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
-        "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
-        "GROUP BY l.province";
+      "SELECT l.province ,COUNT(v.fk_registration_number) AS cnt " +
+      "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
+      "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
+      "GROUP BY l.province";
 
     connection.query(sqlForSelectList, (err, row1) => {
       if (err) console.log(err);
