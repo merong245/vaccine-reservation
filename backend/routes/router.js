@@ -303,7 +303,6 @@ router.get("/info", (req, res) => {
   pool.getConnection(function (err, connection) {
     if (err) console.log(err);
     else {
-
       var sqlForSelectList =
         "SELECT u.name, u.registration_number AS reg, MAX(v.vaccination_number) AS n " +
         "FROM login AS l JOIN user AS u ON l.fk_registration_number = u.registration_number " +
@@ -607,25 +606,9 @@ router.get("/vaccine_result", (req, res) => {
   // option1 : time / residence
   // option2 : number / type / age / gender
   const { option0, option1, option2, option3 } = req.query;
-
+  return;
   var sqlForSelectList = "";
-
-  pool.getConnection(function (err, connection){
-
-    // 2차 접종 이상 맞은 사람들
-    sqlForSelectList =
-        "SELECT l.province ,COUNT(v.fk_registration_number) AS cnt " +
-        "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
-        "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
-        "GROUP BY l.province";
-
-    connection.query(sqlForSelectList, (err, row1) => {
-      if (err) console.log(err);
-      console.log(row1);
-    });
-    connection.release();
-  });
-  /*pool.getConnection(function (err, connection) {
+  pool.getConnection(function (err, connection) {
     if (option1 === "time") {
       // 1차 접종
       sqlForSelectList =
@@ -707,6 +690,6 @@ router.get("/vaccine_result", (req, res) => {
       });
     }
     connection.release();
-  });*/
+  });
 });
 module.exports = router;
