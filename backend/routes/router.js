@@ -451,7 +451,7 @@ router.post("/done_vaccine", (req, res) => {
     // 접종 기록에 추가
     const vaccination = [
       row[0].reg,
-      req.body.vaccination_number,
+      req.body.vaccination_number + 1,
       req.body.vaccine_type,
     ];
     connection.query(
