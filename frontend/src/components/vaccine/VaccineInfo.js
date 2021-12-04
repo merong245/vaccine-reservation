@@ -65,7 +65,7 @@ const InfoButton = styled(Button)`
   }
 `;
 
-const VaccineInfo = ({ info, loading, error, user }) => {
+const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
   return (
     <ContentsBlock>
       {
@@ -119,7 +119,9 @@ const VaccineInfo = ({ info, loading, error, user }) => {
               <InfoContent>{info.reservation.vaccine_type}</InfoContent>
             </InfoBlock>
             <ButtonBlock>
-              <InfoButton fullwidth="true">접종완료</InfoButton>
+              <InfoButton onClick={handleComplete} fullwidth="true">
+                접종완료
+              </InfoButton>
               <InfoButton fullwidth="true" to="/reservation">
                 예약변경
               </InfoButton>

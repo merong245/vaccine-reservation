@@ -3,7 +3,8 @@ import qs from 'qs';
 
 export const getUserInfo = () => client.get(`/info`);
 
-export const completeReservation = () => client.get(`/complete`);
+export const completeReservation = ({ vaccination_number }) =>
+  client.post(`/done_vaccine`, { vaccination_number });
 
 export const getRemainingVaccine = ({
   vaccine_type,

@@ -7,15 +7,29 @@ import { takeLatest } from 'redux-saga/effects';
 
 const [GET_USER_INFO, GET_USER_INFO_SUCCESS, GET_USER_INFO_FAILURE] =
   createRequestActionTypes('info/GET_USER_INFO');
+const [
+  COMPLETE_RESERVATION,
+  COMPLETE_RESERVATION_SUCCESS,
+  COMPLETE_RESERVATION_FAILURE,
+] = createRequestActionTypes('info/COMPLETE_RESERVATION');
 
 export const getUserInfo = createAction(GET_USER_INFO);
+export const completeReservation = createAction(
+  COMPLETE_RESERVATION,
+  ({ vaccination_number }) => ({ vaccination_number }),
+);
 
 const getUserInfoSaga = createRequestSaga(
   GET_USER_INFO,
   vaccineAPI.getUserInfo,
 );
+const completeReservationSaga = createRequestSaga(
+  COMPLETE_RESERVATION,
+  vaccineAPI.completeReservation,
+);
 export function* userInfoSaga() {
   yield takeLatest(GET_USER_INFO, getUserInfoSaga);
+  yield takeLatest(COMPLETE_RESERVATION, completeReservationSaga);
 }
 
 const initialState = {
@@ -29,8 +43,15 @@ const info = handleActions(
       ...state,
       info,
     }),
-    // 회원가입 실패
     [GET_USER_INFO_FAILURE]: (state, { payload: error }) => ({
+      ...state,
+      error: error,
+    }),
+    [COMPLETE_RESERVATION_SUCCESS]: (state, { payload: info }) => ({
+      ...state,
+      info,
+    }),
+    [COMPLETE_RESERVATION_FAILURE]: (state, { payload: error }) => ({
       ...state,
       error: error,
     }),
