@@ -41,7 +41,7 @@ const AuthTemplate = ({ children, center }) => {
           : {}
       }
     >
-      <Navbar bg="dark" variant="dark" fixed="top">
+      <Navbar bg="light" variant="light" fixed="top">
         <Navbar.Brand href="/">　백신 접종 예약 시스템</Navbar.Brand>
       </Navbar>
       <WhiteBox
