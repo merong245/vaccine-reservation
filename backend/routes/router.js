@@ -580,19 +580,28 @@ router.post("/reservation", (req, res, next) => {
 });
 
 // 접종 결과 조회
-router.post("/vaccine_result", (req, res) => {
-  // 날짜별, 백신별, 지역별
-  const option = req.body.option;
+router.get("/vaccine_result", (req, res) => {
+  // option0 : Bar / Line / Pie
+  // option1 : time / residence
+  // option2 : number / type / age / gender
+  const { option0, option1, option2, option3 } = req.query;
+  return;
   var sqlForSelectList = "";
   pool.getConnection(function (err, connection) {
-    if (option == "날짜별") {
+    if (option1 === "time") {
       // 1차 접종
       sqlForSelectList =
-        "SELECT r.reservation_date,COUNT(DISTINCT v.fk_registration_number) " +
+        "(SELECT r.reservation_date, COUNT(DISTINCT v.fk_registration_number) " +
         "FROM reservation r, vaccination v, user u " +
         "WHERE r.state = '완료' AND " +
         "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
         "AND v.vaccination_number = 1 " +
+        "GROUP BY r.reservation_date " +
+        "ORDER BY r.reservation_date) UNION (SELECT r.reservation_date,COUNT(DISTINCT v.fk_registration_number) " +
+        "FROM reservation r, vaccination v, user u " +
+        "WHERE r.state = '완료' AND " +
+        "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
+        "AND v.vaccination_number = 2 " +
         "GROUP BY r.reservation_date " +
         "ORDER BY r.reservation_date";
       connection.query(sqlForSelectList, (err, row1) => {
@@ -602,17 +611,11 @@ router.post("/vaccine_result", (req, res) => {
         console.log(d.getFullYear(), d.getMonth() + 1, d.getDate());
       });
       // 2차 접종
-      sqlForSelectList =
-        "SELECT r.reservation_date,COUNT(DISTINCT v.fk_registration_number) " +
-        "FROM reservation r, vaccination v, user u " +
-        "WHERE r.state = '완료' AND " +
-        "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-        "AND v.vaccination_number = 2 " +
-        "GROUP BY r.reservation_date " +
-        "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList, (err, row2) => {
+      sqlForSelectList = connection.query(sqlForSelectList, (err, row2) => {
         if (err) console.log(err);
-        console.log(row2);
+
+        var result;
+        for (var i = 0; i < row1.length + row2.length; i++) {}
       });
     } else if (option == "백신별") {
       // 1차접종

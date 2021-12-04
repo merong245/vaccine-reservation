@@ -5,6 +5,7 @@ import loading from './loading';
 import user, { userSaga } from './user';
 import info, { userInfoSaga } from './info';
 import vaccine_list, { vaccineStatusSaga } from './vaccineStatus';
+//import result, { resultSaga } from './result';
 
 const rootReducer = combineReducers({
   auth,
@@ -12,10 +13,17 @@ const rootReducer = combineReducers({
   user,
   info,
   vaccine_list,
+  //result,
 });
 
 export function* rootSaga() {
-  yield all([authSaga(), userSaga(), userInfoSaga(), vaccineStatusSaga()]);
+  yield all([
+    authSaga(),
+    userSaga(),
+    userInfoSaga(),
+    vaccineStatusSaga(),
+    //resultSaga(),
+  ]);
 }
 
 export default rootReducer;

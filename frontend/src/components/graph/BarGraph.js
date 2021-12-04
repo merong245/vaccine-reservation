@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResponsiveBar } from '@nivo/bar';
 
-const BarGraph = ({ data }) => (
+const BarGraph = ({ data, options }) => (
   <ResponsiveBar
     data={data}
     keys={['hot dog', 'burger', 'sandwich', 'kebab', 'fries', 'donut']}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import BarGraph from '../graph/BarGraph';
 import LineGraph from '../graph/LineGraph';
@@ -432,10 +432,20 @@ const pieData = [
   },
 ];
 
-const Visualization = () => {
-  const [graphType, setGraphtype] = useState('Bar');
+const Visualization = ({
+  options,
+  result,
+  error,
+  loading,
+  graphChange,
+  criteriaChange,
+  infoChange,
+  accumulateChange,
+}) => {
+  const [graph, setGraph] = useState('Bar');
+  const [keys, setKeys] = useState([]);
 
-  // 그래프 옵션
+  // 그래프 선택
   const graphOptions = useMemo(
     () => [
       { value: 'Bar', label: '막대형' },
@@ -444,9 +454,6 @@ const Visualization = () => {
     ],
     [],
   );
-
-  // 그래프 변경
-  const graphChange = (option) => setGraphtype(option.value);
 
   // 표시 옵션
   const criteriaOptions = useMemo(
@@ -462,8 +469,8 @@ const Visualization = () => {
     () => [
       { value: 'number', label: '접종 차수' },
       { value: 'type', label: '백신 종류' },
-      { value: 'Age', label: '연령' },
-      { value: 'Gender', label: '성별' },
+      { value: 'age', label: '연령' },
+      { value: 'gender', label: '성별' },
     ],
     [],
   );
@@ -471,31 +478,83 @@ const Visualization = () => {
   // 누적 옵션
   const accumulateOptions = useMemo(
     () => [
-      { value: false, label: '누적' },
-      { value: true, label: '지역별' },
+      { value: false, label: '기본' },
+      { value: true, label: '누적' },
     ],
     [],
   );
+
+  const keysList = useMemo(
+    () => [
+      {
+        number: ['1차 접종', '2차 접종'],
+        type: ['화이자', '모더나', '아스트라제네카'],
+        gender: ['남자', '여자'],
+        age: [
+          '10대',
+          '20대',
+          '30대',
+          '40대',
+          '50대',
+          '60대',
+          '70대',
+          '80대 이상',
+        ],
+      },
+    ],
+    [],
+  );
+
+  // useEffect(() => {
+  //   setKeys(
+  //     options.option2 === 'number'
+  //       ? keysList[0].number
+  //       : options.option2 === 'type'
+  //       ? keysList[0].type
+  //       : options.option2 === 'gender'
+  //       ? keysList[0].gender
+  //       : options.option2 === 'age'
+  //       ? keysList[0].age
+  //       : [],
+  //   );
+  // }, [keysList, options.option2]);
 
   return (
     <ContentsBlock style={{ marginTop: '6rem' }}>
       <SelectBox>
         <StyledSelect
-          onChange={graphChange}
+          //onChange={graphChange}
+          onChange={(selectedOption) => setGraph(selectedOption.value)}
+          selected={graphOptions[0]}
           options={graphOptions}
-          defaultValue={graphOptions[0]}
-          placeholder="그래프 선택"
+          placeholder="그래프"
         />
-        <StyledSelect options={criteriaOptions} placeholder="표시 기준" />
-        <StyledSelect options={infoOptions} placeholder="표시 정보" />
-        <StyledSelect options={accumulateOptions} placeholder="누적 표시" />
+        <StyledSelect
+          //onChange={criteriaChange}
+          options={criteriaOptions}
+          placeholder="표시 기준"
+        />
+        <StyledSelect
+          //onChange={infoChange}
+          options={infoOptions}
+          placeholder="표시 정보"
+        />
+        <StyledSelect
+          //onChange={accumulateChange}
+          options={accumulateOptions}
+          placeholder="누적 표시"
+        />
       </SelectBox>
-      {graphType === 'Bar' ? (
-        <BarGraph data={barData} />
-      ) : graphType === 'Line' ? (
-        <LineGraph data={lineData} />
+      {/* {error || loading || !result ? ( // 에러, 로딩, 응답없음
+        <></>) :  */}
+      {graph === 'Bar' ? (
+        <BarGraph data={barData} options={options} />
+      ) : graph === 'Line' ? (
+        <LineGraph data={lineData} options={options} />
+      ) : graph === 'Pie' ? (
+        <PieGraph data={pieData} options={options} />
       ) : (
-        <PieGraph data={pieData} />
+        <></>
       )}
     </ContentsBlock>
   );
