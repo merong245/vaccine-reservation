@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  ContentsBox,
-  ContentsBlock,
-  StyledBox,
-  StyledClickBox,
-} from '../../components/common/Contents';
-import SideNavigator from '../../components/common/SideNavigator';
+import { StyledBox, StyledClickBox } from '../../components/common/Contents';
 import HospitalList from '../../components/vaccine/HospitalList';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRemainingVaccine, changeField } from '../../modules/vaccineStatus';

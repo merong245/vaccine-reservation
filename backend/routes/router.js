@@ -426,7 +426,9 @@ router.post("/done_vaccine", (req, res) => {
   res.redirect("/info");
 });
 
-//잔여 백신 조회
+/**
+ * 잔여 백신 조회
+ */
 router.get("/remaining_vaccine", (req, res) => {
   //   //res.render("remaining_vaccine");
   // });

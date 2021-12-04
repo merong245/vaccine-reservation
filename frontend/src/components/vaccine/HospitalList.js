@@ -16,7 +16,7 @@ const HospitalItem = styled.div`
   background-color: ${palette.gray[3]};
 
   ${(props) =>
-    props.even &&
+    props.index % 2 === 1 &&
     css`
       background-color: ${palette.gray[1]}; // 홀짝 색 다르게
     `}
@@ -34,6 +34,11 @@ const HospitalItem = styled.div`
     props.location &&
     css`
       width: 40%;
+    `}
+    ${(props) =>
+    props.quantity &&
+    css`
+      width: 12%;
     `}
 `;
 
@@ -65,6 +70,11 @@ const HospitalTag = styled.div`
     css`
       width: 40%;
     `}
+    ${(props) =>
+    props.quantity &&
+    css`
+      width: 12%;
+    `}
 `;
 
 const ReserveButton = styled(Button)`
@@ -81,14 +91,17 @@ const HospitalList = ({ type, list, error, loading, user }) => {
         <HospitalTag left>병원명</HospitalTag>
         <HospitalTag location>지역</HospitalTag>
         <HospitalTag>백신</HospitalTag>
+        <HospitalTag quantity>잔량</HospitalTag>
         <HospitalTag right>운영시간</HospitalTag>
       </ItemBlock>
       {!loading && list && (
         <>
-          {list.map((hospital) => (
+          {list.map((hospital, index) => (
             <ItemBlock>
-              <HospitalItem>{hospital.fk_hospital_name}</HospitalItem>
-              <HospitalItem location>
+              <HospitalItem index={index}>
+                {hospital.fk_hospital_name}
+              </HospitalItem>
+              <HospitalItem location index={index}>
                 {hospital.district
                   ? hospital.province +
                     ' ' +
@@ -97,8 +110,11 @@ const HospitalList = ({ type, list, error, loading, user }) => {
                     hospital.district
                   : hospital.province + ' ' + hospital.city}
               </HospitalItem>
-              <HospitalItem>{hospital.vaccine_type}</HospitalItem>
-              <HospitalItem>
+              <HospitalItem index={index}>{hospital.vaccine_type}</HospitalItem>
+              <HospitalItem quantity index={index}>
+                {hospital.quantity}
+              </HospitalItem>
+              <HospitalItem index={index}>
                 <span>{hospital.opening_time}</span>
                 <span> {hospital.closing_time}</span>
               </HospitalItem>

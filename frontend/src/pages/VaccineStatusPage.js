@@ -10,7 +10,7 @@ const VaccineStatusPage = () => {
       <HeaderContainer title="잔여 백신 현황" />
       <ContentsBox>
         <SideNavigator />
-        <ContentsBlock>
+        <ContentsBlock style={{ width: '700px' }}>
           <VaccineStatusContainer />
         </ContentsBlock>
       </ContentsBox>
