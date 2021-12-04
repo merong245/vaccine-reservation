@@ -391,8 +391,8 @@ router.post("/done_vaccine", (req, res) => {
       // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
       const reserv_date = new Date();
       if (row[0].vaccine_type == "모더나")
-        reserv_date.setDate(today.getDate() + 28);
-      else reserv_date.setDate(today.getDate() + 21);
+        reserv_date.setDate(reserv_date.getDate() + 28);
+      else reserv_date.setDate(reserv_date.getDate() + 21);
       // 새로운 예약 정보
       // (default)대기, 취소, 완료
       const reserv = [
@@ -409,6 +409,27 @@ router.post("/done_vaccine", (req, res) => {
         (err) => {
           if (err) console.log(err);
         },
+      );
+    }
+    else // 2차 이후 부스터 샷은 6개월 뒤 예약
+    {
+      const reserv_date = new Date();
+        reserv_date.setMonth(reserv_date.getMonth() + 6);
+      // 새로운 예약 정보
+      const reserv = [
+        row[0].hospital_name,
+        row[0].reg,
+        reserv_date,
+        row[0].vaccine_type,
+        "대기",
+      ];
+
+      connection.query(
+          "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
+          reserv,
+          (err) => {
+            if (err) console.log(err);
+          },
       );
     }
 
