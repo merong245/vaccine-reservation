@@ -296,7 +296,7 @@ router.get("/info", (req, res) => {
     if (err) console.log(err);
     else {
       var sqlForSelectList =
-        "SELECT u.name, u.registration_number AS reg, v.vaccine_type, MAX(v.vaccination_number) AS n " +
+        "SELECT u.name, u.registration_number AS reg, MAX(v.vaccination_number) AS n " +
         "FROM login AS l JOIN user AS u ON l.fk_registration_number = u.registration_number " +
         "LEFT JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
         "WHERE l.id=?";
@@ -304,104 +304,47 @@ router.get("/info", (req, res) => {
       // 사용자 접종정보
       connection.query(sqlForSelectList, [id], (err, row) => {
         if (err) console.log(err);
-        const { name, reg, vaccineType = null, num = null } = row[0];
-
+        const { n = null } = row[0];
         // 접종정보 없음
         if (row.n === NULL) {
           console.log(row[0].name + "님은 미접종자 입니다.");
-          res.send({});
         } else {
           // 접종접보 있음
           console.log(
             row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
           );
           sqlForSelectList =
-            "SELECT reservation_date AS date, fk_hospital_name AS h_name " +
-            "FROM user AS u " +
+            "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
+            "FROM login AS l, user AS u  " +
             "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-            "WHERE u.registration_number=? " +
+            "WHERE l.id=? AND u.registration_number=l.fk_registration_number " +
             "ORDER BY date";
 
           // 예약백신정보
-          connection.query(sqlForSelectList, [reg], (err1, row1) => {
+          connection.query(sqlForSelectList, [id], (err1, row1) => {
+            var info;
             if (!row1.length) {
               // 예약정보 X
-              const info = { name: name, type: vaccineType, num: num };
-              res.send(info);
+              info = { vaccination_number: n };
             } else {
               // 예약정보 존재
-              const { date, hospital } = row1[0];
-              const info = {
-                name: name,
-                type: vaccineType,
-                num: num,
-                date: date,
-                hospital: hospital,
+              const { date, h_name, type } = row1[0];
+              info = {
+                vaccination_number: n,
+                reservation: {
+                  vaccine_type: type,
+                  hospital_name: h_name,
+                  date: date,
+                },
               };
-              res.send(info);
             }
+            console.log(info);
+            res.send(info);
           });
         }
       });
       connection.release();
     }
-  });
-});
-
-router.post("/info", (req, res) => {
-  const id = req.user.id;
-
-  pool.getConnection(function (err, connection) {
-    var sqlForSelectList =
-      "SELECT u.name, u.registration_number AS reg, v.vaccine_type, MAX(v.vaccination_number) AS n " +
-      "FROM login AS l JOIN user AS u ON " +
-      "l.fk_registration_number = u.registration_number " +
-      "LEFT JOIN vaccination AS v ON v.fk_registration_number = u.registration_number " +
-      "WHERE l.id=?";
-
-    // 사용자 접종정보
-    connection.query(sqlForSelectList, [id], (err, row) => {
-      if (err) console.log(err);
-
-      // 접종정보 없음
-      if (row.n != NULL) {
-        console.log(row[0].name + "님은 미접종자 입니다.");
-        res.redirect("/");
-      } else {
-        // 접종접보 있음
-
-        // 1차만
-        if (row[0].n == 1) {
-          console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
-          );
-          sqlForSelectList =
-            "SELECT reservation_date AS date, fk_hospital_name AS h_name, fk_registration_number AS reg, vaccine_type AS type " +
-            "FROM user AS u " +
-            "JOIN reservation AS r ON r.fk_registration_number = u.registration_number " +
-            "WHERE u.name=? " +
-            "ORDER BY date";
-
-          // 예약백신정보
-          connection.query(sqlForSelectList, [row[0].name], (err1, row1) => {
-            // 날짜 주소 백신타입 출력
-            console.log(row1[0].date, row1[0].h_name, row1[0].type);
-
-            console.log(row[0], row1);
-            //res.send(user);
-          });
-        } else if (row[0].n == 2) {
-          // 접종완료
-          console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
-          );
-
-          console.log(row[0]);
-        }
-        res.redirect("/");
-      }
-    });
-    connection.release();
   });
 });
 
