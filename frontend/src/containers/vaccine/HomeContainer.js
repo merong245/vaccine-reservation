@@ -15,8 +15,8 @@ const HomeContainer = () => {
   );
 
   useEffect(() => {
-    dispatch(getUserInfo());
-  }, [dispatch]);
+    if (user !== null) dispatch(getUserInfo());
+  }, [dispatch, user]);
 
   return (
     <VaccineInfo info={info} loading={loading} error={error} user={user} />
