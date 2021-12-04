@@ -12,7 +12,7 @@ var register = require("./routes/router");
 var login = require("./routes/router");
 var remaining_vaccine = require("./routes/router");
 var my_vaccine = require("./routes/router");
-
+var visual = require("./routes/visualization");
 var app = express();
 
 const jwtMiddleware = (req, res, next) => {
@@ -49,6 +49,7 @@ app.use("/register", register);
 app.use("/login", login);
 app.use("/remaining_vaccine", remaining_vaccine);
 app.use("/my_vaccine", my_vaccine);
+app.use("/visual", visual);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
