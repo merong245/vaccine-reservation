@@ -4,7 +4,7 @@ var pool = mysql.createPool({
   connectionLimit: 5,
   host: "localhost",
   user: "root",
-  database: "anticovid",
+  database: "vaccine",
   password: "1234",
   dateStrings: "date",
 });
