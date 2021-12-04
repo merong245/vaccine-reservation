@@ -403,6 +403,21 @@ router.post("/done_vaccine", (req, res) => {
         "대기",
       ];
 
+      // 백신 개수 감소
+      // 백신이 없는 경우 20개 추가 후 1개 감소
+      connection.query(
+          "UPDATE vaccine " +
+          "SET quantity = " +
+          "CASE " +
+          "WHEN quantity> 0 THEN quantity - 1 " +
+          "ELSE quantity + 20 - 1 " +
+          "END " +
+          "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+          [req.body.hospital_name, req.body.vaccine_type],
+          (err) => {
+            if (err) console.log(err);
+          },
+      );
       connection.query(
         "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
         reserv,
@@ -593,13 +608,29 @@ router.post("/reservation", (req, res, next) => {
         ];
       },
     );
-
+    // 예약
     connection.query(
       "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
       reserv,
       (err) => {
         if (err) console.log(err);
       },
+    );
+
+    // 백신 개수 감소
+    // 백신이 없는 경우 20개 추가 후 1개 감소
+    connection.query(
+        "UPDATE vaccine " +
+        "SET quantity = " +
+        "CASE " +
+        "WHEN quantity> 0 THEN quantity - 1 " +
+        "ELSE quantity + 20 - 1 " +
+        "END " +
+        "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+        [req.body.hospital_name, req.body.vaccine_type],
+        (err) => {
+          if (err) console.log(err);
+        },
     );
   });
 });
