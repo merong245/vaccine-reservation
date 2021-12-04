@@ -70,51 +70,48 @@ const VaccineStatusContainer = () => {
   );
 
   return (
-    <ContentsBox>
-      <SideNavigator />
-      <ContentsBlock>
-        <InputBlock style={{ marginBottom: '1rem' }}>
-          {viewAddress ? (
-            <StyledBox
-              name="residence"
-              style={{ height: '3rem', overflow: 'hidden' }}
+    <>
+      <InputBlock style={{ marginBottom: '1rem' }}>
+        {viewAddress ? (
+          <StyledBox
+            name="residence"
+            style={{ height: '3rem', overflow: 'hidden' }}
+          >
+            {province === '' ? (
+              <div className="initial">지역 선택</div>
+            ) : (
+              province
+            )}
+            <StyledClickBox
+              onClick={() => {
+                setProvince('');
+                setViewAddress(!viewAddress);
+              }}
             >
-              {province === '' ? (
-                <div className="initial">지역 선택</div>
-              ) : (
-                province
-              )}
-              <StyledClickBox
-                onClick={() => {
-                  setProvince('');
-                  setViewAddress(!viewAddress);
-                }}
-              >
-                {province === '' ? '입력' : '수정'}
-              </StyledClickBox>
-            </StyledBox>
-          ) : (
-            <DaumPostcode
-              onComplete={handleComplete}
-              autoClose={false}
-              style={{ height: 100 }}
-            />
-          )}
-        </InputBlock>
-        <Select
-          onChange={handleType}
-          options={vaccines}
-          placeholder="백신 선택"
-          isClearable
-        />
-        <HospitalList
-          list={vaccine_list}
-          error={error}
-          loading={loading}
-          user={user}
-        />
-      </ContentsBlock>
-    </ContentsBox>
+              {province === '' ? '입력' : '수정'}
+            </StyledClickBox>
+          </StyledBox>
+        ) : (
+          <DaumPostcode
+            onComplete={handleComplete}
+            autoClose={false}
+            style={{ height: 100 }}
+          />
+        )}
+      </InputBlock>
+      <Select
+        onChange={handleType}
+        options={vaccines}
+        placeholder="백신 선택"
+        isClearable
+      />
+      <HospitalList
+        list={vaccine_list}
+        error={error}
+        loading={loading}
+        user={user}
+      />
+    </>
   );
 };
 
