@@ -5,11 +5,20 @@ export const getUserInfo = () => client.get(`/info`);
 
 export const completeReservation = () => client.get(`/complete`);
 
-export const getRemainingVaccine = ({ vaccine_type, province }) => {
+export const getRemainingVaccine = ({
+  vaccine_type,
+  residence,
+  date,
+  time,
+  hospital_name,
+}) => {
   const queryString = qs.stringify({
     vaccine_type,
-    province,
+    residence,
+    date,
+    time,
+    hospital_name,
   });
-  console.log({ vaccine_type, province }, queryString);
+  console.log(queryString);
   return client.get(`/remaining_vaccine?${queryString}`);
 };

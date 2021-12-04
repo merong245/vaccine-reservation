@@ -10,7 +10,23 @@ import Button from '../common/Button';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ko from 'date-fns/locale/ko';
+import palette from '../../lib/styles/palette';
 registerLocale('ko', ko);
+
+const SearchButton = styled(StyledBox)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15%;
+  height: 3rem;
+  border: none;
+  background-color: ${palette.gray[7]};
+  color: #ffffff;
+  font-weight: bold;
+  &:hover {
+    background-color: ${palette.gray[6]};
+  }
+`;
 
 const SelectBlock = styled.div`
   display: flex;
@@ -31,19 +47,31 @@ const StyledSelect = styled(Select)`
   width: 34%;
 `;
 
-const ReservationForm = (onSubmit) => {
+const ReservationForm = ({
+  options,
+  list,
+  error,
+  loading,
+  user,
+  handleType,
+  handleTime,
+  handleDate,
+  handleComplete,
+  handleHopsital,
+  handleList,
+}) => {
   const today = new Date();
   const [viewAddress, setViewAddress] = useState(true);
   const [address, setAddress] = useState('');
-  const [reserveDate, setReserveDate] = useState(
-    new Date(today.setDate(today.getDate() + 1)),
-  );
   const [viewList, setViewList] = useState(false);
+  const [disable, setDisable] = useState(false);
+  const [hospital, setHospital] = useState('');
 
   // 주소정보 검색 완료 이벤트 헨들러
-  const handleComplete = (data) => {
+  const handleCompleteWrapper = (data) => {
     setAddress(data.sido + ' ' + data.sigungu);
     setViewAddress(true);
+    handleComplete(data);
   };
 
   // 백신 옵션
@@ -101,18 +129,20 @@ const ReservationForm = (onSubmit) => {
               ) : (
                 address
               )}
-              <StyledClickBox
-                onClick={() => {
-                  setAddress('');
-                  setViewAddress(!viewAddress);
-                }}
-              >
-                {address === '' ? '입력' : '수정'}
-              </StyledClickBox>
+              {!disable && (
+                <StyledClickBox
+                  onClick={() => {
+                    setAddress('');
+                    setViewAddress(!viewAddress);
+                  }}
+                >
+                  {address === '' ? '입력' : '수정'}
+                </StyledClickBox>
+              )}
             </StyledBox>
           ) : (
             <DaumPostcode
-              onComplete={handleComplete}
+              onComplete={handleCompleteWrapper}
               autoClose={false}
               style={{ height: 100 }}
             />
@@ -120,38 +150,69 @@ const ReservationForm = (onSubmit) => {
         </InputBlock>
         <SelectBlock>
           <StyledSelect
+            onChange={handleType}
             options={vaccines}
             placeholder="백신 선택"
             isClearable
+            isDisabled={disable}
           />
           <DateWrapper>
             {/* Thu Dec 16 2021 00:11:38 GMT+0900 (대한민국 표준시) */}
             <DatePicker
+              dateFormat="yyyy/MM/dd"
+              disabled={disable}
               style={{ width: '30%' }}
               locale="ko"
-              selected={reserveDate}
-              onChange={(date) => {
-                setReserveDate(date);
-              }}
+              selected={options.date} //new Date(today.setDate(today.getDate() + 1))
+              onChange={handleDate}
               minDate={new Date(today.setDate(today.getDate() + 1))} // 과거 날짜 disable
             />
           </DateWrapper>
-          <StyledSelect options={hours} placeholder="시간 선택" isClearable />
+          <StyledSelect
+            onChange={handleTime}
+            options={hours}
+            placeholder="시간 선택"
+            isClearable
+            isDisabled={disable}
+          />
         </SelectBlock>
         {!viewList && (
-          <Button onClick={() => setViewList(true)} fullwidth="true">
+          <Button
+            onClick={(e) => {
+              setViewList(true);
+              setDisable(true);
+              handleList(e);
+            }}
+            fullwidth="true"
+          >
             예약가능 병원 보기
           </Button>
         )}
         {viewList && (
           <>
-            <InputBlock style={{ marginTop: '1rem' }}>
+            <InputBlock style={{ marginTop: '1rem', marginBottom: '0.2rem' }}>
               <StyledInput
-                placeholder="병원명으로 검색"
-                style={{ width: '100%' }}
+                placeholder="병원명 검색"
+                style={{ width: '85%' }}
+                value={hospital}
+                onChange={(e) => {
+                  setHospital(e.target.value);
+                  handleHopsital(e.target.value);
+                }}
               />
+              <SearchButton
+                onClick={(e) => {
+                  handleList(e);
+                }}
+              >
+                검색
+              </SearchButton>
             </InputBlock>
-            <HospitalList type="reservation" />
+            <HospitalList
+              type="reservation"
+              list={list}
+              hospitalName={hospital}
+            />
           </>
         )}
       </form>

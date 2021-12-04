@@ -84,7 +84,7 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-const HospitalList = ({ type, list, error, loading, user }) => {
+const HospitalList = ({ type, list, error, loading, user, hospitalName }) => {
   return (
     <>
       <ItemBlock>

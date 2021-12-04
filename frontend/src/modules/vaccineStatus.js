@@ -19,9 +19,12 @@ export const changeField = createAction(CHANGE_FIELD, ({ key, value }) => ({
 }));
 export const getRemainingVaccine = createAction(
   GET_REMAINING_VACCINE,
-  ({ vaccine_type, province }) => ({
+  ({ vaccine_type, residence, date, time, hospital_name }) => ({
     vaccine_type,
-    province,
+    residence,
+    date,
+    time,
+    hospital_name,
   }),
 );
 
@@ -35,7 +38,10 @@ export function* vaccineStatusSaga() {
 
 const initialState = {
   vaccine_type: '',
-  province: '',
+  residence: '',
+  date: '',
+  time: '',
+  hospital_name: '',
   vaccine_list: null,
   error: null,
 };
@@ -50,7 +56,6 @@ const vaccine_list = handleActions(
       ...state,
       vaccine_list,
     }),
-    // 회원가입 실패
     [GET_REMAINING_VACCINE_FAILURE]: (state, { payload: error }) => ({
       ...state,
       error: error,

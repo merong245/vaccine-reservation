@@ -32,7 +32,7 @@ const VaccineStatusContainer = () => {
 
   // 백신 타입 선택 이벤트 핸들러
   const handleType = (selectedOption) => {
-    const value = selectedOption.value;
+    const value = selectedOption ? selectedOption.value : '';
     dispatch(
       changeField({
         key: 'vaccine_type',
@@ -47,7 +47,7 @@ const VaccineStatusContainer = () => {
     setViewAddress(true);
     dispatch(
       changeField({
-        key: 'province',
+        key: 'residence',
         value: data.sido,
       }),
     );
