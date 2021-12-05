@@ -571,7 +571,24 @@ router.get("/remaining_vaccine", (req, res) => {
 
   // router.post("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
-  const province = req.query.province;
+  const residence = req.query.residence;
+
+  var beforeStr = residence;
+  var afterStr = beforeStr.split(" ");
+
+  if (afterStr[1] == undefined) {
+    province = afterStr[0];
+    city = null;
+    district = null;
+  } else if (afterStr[2] == undefined) {
+    province = afterStr[0];
+    city = afterStr[1];
+    district = null;
+  } else {
+    province = afterStr[0];
+    city = afterStr[1];
+    district = afterStr[2];
+  }
 
   console.log(req.query);
 
@@ -591,7 +608,14 @@ router.get("/remaining_vaccine", (req, res) => {
     // 백신 선택안함
     else if (!vaccine_type) {
       sqlForSelectList =
-        sqlForSelectList + " WHERE province=" + "'" + province + "'";
+        sqlForSelectList +
+        " WHERE province=" +
+        "'" +
+        province +
+        "' AND city= " +
+        "'" +
+        city +
+        "'";
     }
     // 지역,백신 선택
     else {
@@ -604,6 +628,10 @@ router.get("/remaining_vaccine", (req, res) => {
         "AND province=" +
         "'" +
         province +
+        "' " +
+        "AND city= " +
+        "'" +
+        city +
         "'";
     }
 
@@ -646,7 +674,11 @@ router.post("/reservationlist", (req, res, next) => {
     var beforeStr = req.body.residence;
     var afterStr = beforeStr.split(" ");
 
-    if (afterStr[2] == undefined) {
+    if (afterStr[1] == undefined) {
+      province = afterStr[0];
+      city = null;
+      district = null;
+    } else if (afterStr[2] == undefined) {
       province = afterStr[0];
       city = afterStr[1];
       district = null;
@@ -750,33 +782,53 @@ router.get("/vaccine_result", (req, res) => {
       }
     */
     if (option0 === "Pie") {
-      if (option2 === "type") {
-        sqlForSelectList =
-          "SELECT r.vaccine_type AS id, COUNT(r.reservation_id) AS value " +
-          "FROM reservation r " +
-          "WHERE r.state='완료' " +
-          "GROUP BY r.vaccine_type ";
-      }
-      if (option2 === "age") {
-        sqlForSelectList =
-          "SELECT u.age AS id, COUNT(r.reservation_id) AS value " +
-          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number " +
-          "WHERE r.state='완료'" +
-          "GROUP BY u.age";
-      }
-      if (option2 === "gender") {
-        sqlForSelectList =
-          "SELECT u.sex AS id, COUNT(r.reservation_id) AS value " +
-          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number " +
-          "WHERE r.state='완료' " +
-          "GROUP BY u.sex";
-      }
       if (option2 === "number") {
+        // 미접종자와 1차 접종자 와 완료자 수
         sqlForSelectList =
-          "SELECT v.vaccination_number AS id, COUNT(v.fk_registration_number) AS value " +
-          "FROM vaccination v JOIN user u ON v.fk_registration_number=u.registration_number " +
-          "GROUP BY v.vaccination_number";
+          "SELECT CASE " +
+          "WHEN vaccination_number = 1 THEN '1차' " +
+          "WHEN vaccination_number = 2 THEN '접종완료' " +
+          "ELSE '미접종' " +
+          "END " +
+          "AS id, COUNT(*) AS value " +
+          "FROM user LEFT JOIN vaccination ON registration_number = fk_registration_number  " +
+          "AND (vaccination_number = NULL OR vaccination_number <3) " +
+          "GROUP BY id";
+      } else if (option2 === "type") {
+        // 백신별 접종 완료자수
+        sqlForSelectList =
+          "SELECT vaccine_type AS id, COUNT(*)AS value " +
+          "FROM vaccination " +
+          "WHERE vaccination_number='2' " +
+          "GROUP BY vaccine_type";
+      } else if (option2 === "age") {
+        // 연령별 접종 완료자수
+        sqlForSelectList =
+          "SELECT CASE " +
+          "WHEN age < 20 THEN '10대' " +
+          "WHEN age < 30 THEN '20대' " +
+          "WHEN age < 40 THEN '30대' " +
+          "WHEN age < 50 THEN '40대' " +
+          "WHEN age < 60 THEN '50대' " +
+          "WHEN age < 70 THEN '60대' " +
+          "ELSE '70세 이상' " +
+          "END AS id ,COUNT(*) AS value " +
+          "FROM user u, vaccination v " +
+          "WHERE u.registration_number = v.fk_registration_number AND v.vaccination_number=2 " +
+          "GROUP BY id " +
+          "ORDER BY id";
+      } else if (option2 === "gender") {
+        // 성별 접종 완료자수
+        sqlForSelectList =
+          "SELECT CASE " +
+          "WHEN sex = 'M' THEN '남성' " +
+          "ELSE '여성' " +
+          "END AS id, COUNT(*) AS value " +
+          "FROM user, vaccination " +
+          "WHERE registration_number = fk_registration_number AND vaccination_number=2 " +
+          "GROUP BY id";
       }
+
       /*sqlForSelectList =
         "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
         "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
