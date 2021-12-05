@@ -457,7 +457,7 @@ router.get("/info", (req, res) => {
                 reservation: {
                   vaccine_type: type,
                   hospital_name: h_name,
-                  date: date,
+                  date: date.toLocaleString(),
                 },
               };
             }
@@ -534,7 +534,7 @@ router.post("/done_vaccine", (req, res) => {
             reservation: {
               vaccine_type: row[0].vaccine_type,
               hospital_name: row[0].hospital_name,
-              date: reserv_date,
+              date: reserv_date.toLocaleString(),
             },
           };
         } else {
@@ -748,7 +748,6 @@ router.post("/reservation", (req, res, next) => {
         date.setHours(
           date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)) // 한국시 설정
         );
-
         const reserv = [
           req.body.hospital_name,
           row[0].reg,
