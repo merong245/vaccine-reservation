@@ -6,6 +6,7 @@ const path = require("path");
 const fs = require("fs");
 
 const jwt = require("jsonwebtoken");
+const { off } = require("process");
 
 // 서버 시작 시 실행
 // location 데이터, hospital 데이터, vaccine 데이터 로드
@@ -732,7 +733,7 @@ router.get("/vaccine_result", (req, res) => {
   // option2 : number / type / age / gender
   // option3 : 누적 t/f
   const { option0, option1, option2, option3 } = req.query;
-
+  console.log(req.query);
   var sqlForSelectList = "";
 
   pool.getConnection(function (err, connection) {
@@ -798,6 +799,26 @@ router.get("/vaccine_result", (req, res) => {
       }
     */
     if (option0 === "Bar") {
+      if (option1 === "time") {
+        if (option2 === "type") {
+        }
+        if (option2 === "age") {
+        }
+        if (option2 === "gender") {
+        }
+        if (option2 === "number") {
+        }
+      }
+      if (option1 === "residence") {
+        if (option2 === "type") {
+        }
+        if (option2 === "age") {
+        }
+        if (option2 === "gender") {
+        }
+        if (option2 === "number") {
+        }
+      }
     }
     /*
       선 그래프
@@ -824,6 +845,36 @@ router.get("/vaccine_result", (req, res) => {
       },
     */
     if (option0 === "line") {
+      if (option1 === "time") {
+        if (option2 === "type") {
+        }
+        if (option2 === "age") {
+        }
+        if (option2 === "gender") {
+          // sqlForSelectList =
+          //   "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
+          //   "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
+          //   "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
+          //   "GROUP BY l.province";
+        }
+        if (option2 === "number") {
+        }
+      }
+      if (option1 === "residence") {
+        if (option2 === "type") {
+        }
+        if (option2 === "age") {
+        }
+        if (option2 === "gender") {
+          // sqlForSelectList =
+          //   "SELECT u.sex AS id,l.province AS x,COUNT(v.fk_registration_number) AS y " +
+          //   "FROM location l LEFT OUTER JOIN user u ON l.location_id = u.fk_location_id " +
+          //   "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number " +
+          //   "GROUP BY l.province, u.sex ";
+        }
+        if (option2 === "number") {
+        }
+      }
     }
     console.log("결과 조회 쿼리", sqlForSelectList);
 

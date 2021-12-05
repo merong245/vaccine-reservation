@@ -442,7 +442,7 @@ const Visualization = ({
   infoChange,
   accumulateChange,
 }) => {
-  const [graph, setGraph] = useState('Bar');
+  const [graph, setGraph] = useState('Pie');
   const [keys, setKeys] = useState([]);
 
   // 그래프 선택
@@ -527,7 +527,7 @@ const Visualization = ({
             setGraph(selectedOption.value);
             graphChange(selectedOption);
           }}
-          selected={graphOptions[0]}
+          defaultValue={graphOptions[2]}
           options={graphOptions}
           placeholder="그래프"
         />
@@ -549,7 +549,7 @@ const Visualization = ({
           isDisabled={graph === 'Pie'}
         />
       </SelectBox>
-      {error || loading || !result ? ( // 에러, 로딩, 응답없음
+      {error || loading || !result ? ( // 에러, 로딩, 결과없음
         <></>
       ) : graph === 'Bar' ? (
         <BarGraph data={barData} options={options} />

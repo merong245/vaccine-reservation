@@ -35,7 +35,7 @@ export function* resultSaga() {
 
 const initialState = {
   options: {
-    option0: '',
+    option0: 'Pie',
     option1: '',
     option2: '',
     option3: false,
