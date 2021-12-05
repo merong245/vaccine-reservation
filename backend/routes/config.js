@@ -6,7 +6,6 @@ var pool = mysql.createPool({
   user: "root",
   database: "anticovid",
   password: "1234",
-  dateStrings: "date",
 });
 
 // 커넥션 확인

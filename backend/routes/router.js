@@ -457,7 +457,7 @@ router.get("/info", (req, res) => {
                 reservation: {
                   vaccine_type: type,
                   hospital_name: h_name,
-                  date: date,
+                  date: date.toLocaleString(),
                 },
               };
             }
@@ -534,13 +534,27 @@ router.post("/done_vaccine", (req, res) => {
             reservation: {
               vaccine_type: row[0].vaccine_type,
               hospital_name: row[0].hospital_name,
-              date: reserv_date,
+              date: reserv_date.toLocaleString(),
             },
           };
         } else {
           info = { vaccination_number: req.body.vaccination_number };
         }
-
+        // 백신 개수 감소
+        // 백신이 없는 경우 20개 추가 후 1개 감소
+        connection.query(
+            "UPDATE vaccine " +
+            "SET quantity = " +
+            "CASE " +
+            "WHEN quantity> 0 THEN quantity - 1 " +
+            "ELSE quantity + 20 - 1 " +
+            "END " +
+            "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+            [row[0].hospital_name, row[0].vaccine_type],
+            (err) => {
+              if (err) console.log(err);
+            },
+        );
         // 접종 기록에 추가
         const vaccination = [
           row[0].reg,
@@ -719,7 +733,7 @@ router.post("/reservationlist", (req, res, next) => {
 /*예약*/
 router.post("/reservation", (req, res, next) => {
   console.log("백신예약 요청", req.body);
-
+  console.log(req.body.hospital_name);
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
@@ -734,7 +748,6 @@ router.post("/reservation", (req, res, next) => {
         date.setHours(
           date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)) // 한국시 설정
         );
-
         const reserv = [
           req.body.hospital_name,
           row[0].reg,
@@ -756,6 +769,21 @@ router.post("/reservation", (req, res, next) => {
           }
         );
       }
+    );
+    // 백신 개수 감소
+    // 백신이 없는 경우 20개 추가 후 1개 감소
+    connection.query(
+        "UPDATE vaccine " +
+        "SET quantity = " +
+        "CASE " +
+        "WHEN quantity> 0 THEN quantity - 1 " +
+        "ELSE quantity + 20 - 1 " +
+        "END " +
+        "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+        [req.body.hospital_name, req.body.vaccine_type],
+        (err) => {
+          if (err) console.log(err);
+        },
     );
   });
 });
