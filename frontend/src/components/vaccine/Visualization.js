@@ -536,7 +536,7 @@ const Visualization = ({
   // }, [keysList, options.option2]);
 
   return (
-    <ContentsBlock style={{ marginTop: '6rem' }}>
+    <ContentsBlock style={{ marginTop: '6rem', height: '80%' }}>
       <SelectBox>
         <StyledSelect
           onChange={(selectedOption) => {

@@ -8,6 +8,7 @@ import {
   initializeStatus,
 } from '../../modules/vaccineStatus';
 import { check } from '../../modules/user';
+import { getUserInfo } from '../../modules/info';
 import { withRouter } from 'react-router-dom';
 
 const ReservationContainer = ({ history }) => {
@@ -31,6 +32,14 @@ const ReservationContainer = ({ history }) => {
     loading: loading['vaccine/GET_REMAINING_VACCINE'],
     user: user.user,
   }));
+
+  const { info } = useSelector(({ info }) => ({
+    info: info.info,
+  }));
+
+  useEffect(() => {
+    if (user !== null) dispatch(getUserInfo());
+  }, [dispatch, user]);
 
   useEffect(() => {
     dispatch(check());
@@ -135,6 +144,7 @@ const ReservationContainer = ({ history }) => {
 
   return (
     <ReservationForm
+      info={info}
       options={options}
       list={vaccine_list}
       error={error}

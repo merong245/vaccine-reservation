@@ -126,7 +126,8 @@ const VaccineInfo = ({
             </ButtonBlock>
           </>
         ) : (
-          user && (
+          user &&
+          ((info && info.vaccination_number !== 2) || info === null) && (
             <InfoBlock>
               <InfoText>
                 <span style={{ color: palette.cyan[9], fontWeight: 'bold' }}>

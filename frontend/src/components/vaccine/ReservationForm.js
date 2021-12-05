@@ -52,6 +52,7 @@ const StyledSelect = styled(Select)`
 `;
 
 const ReservationForm = ({
+  info,
   options,
   list,
   error,
@@ -107,115 +108,123 @@ const ReservationForm = ({
   );
 
   return user ? (
-    <ContentsBlock>
-      <form onSubmit={onSubmit}>
-        <InputBlock>
-          {viewAddress ? (
-            <StyledBox
-              name="residence"
-              style={{ height: '3rem', overflow: 'hidden' }}
+    (info && info.vaccination_number !== 2) || info === undefined ? (
+      <ContentsBlock>
+        <form onSubmit={onSubmit}>
+          <InputBlock>
+            {viewAddress ? (
+              <StyledBox
+                name="residence"
+                style={{ height: '3rem', overflow: 'hidden' }}
+              >
+                {address === '' ? (
+                  <div className="initial">지역 선택</div>
+                ) : (
+                  address
+                )}
+                {!disable && (
+                  <StyledClickBox
+                    onClick={() => {
+                      setAddress('');
+                      setViewAddress(!viewAddress);
+                    }}
+                  >
+                    {address === '' ? '입력' : '수정'}
+                  </StyledClickBox>
+                )}
+              </StyledBox>
+            ) : (
+              <DaumPostcode
+                onComplete={handleCompleteWrapper}
+                autoClose={false}
+                style={{ height: 100 }}
+              />
+            )}
+          </InputBlock>
+          <SelectBlock>
+            <StyledSelect
+              onChange={handleType}
+              options={vaccines}
+              placeholder="백신 선택"
+              isClearable
+              isDisabled={disable}
+            />
+            <div>
+              {/* Thu Dec 16 2021 00:11:38 GMT+0900 (대한민국 표준시) */}
+              <StyledDatePicker
+                dateFormat="yyyy/MM/dd"
+                disabled={disable}
+                locale="ko"
+                selected={options.date} //new Date(today.setDate(today.getDate() + 1))
+                onChange={handleDate}
+                minDate={new Date(today.setDate(today.getDate() + 1))} // 과거 날짜 disable
+                placeholderText=" 날짜 선택"
+                fixedHeight
+                withPortal
+              />
+            </div>
+            <StyledSelect
+              onChange={handleTime}
+              options={hours}
+              placeholder="시간 선택"
+              isClearable
+              isDisabled={disable}
+            />
+          </SelectBlock>
+          {!viewList && (
+            <Button
+              onClick={(e) => {
+                setViewList(true);
+                setDisable(true);
+                handleList(e);
+              }}
+              fullwidth="true"
+              disabled={
+                !options.residence ||
+                !options.time ||
+                !options.date ||
+                !options.vaccine_type
+              }
             >
-              {address === '' ? (
-                <div className="initial">지역 선택</div>
-              ) : (
-                address
-              )}
-              {!disable && (
-                <StyledClickBox
-                  onClick={() => {
-                    setAddress('');
-                    setViewAddress(!viewAddress);
+              예약가능 병원 보기
+            </Button>
+          )}
+          {viewList && (
+            <>
+              <InputBlock style={{ marginTop: '1rem', marginBottom: '0.2rem' }}>
+                <StyledInput
+                  placeholder="병원명 검색"
+                  style={{ width: '85%' }}
+                  value={options.hospital_name}
+                  onChange={(e) => {
+                    handleHopsital(e.target.value);
+                  }}
+                />
+                <SearchButton
+                  onClick={(e) => {
+                    handleList(e);
                   }}
                 >
-                  {address === '' ? '입력' : '수정'}
-                </StyledClickBox>
-              )}
-            </StyledBox>
-          ) : (
-            <DaumPostcode
-              onComplete={handleCompleteWrapper}
-              autoClose={false}
-              style={{ height: 100 }}
-            />
-          )}
-        </InputBlock>
-        <SelectBlock>
-          <StyledSelect
-            onChange={handleType}
-            options={vaccines}
-            placeholder="백신 선택"
-            isClearable
-            isDisabled={disable}
-          />
-          <div>
-            {/* Thu Dec 16 2021 00:11:38 GMT+0900 (대한민국 표준시) */}
-            <StyledDatePicker
-              dateFormat="yyyy/MM/dd"
-              disabled={disable}
-              locale="ko"
-              selected={options.date} //new Date(today.setDate(today.getDate() + 1))
-              onChange={handleDate}
-              minDate={new Date(today.setDate(today.getDate() + 1))} // 과거 날짜 disable
-              placeholderText=" 날짜 선택"
-              fixedHeight
-              withPortal
-            />
-          </div>
-          <StyledSelect
-            onChange={handleTime}
-            options={hours}
-            placeholder="시간 선택"
-            isClearable
-            isDisabled={disable}
-          />
-        </SelectBlock>
-        {!viewList && (
-          <Button
-            onClick={(e) => {
-              setViewList(true);
-              setDisable(true);
-              handleList(e);
-            }}
-            fullwidth="true"
-            disabled={
-              !options.residence ||
-              !options.time ||
-              !options.date ||
-              !options.vaccine_type
-            }
-          >
-            예약가능 병원 보기
-          </Button>
-        )}
-        {viewList && (
-          <>
-            <InputBlock style={{ marginTop: '1rem', marginBottom: '0.2rem' }}>
-              <StyledInput
-                placeholder="병원명 검색"
-                style={{ width: '85%' }}
-                value={options.hospital_name}
-                onChange={(e) => {
-                  handleHopsital(e.target.value);
-                }}
+                  검색
+                </SearchButton>
+              </InputBlock>
+              <HospitalList
+                type="reservation"
+                list={list}
+                hospitalName={options.hospital_name}
+                setSelectedHospital={setSelectedHospital}
               />
-              <SearchButton
-                onClick={(e) => {
-                  handleList(e);
-                }}
-              >
-                검색
-              </SearchButton>
-            </InputBlock>
-            <HospitalList
-              type="reservation"
-              list={list}
-              hospitalName={options.hospital_name}
-              setSelectedHospital={setSelectedHospital}
-            />
-          </>
-        )}
-      </form>
-    </ContentsBlock>
+            </>
+          )}
+        </form>
+      </ContentsBlock>
+    ) : (
+      <ContentsBlock>
+        <InfoBlock>
+          <InfoText>2차 접종을 완료하여 예약할 수 없습니다.</InfoText>
+        </InfoBlock>
+      </ContentsBlock>
+    )
   ) : (
     <ContentsBlock>
       <InfoBlock>
