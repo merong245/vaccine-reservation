@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
@@ -45,7 +45,14 @@ const InfoButton = styled(Button)`
   }
 `;
 
-const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
+const VaccineInfo = ({
+  info,
+  loading,
+  error,
+  user,
+  handleComplete,
+  handleCancel,
+}) => {
   const now = new Date();
 
   return (
@@ -109,6 +116,9 @@ const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
                 disabled={now < new Date(info.reservation.date)}
               >
                 접종완료
+              </InfoButton>
+              <InfoButton fullwidth="true" onClick={handleCancel}>
+                예약취소
               </InfoButton>
               <InfoButton fullwidth="true" to="/reservation">
                 예약변경

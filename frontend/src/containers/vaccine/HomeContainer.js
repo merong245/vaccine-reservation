@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import VaccineInfo from '../../components/vaccine/VaccineInfo';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserInfo, completeReservation } from '../../modules/info';
+import {
+  getUserInfo,
+  completeReservation,
+  cancelReservation,
+} from '../../modules/info';
 
 const HomeContainer = () => {
   const dispatch = useDispatch();
@@ -23,6 +27,10 @@ const HomeContainer = () => {
     dispatch(completeReservation({ vaccination_number }));
   };
 
+  const handleCancel = (e) => {
+    dispatch(cancelReservation());
+  };
+
   return (
     <VaccineInfo
       info={info}
@@ -30,6 +38,7 @@ const HomeContainer = () => {
       error={error}
       user={user}
       handleComplete={handleComplete}
+      handleCancel={handleCancel}
     />
   );
 };

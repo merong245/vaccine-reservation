@@ -747,9 +747,8 @@ router.post("/reservation", (req, res, next) => {
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
-      "SELECT fk_registration_number AS reg FROM login WHERE id = '" +
-        req.user.id +
-        "'",
+      "SELECT fk_registration_number AS reg FROM login WHERE id = ?",
+      [req.user.id],
       (err, row) => {
         if (err) console.log(err);
 
@@ -825,6 +824,45 @@ router.post("/reservation", (req, res, next) => {
       [req.body.hospital_name, req.body.vaccine_type],
       (err) => {
         if (err) console.log(err);
+      },
+    );
+  });
+});
+
+router.post("/cancel", (req, res) => {
+  pool.getConnection(function (err, connection) {
+    connection.query(
+      "SELECT reservation_id, fk_hospital_name, vaccine_type " +
+        "FROM reservation r ,login l " +
+        "WHERE id = ? " +
+        "AND l.fk_registration_number = r.fk_registration_number " +
+        "AND r.state = '대기'",
+      [req.user.id],
+      (err, row) => {
+        if (err) console.log(err);
+        console.log(row);
+        // 기존 예약 있는 경우
+        if (row.length) {
+          connection.query(
+            "UPDATE vaccine " +
+              "SET quantity = quantity + 1 " +
+              "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+            [row[0].fk_hospital_name, row[0].vaccine_type],
+            (err) => {
+              if (err) console.log(err);
+            },
+          );
+          connection.query(
+            "delete from reservation where reservation_id = ?",
+            [row[0].reservation_id],
+            (err) => {
+              if (err) console.log(err);
+            },
+          );
+          res.json({
+            success: "success",
+          });
+        }
       },
     );
   });

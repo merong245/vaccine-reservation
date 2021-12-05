@@ -12,12 +12,18 @@ const [
   COMPLETE_RESERVATION_SUCCESS,
   COMPLETE_RESERVATION_FAILURE,
 ] = createRequestActionTypes('info/COMPLETE_RESERVATION');
+const [
+  CANCEL_RESERVATION,
+  CANCEL_RESERVATION_SUCCESS,
+  CANCEL_RESERVATION_FAILURE,
+] = createRequestActionTypes('info/CANCEL_RESERVATION');
 
 export const getUserInfo = createAction(GET_USER_INFO);
 export const completeReservation = createAction(
   COMPLETE_RESERVATION,
   ({ vaccination_number }) => ({ vaccination_number }),
 );
+export const cancelReservation = createAction(CANCEL_RESERVATION);
 
 const getUserInfoSaga = createRequestSaga(
   GET_USER_INFO,
@@ -27,9 +33,14 @@ const completeReservationSaga = createRequestSaga(
   COMPLETE_RESERVATION,
   vaccineAPI.completeReservation,
 );
+const cancelReservationSaga = createRequestSaga(
+  CANCEL_RESERVATION,
+  vaccineAPI.cancelReservation,
+);
 export function* userInfoSaga() {
   yield takeLatest(GET_USER_INFO, getUserInfoSaga);
   yield takeLatest(COMPLETE_RESERVATION, completeReservationSaga);
+  yield takeLatest(CANCEL_RESERVATION, cancelReservationSaga);
 }
 
 const initialState = {
@@ -52,6 +63,14 @@ const info = handleActions(
       info,
     }),
     [COMPLETE_RESERVATION_FAILURE]: (state, { payload: error }) => ({
+      ...state,
+      error: error,
+    }),
+    [CANCEL_RESERVATION_SUCCESS]: (state, { payload: info }) => ({
+      ...state,
+      info,
+    }),
+    [CANCEL_RESERVATION_FAILURE]: (state, { payload: error }) => ({
       ...state,
       error: error,
     }),
