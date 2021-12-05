@@ -570,7 +570,24 @@ router.get("/remaining_vaccine", (req, res) => {
 
   // router.post("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
-  const province = req.query.province;
+  const residence = req.query.residence;
+
+  var beforeStr = residence;
+  var afterStr = beforeStr.split(" ");
+
+  if (afterStr[1] == undefined) {
+    province = afterStr[0];
+    city = null;
+    district = null;
+  } else if (afterStr[2] == undefined) {
+    province = afterStr[0];
+    city = afterStr[1];
+    district = null;
+  } else {
+    province = afterStr[0];
+    city = afterStr[1];
+    district = afterStr[2];
+  }
 
   console.log(req.query);
 
@@ -585,25 +602,29 @@ router.get("/remaining_vaccine", (req, res) => {
     // 지역 선택안함
     else if (!province) {
       sqlForSelectList =
-        sqlForSelectList + " WHERE vaccine_type=" + "'" + vaccine_type + "'";
+          sqlForSelectList + " WHERE vaccine_type=" + "'" + vaccine_type + "'";
     }
     // 백신 선택안함
     else if (!vaccine_type) {
       sqlForSelectList =
-        sqlForSelectList + " WHERE province=" + "'" + province + "'";
+          sqlForSelectList + " WHERE province=" + "'" + province + "' AND city= " + "'" + city + "'" ;
     }
     // 지역,백신 선택
     else {
       sqlForSelectList =
-        sqlForSelectList +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND province=" +
-        "'" +
-        province +
-        "'";
+          sqlForSelectList +
+          " WHERE vaccine_type=" +
+          "'" +
+          vaccine_type +
+          "'" +
+          "AND province=" +
+          "'" +
+          province +
+          "' " +
+          "AND city= " +
+          "'" +
+          city +
+          "'";
     }
 
     // else if (province == "수도권") {
@@ -645,7 +666,11 @@ router.post("/reservationlist", (req, res, next) => {
     var beforeStr = req.body.residence;
     var afterStr = beforeStr.split(" ");
 
-    if (afterStr[2] == undefined) {
+    if (afterStr[1] == undefined) {
+      province = afterStr[0];
+      city = null;
+      district = null;
+    } else if (afterStr[2] == undefined) {
       province = afterStr[0];
       city = afterStr[1];
       district = null;
