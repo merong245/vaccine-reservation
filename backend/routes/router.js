@@ -217,7 +217,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
 
                   // sqlForSelectList =
@@ -254,7 +254,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    },
+                    }
                   );
 
                   // 로그인정보 삽입
@@ -263,7 +263,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    },
+                    }
                   );
                   //});
                 } else {
@@ -276,7 +276,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -285,7 +285,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    },
+                    }
                   );
                 }
 
@@ -298,7 +298,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  },
+                  }
                 );
 
                 // 쿠키 설정
@@ -364,7 +364,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          },
+          }
         );
 
         // 쿠키 설정
@@ -433,7 +433,7 @@ router.get("/info", (req, res) => {
         } else {
           // 접종접보 있음
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
@@ -460,7 +460,7 @@ router.get("/info", (req, res) => {
                 },
               };
             }
-            console.log(info);
+            //console.log(info);
             res.send(info);
           });
         }
@@ -501,7 +501,7 @@ router.post("/done_vaccine", (req, res) => {
           [row[0].r_id],
           (err) => {
             if (err) console.log(err);
-          },
+          }
         );
 
         // 1차 접종인 경우는 2차 자동 예약
@@ -526,7 +526,7 @@ router.post("/done_vaccine", (req, res) => {
             reserv,
             (err) => {
               if (err) console.log(err);
-            },
+            }
           );
           info = {
             vaccination_number: req.body.vaccination_number,
@@ -552,11 +552,11 @@ router.post("/done_vaccine", (req, res) => {
           vaccination,
           (err) => {
             if (err) console.log(err);
-          },
+          }
         );
         res.send(info);
         connection.release();
-      },
+      }
     );
   });
 });
@@ -572,7 +572,7 @@ router.get("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
   const province = req.query.province;
 
-  console.log(vaccine_type, province);
+  console.log(req.query);
 
   pool.getConnection(function (err, connection) {
     var sqlForSelectList =
@@ -623,9 +623,9 @@ router.get("/remaining_vaccine", (req, res) => {
       if (!row.length) {
         console.log("조건에 맞는 병원이 없습니다.");
       } else {
-        for (var i = 0; i < row.length; i++) {
-          console.log(row[i]);
-        }
+        // for (var i = 0; i < row.length; i++) {
+        //   console.log(row[i]);
+        // }
         console.log("조회 성공");
       }
       res.send(row);
@@ -701,7 +701,7 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      },
+      }
     );
 
     connection.query(
@@ -709,7 +709,7 @@ router.post("/reservation", (req, res, next) => {
       reserv,
       (err) => {
         if (err) console.log(err);
-      },
+      }
     );
   });
 });

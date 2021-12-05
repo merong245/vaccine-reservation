@@ -9,22 +9,22 @@ import DaumPostcode from '../../../node_modules/react-daum-postcode/lib/DaumPost
 
 const VaccineStatusContainer = () => {
   const dispatch = useDispatch();
-  const { vaccine_type, vaccine_list, error, loading, user } = useSelector(
-    ({ vaccine_list, loading, user }) => ({
+  const { vaccine_type, residence, vaccine_list, error, loading, user } =
+    useSelector(({ vaccine_list, loading, user }) => ({
       vaccine_type: vaccine_list.vaccine_type,
+      residence: vaccine_list.residence,
       vaccine_list: vaccine_list.vaccine_list,
       error: vaccine_list.error,
       loading: loading['vaccine/GET_REMAINING_VACCINE'],
       user: user.user,
-    }),
-  );
+    }));
 
   const [viewAddress, setViewAddress] = useState(true);
   const [province, setProvince] = useState('');
 
   useEffect(() => {
-    dispatch(getRemainingVaccine({ vaccine_type, province }));
-  }, [vaccine_type, province, dispatch]);
+    dispatch(getRemainingVaccine({ vaccine_type, residence }));
+  }, [vaccine_type, residence, dispatch]);
 
   useEffect(() => {
     console.log(vaccine_list);
