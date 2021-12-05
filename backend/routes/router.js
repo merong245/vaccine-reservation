@@ -774,7 +774,20 @@ router.get("/vaccine_result", (req, res) => {
       }
     */
     if (option0 === "Pie") {
-      if (option2 === "type") {
+      if (option2 === "number") {
+        // 미접종자와 1차 접종자 와 완료자 수
+        sqlForSelectList =
+            "SELECT CASE " +
+            "WHEN vaccination_number = 1 THEN '1차' " +
+            "WHEN vaccination_number = 2 THEN '접종완료' " +
+            "ELSE '미접종' " +
+            "END " +
+            "AS id, COUNT(*) AS value " +
+            "FROM user LEFT JOIN vaccination ON registration_number = fk_registration_number  " +
+            "AND (vaccination_number = NULL OR vaccination_number <3) " +
+            "GROUP BY id";
+      }
+      else if (option2 === "type") {
         // 백신별 접종 완료자수
         sqlForSelectList =
             "SELECT vaccine_type AS id, COUNT(*)AS value " +
