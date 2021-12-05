@@ -894,7 +894,7 @@ router.get("/vaccine_result", (req, res) => {
         }
         // 날짜별 접종 완료자 수
         sqlForSelectList =
-          "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS time, COUNT(*) AS 1차 " +
+          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS time, COUNT(*) AS 1차 " +
           "FROM reservation r, vaccination v, user u " +
           "WHERE r.state = '완료' " +
           "AND r.fk_registration_number = u.registration_number " +
@@ -965,7 +965,7 @@ router.get("/vaccine_result", (req, res) => {
 
         // 날짜별 1차 접종자 수
         sqlForSelectList =
-          "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS x, COUNT(*) AS y " +
+          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS x, COUNT(*) AS y " +
           "FROM reservation r, vaccination v, user u " +
           "WHERE r.state = '완료' " +
           "AND r.fk_registration_number = u.registration_number " +
