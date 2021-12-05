@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
@@ -90,7 +90,9 @@ const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
           <>
             <InfoBlock>
               <InfoTag>{info.vaccination_number + 1}차 접종 예약 날짜</InfoTag>
-              <InfoContent>{info.reservation.date}</InfoContent>
+              <InfoContent>
+                {new Date(info.reservation.date).toLocaleString()}
+              </InfoContent>
             </InfoBlock>
             <InfoBlock>
               <InfoTag>{info.vaccination_number + 1}차 접종 예약 장소</InfoTag>

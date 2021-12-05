@@ -466,7 +466,7 @@ router.get("/info", (req, res) => {
                 reservation: {
                   vaccine_type: type,
                   hospital_name: h_name,
-                  date: date.toLocaleString(),
+                  date: date,
                 },
               };
             }
@@ -761,24 +761,32 @@ router.post("/reservation", (req, res, next) => {
 
         // 기존 예약 있으면 취소
         connection.query(
-            "SELECT reservation_id " +
+          "SELECT reservation_id " +
             "FROM reservation r ,login l " +
-            "WHERE id = " + "'" +  req.user.id + "' " +
+            "WHERE id = " +
+            "'" +
+            req.user.id +
+            "' " +
             "AND l.fk_registration_number = r.fk_registration_number " +
             "AND r.state = '대기'",
-            (err, row) => {
-              if (err) console.log(err);
-              console.log(row);
-              if(row.length){
-                connection.query(
-                    "UPDATE reservation " +
-                    "SET state = '취소' " +
-                    "WHERE reservation_id = " + "'" + row[0].reservation_id + "'",
-                    (err) => {
-                      if (err) console.log(err);
-                    })
-              }
-            });
+          (err, row) => {
+            if (err) console.log(err);
+            console.log(row);
+            if (row.length) {
+              connection.query(
+                "UPDATE reservation " +
+                  "SET state = '취소' " +
+                  "WHERE reservation_id = " +
+                  "'" +
+                  row[0].reservation_id +
+                  "'",
+                (err) => {
+                  if (err) console.log(err);
+                }
+              );
+            }
+          }
+        );
 
         // 예약
         connection.query(
