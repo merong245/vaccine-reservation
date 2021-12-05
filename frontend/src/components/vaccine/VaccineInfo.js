@@ -46,6 +46,8 @@ const InfoButton = styled(Button)`
 `;
 
 const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
+  const now = new Date();
+
   return (
     <ContentsBlock>
       {
@@ -99,7 +101,11 @@ const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
               <InfoContent>{info.reservation.vaccine_type}</InfoContent>
             </InfoBlock>
             <ButtonBlock>
-              <InfoButton onClick={handleComplete} fullwidth="true">
+              <InfoButton
+                onClick={handleComplete}
+                fullwidth="true"
+                disabled={now < new Date(info.reservation.date)}
+              >
                 접종완료
               </InfoButton>
               <InfoButton fullwidth="true" to="/reservation">

@@ -510,8 +510,8 @@ router.post("/done_vaccine", (req, res) => {
           // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
           const reserv_date = new Date();
           if (row[0].vaccine_type == "모더나")
-            reserv_date.setDate(today.getDate() + 28);
-          else reserv_date.setDate(today.getDate() + 21);
+            reserv_date.setDate(reserv_date.getDate() + 28);
+          else reserv_date.setDate(reserv_date.getDate() + 21);
           // 새로운 예약 정보
           // (default)대기, 취소, 완료
           const reserv = [
