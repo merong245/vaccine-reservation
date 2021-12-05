@@ -44,6 +44,14 @@ pool.getConnection(function (err, connection) {
         console.log("success");
       }
     });
+    sql =
+      "ALTER TABLE reservation MODIFY COLUMN fk_hospital_name varchar(25) NOT NULL";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+      else {
+        console.log("success");
+      }
+    });
     sql = "TRUNCATE location";
     connection.query(sql, (err) => {
       if (err) console.log(err);
@@ -218,7 +226,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
 
                   // sqlForSelectList =
@@ -255,7 +263,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
 
                   // 로그인정보 삽입
@@ -264,7 +272,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
                   //});
                 } else {
@@ -277,7 +285,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -286,7 +294,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                 }
 
@@ -299,7 +307,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  }
+                  },
                 );
 
                 // 쿠키 설정
@@ -365,7 +373,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          }
+          },
         );
 
         // 쿠키 설정
@@ -434,7 +442,7 @@ router.get("/info", (req, res) => {
         } else {
           // 접종접보 있음
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
@@ -502,7 +510,7 @@ router.post("/done_vaccine", (req, res) => {
           [row[0].r_id],
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
 
         // 1차 접종인 경우는 2차 자동 예약
@@ -527,7 +535,7 @@ router.post("/done_vaccine", (req, res) => {
             reserv,
             (err) => {
               if (err) console.log(err);
-            }
+            },
           );
           info = {
             vaccination_number: req.body.vaccination_number,
@@ -543,17 +551,17 @@ router.post("/done_vaccine", (req, res) => {
         // 백신 개수 감소
         // 백신이 없는 경우 20개 추가 후 1개 감소
         connection.query(
-            "UPDATE vaccine " +
+          "UPDATE vaccine " +
             "SET quantity = " +
             "CASE " +
             "WHEN quantity> 0 THEN quantity - 1 " +
             "ELSE quantity + 20 - 1 " +
             "END " +
             "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-            [row[0].hospital_name, row[0].vaccine_type],
-            (err) => {
-              if (err) console.log(err);
-            },
+          [row[0].hospital_name, row[0].vaccine_type],
+          (err) => {
+            if (err) console.log(err);
+          },
         );
         // 접종 기록에 추가
         const vaccination = [
@@ -567,11 +575,11 @@ router.post("/done_vaccine", (req, res) => {
           vaccination,
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
         res.send(info);
         connection.release();
-      }
+      },
     );
   });
 });
@@ -587,23 +595,6 @@ router.get("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
   const residence = req.query.residence;
 
-  var beforeStr = residence;
-  var afterStr = beforeStr.split(" ");
-
-  if (afterStr[1] == undefined) {
-    province = afterStr[0];
-    city = null;
-    district = null;
-  } else if (afterStr[2] == undefined) {
-    province = afterStr[0];
-    city = afterStr[1];
-    district = null;
-  } else {
-    province = afterStr[0];
-    city = afterStr[1];
-    district = afterStr[2];
-  }
-
   console.log(req.query);
 
   pool.getConnection(function (err, connection) {
@@ -612,41 +603,33 @@ router.get("/remaining_vaccine", (req, res) => {
       "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id";
 
     // 지역,백신 선택안함
-    if (!province && !vaccine_type) {
+    if (!residence && !vaccine_type) {
     }
     // 지역 선택안함
-    else if (!province) {
-      sqlForSelectList =
-        sqlForSelectList + " WHERE vaccine_type=" + "'" + vaccine_type + "'";
+    else if (!residence) {
+      sqlForSelectList += " WHERE ?? = ?";
+      sqlForSelectList = mysql.format(sqlForSelectList, [
+        "vaccine_type",
+        vaccine_type,
+      ]);
     }
     // 백신 선택안함
     else if (!vaccine_type) {
-      sqlForSelectList =
-        sqlForSelectList +
-        " WHERE province=" +
-        "'" +
-        province +
-        "' AND city= " +
-        "'" +
-        city +
-        "'";
+      sqlForSelectList += " WHERE ?? = ?";
+      sqlForSelectList = mysql.format(sqlForSelectList, [
+        "location_id",
+        residence,
+      ]);
     }
     // 지역,백신 선택
     else {
-      sqlForSelectList =
-        sqlForSelectList +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND province=" +
-        "'" +
-        province +
-        "' " +
-        "AND city= " +
-        "'" +
-        city +
-        "'";
+      sqlForSelectList += " WHERE ?? = ? AND ?? = ?";
+      sqlForSelectList = mysql.format(sqlForSelectList, [
+        "vaccine_type",
+        vaccine_type,
+        "location_id",
+        residence,
+      ]);
     }
 
     // else if (province == "수도권") {
@@ -746,7 +729,7 @@ router.post("/reservation", (req, res, next) => {
         // (default)대기, 취소, 완료
         const date = new Date(req.body.date);
         date.setHours(
-          date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)) // 한국시 설정
+          date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)), // 한국시 설정
         );
         const reserv = [
           req.body.hospital_name,
@@ -766,24 +749,24 @@ router.post("/reservation", (req, res, next) => {
             res.json({
               success: "success",
             });
-          }
+          },
         );
-      }
+      },
     );
     // 백신 개수 감소
     // 백신이 없는 경우 20개 추가 후 1개 감소
     connection.query(
-        "UPDATE vaccine " +
+      "UPDATE vaccine " +
         "SET quantity = " +
         "CASE " +
         "WHEN quantity> 0 THEN quantity - 1 " +
         "ELSE quantity + 20 - 1 " +
         "END " +
         "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-        [req.body.hospital_name, req.body.vaccine_type],
-        (err) => {
-          if (err) console.log(err);
-        },
+      [req.body.hospital_name, req.body.vaccine_type],
+      (err) => {
+        if (err) console.log(err);
+      },
     );
   });
 });
@@ -889,19 +872,17 @@ router.get("/vaccine_result", (req, res) => {
         if (option2 === "gender") {
         }
         if (option2 === "number") {
-        }
-        else{
+        } else {
           // 날짜별 접종 완료자 수
           sqlForSelectList =
-              "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS id, COUNT(*) AS value " +
-              "FROM reservation r, vaccination v, user u " +
-              "WHERE r.state = '완료' " +
-              "AND r.fk_registration_number = u.registration_number " +
-              "AND v.fk_registration_number = u.registration_number " +
-              "AND v.vaccination_number = 1 " +
-              "GROUP BY id " +
-              "ORDER BY id";
-
+            "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS id, COUNT(*) AS value " +
+            "FROM reservation r, vaccination v, user u " +
+            "WHERE r.state = '완료' " +
+            "AND r.fk_registration_number = u.registration_number " +
+            "AND v.fk_registration_number = u.registration_number " +
+            "AND v.vaccination_number = 1 " +
+            "GROUP BY id " +
+            "ORDER BY id";
         }
       }
       if (option1 === "residence") {
@@ -912,17 +893,15 @@ router.get("/vaccine_result", (req, res) => {
         if (option2 === "gender") {
         }
         if (option2 === "number") {
-        }
-        else{
-
+        } else {
           // 지역별 접종 완료자 수
           sqlForSelectList =
-              "SELECT l.province AS id, COUNT(*) AS value " +
-              "FROM location l, vaccination v, user u " +
-              "WHEREv.fk_registration_number = u.registration_number " +
-              "AND u.fk_location_id = l.location_id " +
-              "AND v.vaccination_number = 2 " +
-              "GROUP BY id";
+            "SELECT l.province AS id, COUNT(*) AS value " +
+            "FROM location l, vaccination v, user u " +
+            "WHEREv.fk_registration_number = u.registration_number " +
+            "AND u.fk_location_id = l.location_id " +
+            "AND v.vaccination_number = 2 " +
+            "GROUP BY id";
         }
       }
     }

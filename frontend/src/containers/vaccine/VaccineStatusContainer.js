@@ -48,7 +48,7 @@ const VaccineStatusContainer = () => {
     dispatch(
       changeField({
         key: 'residence',
-        value: data.sido + ' ' + data.sigungu,
+        value: data.sigunguCode,
       }),
     );
   };
