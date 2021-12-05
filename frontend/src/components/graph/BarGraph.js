@@ -4,47 +4,13 @@ import { ResponsiveBar } from '@nivo/bar';
 const BarGraph = ({ data, options }) => (
   <ResponsiveBar
     data={data}
-    keys={['hot dog', 'burger', 'sandwich', 'kebab', 'fries', 'donut']}
-    indexBy="country"
-    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+    keys={['1차', '2차']}
+    indexBy={options.option1}
+    margin={{ top: 20, right: 130, bottom: 50, left: 60 }}
     padding={0.3}
     valueScale={{ type: 'linear' }}
     indexScale={{ type: 'band', round: true }}
     colors={{ scheme: 'nivo' }}
-    defs={[
-      {
-        id: 'dots',
-        type: 'patternDots',
-        background: 'inherit',
-        color: '#38bcb2',
-        size: 4,
-        padding: 1,
-        stagger: true,
-      },
-      {
-        id: 'lines',
-        type: 'patternLines',
-        background: 'inherit',
-        color: '#eed312',
-        rotation: -45,
-        lineWidth: 6,
-        spacing: 10,
-      },
-    ]}
-    fill={[
-      {
-        match: {
-          id: 'fries',
-        },
-        id: 'dots',
-      },
-      {
-        match: {
-          id: 'sandwich',
-        },
-        id: 'lines',
-      },
-    ]}
     borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
     axisTop={null}
     axisRight={null}
@@ -52,7 +18,7 @@ const BarGraph = ({ data, options }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'country',
+      legend: options.option1,
       legendPosition: 'middle',
       legendOffset: 32,
     }}
@@ -60,7 +26,7 @@ const BarGraph = ({ data, options }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'food',
+      legend: '접종자수',
       legendPosition: 'middle',
       legendOffset: -40,
     }}

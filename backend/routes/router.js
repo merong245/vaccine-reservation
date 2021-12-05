@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const jwt = require("jsonwebtoken");
 const { off } = require("process");
+const e = require("express");
 
 // 서버 시작 시 실행
 // location 데이터, hospital 데이터, vaccine 데이터 로드
@@ -543,17 +544,17 @@ router.post("/done_vaccine", (req, res) => {
         // 백신 개수 감소
         // 백신이 없는 경우 20개 추가 후 1개 감소
         connection.query(
-            "UPDATE vaccine " +
+          "UPDATE vaccine " +
             "SET quantity = " +
             "CASE " +
             "WHEN quantity> 0 THEN quantity - 1 " +
             "ELSE quantity + 20 - 1 " +
             "END " +
             "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-            [row[0].hospital_name, row[0].vaccine_type],
-            (err) => {
-              if (err) console.log(err);
-            },
+          [row[0].hospital_name, row[0].vaccine_type],
+          (err) => {
+            if (err) console.log(err);
+          }
         );
         // 접종 기록에 추가
         const vaccination = [
@@ -773,17 +774,17 @@ router.post("/reservation", (req, res, next) => {
     // 백신 개수 감소
     // 백신이 없는 경우 20개 추가 후 1개 감소
     connection.query(
-        "UPDATE vaccine " +
+      "UPDATE vaccine " +
         "SET quantity = " +
         "CASE " +
         "WHEN quantity> 0 THEN quantity - 1 " +
         "ELSE quantity + 20 - 1 " +
         "END " +
         "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-        [req.body.hospital_name, req.body.vaccine_type],
-        (err) => {
-          if (err) console.log(err);
-        },
+      [req.body.hospital_name, req.body.vaccine_type],
+      (err) => {
+        if (err) console.log(err);
+      }
     );
   });
 });
@@ -890,19 +891,16 @@ router.get("/vaccine_result", (req, res) => {
         }
         if (option2 === "number") {
         }
-        else{
-          // 날짜별 접종 완료자 수
-          sqlForSelectList =
-              "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS id, COUNT(*) AS value " +
-              "FROM reservation r, vaccination v, user u " +
-              "WHERE r.state = '완료' " +
-              "AND r.fk_registration_number = u.registration_number " +
-              "AND v.fk_registration_number = u.registration_number " +
-              "AND v.vaccination_number = 1 " +
-              "GROUP BY id " +
-              "ORDER BY id";
-
-        }
+        // 날짜별 접종 완료자 수
+        sqlForSelectList =
+          "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS time, COUNT(*) AS 1차 " +
+          "FROM reservation r, vaccination v, user u " +
+          "WHERE r.state = '완료' " +
+          "AND r.fk_registration_number = u.registration_number " +
+          "AND v.fk_registration_number = u.registration_number " +
+          "AND v.vaccination_number = 1 " +
+          "GROUP BY time " +
+          "ORDER BY time";
       }
       if (option1 === "residence") {
         if (option2 === "type") {
@@ -913,17 +911,15 @@ router.get("/vaccine_result", (req, res) => {
         }
         if (option2 === "number") {
         }
-        else{
 
-          // 지역별 접종 완료자 수
-          sqlForSelectList =
-              "SELECT l.province AS id, COUNT(*) AS value " +
-              "FROM location l, vaccination v, user u " +
-              "WHEREv.fk_registration_number = u.registration_number " +
-              "AND u.fk_location_id = l.location_id " +
-              "AND v.vaccination_number = 2 " +
-              "GROUP BY id";
-        }
+        // 지역별 접종 완료자 수
+        sqlForSelectList =
+          "SELECT l.province AS residence, COUNT(*) AS 2차 " +
+          "FROM location l, vaccination v, user u " +
+          "WHERE v.fk_registration_number = u.registration_number " +
+          "AND u.fk_location_id = l.location_id " +
+          "AND v.vaccination_number = 2 " +
+          "GROUP BY residence ";
       }
     }
     /*
@@ -950,7 +946,7 @@ router.get("/vaccine_result", (req, res) => {
         ],
       },
     */
-    if (option0 === "line") {
+    if (option0 === "Line") {
       if (option1 === "time") {
         if (option2 === "type") {
         }
@@ -965,6 +961,17 @@ router.get("/vaccine_result", (req, res) => {
         }
         if (option2 === "number") {
         }
+
+        // 날짜별 1차 접종자 수
+        sqlForSelectList =
+          "SELECT DATE_FORMAT(r.reservation_date, '%Y-%m-%d') AS x, COUNT(*) AS y " +
+          "FROM reservation r, vaccination v, user u " +
+          "WHERE r.state = '완료' " +
+          "AND r.fk_registration_number = u.registration_number " +
+          "AND v.fk_registration_number = u.registration_number " +
+          "AND v.vaccination_number = 1 " +
+          "GROUP BY x " +
+          "ORDER BY x ";
       }
       if (option1 === "residence") {
         if (option2 === "type") {
@@ -980,13 +987,21 @@ router.get("/vaccine_result", (req, res) => {
         }
         if (option2 === "number") {
         }
+
+        // 지역별 접종 완료자 수
+        sqlForSelectList =
+          "SELECT l.province AS x, COUNT(*) AS y " +
+          "FROM location l, vaccination v, user u " +
+          "WHERE v.fk_registration_number = u.registration_number " +
+          "AND u.fk_location_id = l.location_id " +
+          "AND v.vaccination_number = 2 " +
+          "GROUP BY x";
       }
     }
     console.log("결과 조회 쿼리", sqlForSelectList);
 
     connection.query(sqlForSelectList, (err, row1) => {
       if (err) console.log(err);
-      console.log("결과 조회", row1);
       res.send(row1);
     });
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import BarGraph from '../graph/BarGraph';
 import LineGraph from '../graph/LineGraph';
@@ -130,7 +130,7 @@ const barData = [
 const lineData = [
   {
     id: 'japan',
-    color: 'hsl(160, 70%, 50%)',
+    //color: 'hsl(160, 70%, 50%)',
     data: [
       {
         x: 'plane',
@@ -144,7 +144,10 @@ const lineData = [
         x: 'boat',
         y: 146,
       },
-      {
+    ],
+  },
+];
+/*      {
         x: 'train',
         y: 294,
       },
@@ -398,7 +401,7 @@ const lineData = [
       },
     ],
   },
-];
+];*/
 const pieData = [
   {
     id: 'lisp',
@@ -443,7 +446,8 @@ const Visualization = ({
   accumulateChange,
 }) => {
   const [graph, setGraph] = useState('Pie');
-  const [keys, setKeys] = useState([]);
+  const [lineDataSet, setLineDataSet] = useState({});
+  //const [keys, setKeys] = useState([]);
 
   // 그래프 선택
   const graphOptions = useMemo(
@@ -484,26 +488,38 @@ const Visualization = ({
     [],
   );
 
-  const keysList = useMemo(
-    () => [
+  // const keysList = useMemo(
+  //   () => [
+  //     {
+  //       number: ['1차 접종', '2차 접종'],
+  //       type: ['화이자', '모더나', '아스트라제네카'],
+  //       gender: ['남자', '여자'],
+  //       age: [
+  //         '10대',
+  //         '20대',
+  //         '30대',
+  //         '40대',
+  //         '50대',
+  //         '60대',
+  //         '70대',
+  //         '80대 이상',
+  //       ],
+  //     },
+  //   ],
+  //   [],
+  // );
+
+  // lineData 설정
+  useEffect(() => {
+    const dataSet = [
       {
-        number: ['1차 접종', '2차 접종'],
-        type: ['화이자', '모더나', '아스트라제네카'],
-        gender: ['남자', '여자'],
-        age: [
-          '10대',
-          '20대',
-          '30대',
-          '40대',
-          '50대',
-          '60대',
-          '70대',
-          '80대 이상',
-        ],
+        id: options.option1 === 'time' ? '1차' : '2차',
+        data: result,
       },
-    ],
-    [],
-  );
+    ];
+    setLineDataSet(dataSet);
+    console.log(lineDataSet);
+  }, [options.option1, result]);
 
   // useEffect(() => {
   //   setKeys(
@@ -541,21 +557,22 @@ const Visualization = ({
           onChange={infoChange}
           options={infoOptions}
           placeholder="표시 정보"
+          isDisabled={graph !== 'Pie'}
         />
         <StyledSelect
           onChange={accumulateChange}
           options={accumulateOptions}
           placeholder="누적 표시"
-          isDisabled={graph === 'Pie'}
+          isDisabled={true}
         />
       </SelectBox>
       {error || loading || !result ? ( // 에러, 로딩, 결과없음
         <></>
       ) : graph === 'Bar' ? (
-        <BarGraph data={barData} options={options} />
+        <BarGraph data={result} options={options} />
       ) : graph === 'Line' ? (
-        <LineGraph data={lineData} options={options} />
-      ) : graph === 'Pie' && result ? (
+        <LineGraph data={lineDataSet} options={options} />
+      ) : graph === 'Pie' ? (
         <PieGraph data={result} options={options} />
       ) : (
         <></>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResponsiveLine } from '@nivo/line';
 
-const LineGraph = ({ data }) => (
+const LineGraph = ({ data, options }) => (
   <ResponsiveLine
     data={data}
     margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
@@ -21,7 +21,7 @@ const LineGraph = ({ data }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'transportation',
+      legend: options.option1,
       legendOffset: 36,
       legendPosition: 'middle',
     }}
@@ -30,7 +30,7 @@ const LineGraph = ({ data }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'count',
+      legend: '접종자수',
       legendOffset: -40,
       legendPosition: 'middle',
     }}

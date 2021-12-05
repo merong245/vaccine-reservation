@@ -17,9 +17,9 @@ const ResultContainer = () => {
   useEffect(() => {
     console.log(options);
     if (
-      options.option0 &&
-      options.option2 &&
-      (options.option0 === 'Pie' || options.option1)
+      (options.option0 !== 'Pie' &&
+      options.option1) ||
+      (options.option0 === 'Pie' && options.option2)
     )
       dispatch(getResult(options));
   }, [
