@@ -53,11 +53,31 @@ pool.getConnection(function (err, connection) {
         console.log("success");
       }
     });
+    sql = "DROP trigger insert_vaccination_trigger";
+    connection.query(sql, (err) => {
+      if (err) console.log("trigger does not exist");
+      else {
+        console.log("success");
+      }
+    });
     sql = "TRUNCATE location";
     connection.query(sql, (err) => {
       if (err) console.log(err);
     });
     sql = "SET foreign_key_checks = 1";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+    });
+    // 트리거 수정
+    sql =
+      "create trigger insert_vaccination_trigger " +
+      "before update on reservation for each row " +
+      "begin if new.state='완료' and old.state!='완료' and " +
+      "not exists(select vaccination_number from vaccination v where new.fk_registration_number=v.fk_registration_number) " +
+      "then insert into vaccination(fk_registration_number, vaccination_number, vaccine_type) " +
+      "values(new.fk_registration_number, 1, new.vaccine_type); " +
+      "else UPDATE vaccination SET vaccination_number = 2 where fk_registration_number = new.fk_registration_number; " +
+      "end if; end;";
     connection.query(sql, (err) => {
       if (err) console.log(err);
     });
@@ -564,20 +584,8 @@ router.post("/done_vaccine", (req, res) => {
             if (err) console.log(err);
           }
         );
-        // 접종 기록에 추가
-        const vaccination = [
-          row[0].reg,
-          req.body.vaccination_number,
-          row[0].vaccine_type,
-        ];
-        console.log("접종 기록 추가", vaccination);
-        connection.query(
-          "INSERT INTO vaccination(`fk_registration_number`,`vaccination_number`,`vaccine_type`) VALUES (?,?,?)",
-          vaccination,
-          (err) => {
-            if (err) console.log(err);
-          }
-        );
+        // 접종 기록에 추가(트리거 자동 수행)
+
         res.send(info);
         connection.release();
       }
