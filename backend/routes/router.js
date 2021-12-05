@@ -776,17 +776,26 @@ router.get("/vaccine_result", (req, res) => {
     if (option0 === "Pie") {
       if (option2 === "type") {
         sqlForSelectList =
-          "SELECT r.vaccine_type AS id, COUNT(r.reservation_id) AS value " +
+          "SELECT r.vaccine_type AS id, COUNT(r.reservation_number) AS value " +
           "FROM reservation r " +
           "WHERE r.state='완료'" +
           "GROUP BY r.vaccine_type";
       }
       if (option2 === "age") {
-        sqlForSelectList =
-          "SELECT u.age AS id, COUNT(r.reservation_id) AS value " +
-          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number" +
-          //"WHERE r.state='완료'" +
-          "GROUP BY u.age";
+        // 연령별 접종 완료자수
+        sqlForSelectList = "SELECT CASE " +
+            "WHEN age < 20 THEN '10대' " +
+            "WHEN age < 30 THEN '20대' " +
+            "WHEN age < 40 THEN '30대' " +
+            "WHEN age < 50 THEN '40대' " +
+            "WHEN age < 60 THEN '50대' " +
+            "WHEN age < 70 THEN '60대' " +
+            "ELSE '70세 이상' " +
+            "END AS id ,COUNT(*) AS value " +
+            "FROM user u, vaccination v " +
+            "WHERE u.registration_number = v.fk_registration_number AND v.vaccination_number=2 " +
+            "GROUP BY id " +
+            "ORDER BY id";
       }
 
       /*sqlForSelectList =
