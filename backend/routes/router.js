@@ -45,6 +45,14 @@ pool.getConnection(function (err, connection) {
         console.log("success");
       }
     });
+    sql =
+      "ALTER TABLE reservation MODIFY COLUMN fk_hospital_name varchar(25) NOT NULL";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+      else {
+        console.log("success");
+      }
+    });
     sql = "TRUNCATE location";
     connection.query(sql, (err) => {
       if (err) console.log(err);
@@ -588,23 +596,9 @@ router.get("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
   const residence = req.query.residence;
 
-  var beforeStr = residence;
-  var afterStr = beforeStr.split(" ");
-
-  if (afterStr[1] == undefined) {
-    province = afterStr[0];
-    city = null;
-    district = null;
-  } else if (afterStr[2] == undefined) {
-    province = afterStr[0];
-    city = afterStr[1];
-    district = null;
-  } else {
-    province = afterStr[0];
-    city = afterStr[1];
-    district = afterStr[2];
-  }
-
+  // 글자 포함 문자열
+  const hospital_name = "%" + req.query.hospital_name + "%";
+  console.log(hospital_name);
   console.log(req.query);
 
   pool.getConnection(function (err, connection) {
@@ -612,42 +606,49 @@ router.get("/remaining_vaccine", (req, res) => {
       "SELECT * FROM vaccine JOIN hospital ON " +
       "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id";
 
-    // 지역,백신 선택안함
-    if (!province && !vaccine_type) {
+    // 병원 이름이 없는 경우
+    if (hospital_name === "%undefined%") {
+      // 지역,백신 선택안함
+      if (!residence && !vaccine_type) {
+      }
+      // 지역 선택안함
+      else if (!residence) {
+        sqlForSelectList += " WHERE ?? = ?";
+        sqlForSelectList = mysql.format(sqlForSelectList, [
+          "vaccine_type",
+          vaccine_type,
+        ]);
+      }
+      // 백신 선택안함
+      else if (!vaccine_type) {
+        sqlForSelectList += " WHERE ?? = ?";
+        sqlForSelectList = mysql.format(sqlForSelectList, [
+          "location_id",
+          residence,
+        ]);
+      }
+      // 지역,백신 선택
+      else {
+        sqlForSelectList += " WHERE ?? = ? AND ?? = ?";
+        sqlForSelectList = mysql.format(sqlForSelectList, [
+          "vaccine_type",
+          vaccine_type,
+          "location_id",
+          residence,
+        ]);
+      }
     }
-    // 지역 선택안함
-    else if (!province) {
-      sqlForSelectList =
-        sqlForSelectList + " WHERE vaccine_type=" + "'" + vaccine_type + "'";
-    }
-    // 백신 선택안함
-    else if (!vaccine_type) {
-      sqlForSelectList =
-        sqlForSelectList +
-        " WHERE province=" +
-        "'" +
-        province +
-        "' AND city= " +
-        "'" +
-        city +
-        "'";
-    }
-    // 지역,백신 선택
+    // 병원 이름 있는 경우
     else {
-      sqlForSelectList =
-        sqlForSelectList +
-        " WHERE vaccine_type=" +
-        "'" +
-        vaccine_type +
-        "'" +
-        "AND province=" +
-        "'" +
-        province +
-        "' " +
-        "AND city= " +
-        "'" +
-        city +
-        "'";
+      sqlForSelectList += " WHERE ?? = ? AND ?? = ? AND ?? LIKE ?";
+      sqlForSelectList = mysql.format(sqlForSelectList, [
+        "vaccine_type",
+        vaccine_type,
+        "location_id",
+        residence,
+        "hospital_name",
+        hospital_name,
+      ]);
     }
 
     // else if (province == "수도권") {

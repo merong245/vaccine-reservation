@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { ContentsBlock } from '../common/Contents';
 import HospitalList from './HospitalList';

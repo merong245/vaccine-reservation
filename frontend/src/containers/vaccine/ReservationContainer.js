@@ -66,11 +66,10 @@ const ReservationContainer = ({ history }) => {
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleComplete = (data) => {
-    const residence = data.sido + ' ' + data.sigungu;
     dispatch(
       changeField({
         key: 'residence',
-        value: residence,
+        value: data.sigunguCode,
       }),
     );
   };
