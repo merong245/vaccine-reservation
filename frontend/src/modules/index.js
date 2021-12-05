@@ -5,7 +5,7 @@ import loading from './loading';
 import user, { userSaga } from './user';
 import info, { userInfoSaga } from './info';
 import vaccine_list, { vaccineStatusSaga } from './vaccineStatus';
-//import result, { resultSaga } from './result';
+import result, { resultSaga } from './result';
 
 const rootReducer = combineReducers({
   auth,
@@ -13,7 +13,7 @@ const rootReducer = combineReducers({
   user,
   info,
   vaccine_list,
-  //result,
+  result,
 });
 
 export function* rootSaga() {
@@ -22,7 +22,7 @@ export function* rootSaga() {
     userSaga(),
     userInfoSaga(),
     vaccineStatusSaga(),
-    //resultSaga(),
+    resultSaga(),
   ]);
 }
 

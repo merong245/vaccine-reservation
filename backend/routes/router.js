@@ -730,22 +730,97 @@ router.get("/vaccine_result", (req, res) => {
   // option0 : Bar / Line / Pie
   // option1 : time / residence
   // option2 : number / type / age / gender
+  // option3 : 누적 t/f
   const { option0, option1, option2, option3 } = req.query;
 
   var sqlForSelectList = "";
 
   pool.getConnection(function (err, connection) {
-    // 2차 접종 이상 맞은 사람들
-    sqlForSelectList =
-      "SELECT l.province ,COUNT(v.fk_registration_number) AS cnt " +
-      "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
-      "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
-      "GROUP BY l.province";
+    /*
+      원형 그래프
+      옵션 2만 사용 (1, 3 disable)
+      데이터의 기준을 id
+      접종자수를 value
+      
+      예시
+      {
+        id: '서울',
+        value: 13
+      }
+    */
+    if (option0 === "Pie") {
+      if (option2 === "type") {
+        sqlForSelectList =
+          "SELECT r.vaccine_type AS id, COUNT(r.reservation_id) AS value " +
+          "FROM reservation r " +
+          "WHERE r.state='완료'" +
+          "GROUP BY r.vaccine_type";
+      }
+      if (option2 === "age") {
+        sqlForSelectList =
+          "SELECT u.age AS id, COUNT(r.reservation_id) AS value " +
+          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number" +
+          //"WHERE r.state='완료'" +
+          "GROUP BY u.age";
+      }
+
+      /*sqlForSelectList =
+        "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
+        "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
+        "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
+        "GROUP BY l.province";*/
+    }
+    /*
+      막대 그래프
+      가로축 option1
+      세로축 접종자수
+      하나의 막대를 option2로 구분
+      
+      property 정확해야됨
+
+      예시
+      {
+        time: '7월',
+        1치 접종: 10,
+        2차 접종: 21,
+      }
+    */
+    if (option0 === "Bar") {
+    }
+    /*
+      선 그래프
+      
+      각 id당 한줄씩 그려짐
+      id가 option2
+      data x가 option1
+      data y가 접종자수
+
+      예시
+      {
+        id: '남자',
+        data: [
+          {
+            x: '경기도',
+            y: 63,
+          },
+          {
+            x: '강원도',
+            y: 32,
+          },
+          ...
+        ],
+      },
+    */
+    if (option0 === "line") {
+    }
+    console.log("결과 조회 쿼리", sqlForSelectList);
 
     connection.query(sqlForSelectList, (err, row1) => {
       if (err) console.log(err);
-      console.log(row1);
+      console.log("결과 조회", row1);
+      res.send(row1);
     });
+
     connection.release();
   });
   /*pool.getConnection(function (err, connection) {

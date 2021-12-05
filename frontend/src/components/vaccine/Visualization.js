@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import BarGraph from '../graph/BarGraph';
 import LineGraph from '../graph/LineGraph';
@@ -523,36 +523,40 @@ const Visualization = ({
     <ContentsBlock style={{ marginTop: '6rem' }}>
       <SelectBox>
         <StyledSelect
-          //onChange={graphChange}
-          onChange={(selectedOption) => setGraph(selectedOption.value)}
+          onChange={(selectedOption) => {
+            setGraph(selectedOption.value);
+            graphChange(selectedOption);
+          }}
           selected={graphOptions[0]}
           options={graphOptions}
           placeholder="그래프"
         />
         <StyledSelect
-          //onChange={criteriaChange}
+          onChange={criteriaChange}
           options={criteriaOptions}
           placeholder="표시 기준"
+          isDisabled={graph === 'Pie'}
         />
         <StyledSelect
-          //onChange={infoChange}
+          onChange={infoChange}
           options={infoOptions}
           placeholder="표시 정보"
         />
         <StyledSelect
-          //onChange={accumulateChange}
+          onChange={accumulateChange}
           options={accumulateOptions}
           placeholder="누적 표시"
+          isDisabled={graph === 'Pie'}
         />
       </SelectBox>
-      {/* {error || loading || !result ? ( // 에러, 로딩, 응답없음
-        <></>) :  */}
-      {graph === 'Bar' ? (
+      {error || loading || !result ? ( // 에러, 로딩, 응답없음
+        <></>
+      ) : graph === 'Bar' ? (
         <BarGraph data={barData} options={options} />
       ) : graph === 'Line' ? (
         <LineGraph data={lineData} options={options} />
-      ) : graph === 'Pie' ? (
-        <PieGraph data={pieData} options={options} />
+      ) : graph === 'Pie' && result ? (
+        <PieGraph data={result} options={options} />
       ) : (
         <></>
       )}

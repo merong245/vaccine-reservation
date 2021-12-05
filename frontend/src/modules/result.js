@@ -6,9 +6,9 @@ import createRequestSaga, {
 } from '../lib/createRequestSaga';
 import * as vaccineAPI from '../lib/api/vaccine';
 
-const CHANGE_FIELD = 'vaccineStatus/CHANGE_FIELD';
+const CHANGE_FIELD = 'result/CHANGE_FIELD';
 const [GET_RESULT, GET_RESULT_SUCCESS, GET_RESULT_FAILURE] =
-  createRequestActionTypes('vaccineStatus/GET_REMAINING_VACCINE');
+  createRequestActionTypes('result/GET_RESULT');
 
 export const changeField = createAction(
   CHANGE_FIELD,
@@ -56,7 +56,7 @@ const result = handleActions(
     }),
     [GET_RESULT_FAILURE]: (state, { payload: error }) => ({
       ...state,
-      error: error,
+      error,
     }),
   },
   initialState,

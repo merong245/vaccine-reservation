@@ -43,12 +43,12 @@ const VaccineStatusContainer = () => {
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleComplete = (data) => {
-    setProvince(data.sido);
+    setProvince(data.sido + ' ' + data.sigungu);
     setViewAddress(true);
     dispatch(
       changeField({
         key: 'residence',
-        value: data.sido,
+        value: data.sido + ' ' + data.sigungu,
       }),
     );
   };
