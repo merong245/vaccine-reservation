@@ -753,17 +753,29 @@ router.get("/vaccine_result", (req, res) => {
         sqlForSelectList =
           "SELECT r.vaccine_type AS id, COUNT(r.reservation_id) AS value " +
           "FROM reservation r " +
-          "WHERE r.state='완료'" +
-          "GROUP BY r.vaccine_type";
+          "WHERE r.state='완료' " +
+          "GROUP BY r.vaccine_type ";
       }
       if (option2 === "age") {
         sqlForSelectList =
           "SELECT u.age AS id, COUNT(r.reservation_id) AS value " +
-          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number" +
-          //"WHERE r.state='완료'" +
+          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number " +
+          "WHERE r.state='완료'" +
           "GROUP BY u.age";
       }
-
+      if (option2 === "gender") {
+        sqlForSelectList =
+          "SELECT u.sex AS id, COUNT(r.reservation_id) AS value " +
+          "FROM reservation r JOIN user u ON r.fk_registration_number=u.registration_number " +
+          "WHERE r.state='완료' " +
+          "GROUP BY u.sex";
+      }
+      if (option2 === "number") {
+        sqlForSelectList =
+          "SELECT v.vaccination_number AS id, COUNT(v.fk_registration_number) AS value " +
+          "FROM vaccination v JOIN user u ON v.fk_registration_number=u.registration_number " +
+          "GROUP BY v.vaccination_number";
+      }
       /*sqlForSelectList =
         "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
         "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
