@@ -84,7 +84,7 @@ const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
       }
       {
         // 예약정보
-        user && info && info.reservation && (
+        user && info && info.reservation ? (
           <>
             <InfoBlock>
               <InfoTag>{info.vaccination_number + 1}차 접종 예약 날짜</InfoTag>
@@ -107,6 +107,17 @@ const VaccineInfo = ({ info, loading, error, user, handleComplete }) => {
               </InfoButton>
             </ButtonBlock>
           </>
+        ) : (
+          user && (
+            <InfoBlock>
+              <InfoText>
+                <span style={{ color: palette.cyan[9], fontWeight: 'bold' }}>
+                  {user.name}
+                </span>
+                님의 예약 정보가 없습니다.
+              </InfoText>
+            </InfoBlock>
+          )
         )
       }
     </ContentsBlock>

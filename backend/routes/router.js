@@ -2,8 +2,123 @@ const pool = require("./config");
 const mysql = require("mysql");
 const router = require(".");
 const { NULL, TIMESTAMP } = require("mysql/lib/protocol/constants/types");
+const path = require("path");
+const fs = require("fs");
 
 const jwt = require("jsonwebtoken");
+
+// 서버 시작 시 실행
+// location 데이터, hospital 데이터, vaccine 데이터 로드
+pool.getConnection(function (err, connection) {
+  if (err) console.log(err);
+  else {
+    console.log("Data loading...");
+    /* csv 파일 로컬 경로 */
+    const hospitalFilePath =
+      path.parse(__dirname).dir + "\\public\\csv\\hospital_data.csv";
+    const locationFilePath =
+      path.parse(__dirname).dir + "\\public\\csv\\location_data.csv";
+    const vaccineFilePath =
+      path.parse(__dirname).dir + "\\public\\csv\\vaccine_data.csv";
+
+    /* hospital 테이블, vaccine 테이블 create table문에서 병원명 길이 변경해주시면 아래 코드 지워주세요
+      여기서 부터 */
+    var sql = "SET foreign_key_checks = 0";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+    });
+    sql =
+      "ALTER TABLE hospital MODIFY COLUMN hospital_name varchar(25) NOT NULL";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+      else {
+        console.log("success");
+      }
+    });
+    sql =
+      "ALTER TABLE vaccine MODIFY COLUMN fk_hospital_name varchar(25) NOT NULL";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+      else {
+        console.log("success");
+      }
+    });
+    sql = "TRUNCATE location";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+    });
+    sql = "SET foreign_key_checks = 1";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+    });
+    /* 여기까지 */
+
+    // MySQL 경로 질의
+    sql = `SHOW VARIABLES LIKE "secure_file_priv"`;
+    connection.query(sql, (err, row) => {
+      if (err) console.log(err);
+      else {
+        var MySQLPath = row[0].Value;
+        var location = MySQLPath + "\\location_data.csv";
+        var hospital = MySQLPath + "\\hospital_data.csv";
+        var vaccine = MySQLPath + "\\vaccine_data.csv";
+        // MySQL 경로로 데이터 파일 복사
+        fs.copyFileSync(locationFilePath, location);
+        fs.copyFileSync(hospitalFilePath, hospital);
+        fs.copyFileSync(vaccineFilePath, vaccine);
+
+        // MySQL 경로의 \를 /로 변경
+        MySQLPath = MySQLPath.replace(/\\/g, "/");
+        // location 데이터 로드
+        sql =
+          `LOAD DATA INFILE ? ` +
+          "INTO TABLE location " +
+          "FIELDS TERMINATED BY ',' " +
+          `ENCLOSED BY '"' ` +
+          `LINES TERMINATED BY '\\r\\n' ` +
+          "IGNORE 1 ROWS";
+        sql = mysql.format(sql, [MySQLPath + "/location_data.csv"]);
+        connection.query(sql, (err, row) => {
+          if (err) console.log("Failed to load location data. ");
+          else {
+            console.log("success");
+          }
+        });
+        // hospital 데이터 로드
+        sql =
+          `LOAD DATA INFILE ? ` +
+          "INTO TABLE hospital " +
+          "FIELDS TERMINATED BY ',' " +
+          `ENCLOSED BY '"' ` +
+          `LINES TERMINATED BY '\\r\\n' ` +
+          "IGNORE 1 ROWS";
+        sql = mysql.format(sql, [MySQLPath + "/hospital_data.csv"]);
+        connection.query(sql, (err, row) => {
+          if (err) console.log("Failed to load hospital data.");
+          else {
+            console.log("success");
+          }
+        });
+        // vaccine 데이터 로드
+        sql =
+          `LOAD DATA INFILE ? ` +
+          "INTO TABLE vaccine " +
+          "FIELDS TERMINATED BY ',' " +
+          `ENCLOSED BY '"' ` +
+          `LINES TERMINATED BY '\\r\\n' ` +
+          "IGNORE 1 ROWS";
+        sql = mysql.format(sql, [MySQLPath + "/vaccine_data.csv"]);
+        connection.query(sql, (err, row) => {
+          if (err) console.log("Failed to load vaccine data. ");
+          else {
+            console.log("success");
+          }
+        });
+      }
+    });
+  }
+  connection.release();
+});
 
 // 회원가입
 router.get("/register", (req, res) => {
@@ -706,4 +821,5 @@ router.get("/vaccine_result", (req, res) => {
     connection.release();
   });*/
 });
+
 module.exports = router;
