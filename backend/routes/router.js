@@ -780,6 +780,7 @@ router.post("/reservation", (req, res, next) => {
           (err, row) => {
             if (err) console.log(err);
             console.log(row);
+            // 기존 예약 있는 경우
             if (row.length) {
               connection.query(
                 "UPDATE reservation " +
@@ -791,6 +792,15 @@ router.post("/reservation", (req, res, next) => {
                 (err) => {
                   if (err) console.log(err);
                 }
+              );
+              connection.query(
+                  "UPDATE vaccine " +
+                  "SET quantity = quantity + 1 " +
+                  "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+                  [req.body.hospital_name, req.body.vaccine_type],
+                  (err) => {
+                    if (err) console.log(err);
+                  }
               );
             }
           }
