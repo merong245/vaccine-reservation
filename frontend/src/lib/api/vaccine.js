@@ -44,3 +44,5 @@ export const reservation = ({
     time,
     hospital_name,
   });
+
+export const cancelReservation = () => client.post('/cancel');
