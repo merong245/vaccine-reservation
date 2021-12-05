@@ -685,11 +685,14 @@ router.post("/reservationlist", (req, res, next) => {
 
 /*예약*/
 router.post("/reservation", (req, res, next) => {
+  console.log("백신예약 요청", req.body);
+
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
-      "SELECT fk_registration_number AS reg FROM login WHERE id = " +
-        req.user.id,
+      "SELECT fk_registration_number AS reg FROM login WHERE id = '" +
+        req.user.id +
+        "'",
       (err, row) => {
         if (err) console.log(err);
 
@@ -701,14 +704,22 @@ router.post("/reservation", (req, res, next) => {
           req.body.vaccine_type,
           "대기",
         ];
-      }
-    );
-
-    connection.query(
-      "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
-      reserv,
-      (err) => {
-        if (err) console.log(err);
+        console.log(reserv);
+        res.json({
+          success: "success",
+        });
+        return;
+        // 예약
+        connection.query(
+          "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
+          reserv,
+          (err) => {
+            if (err) console.log(err);
+            res.json({
+              success: "success",
+            });
+          }
+        );
       }
     );
   });

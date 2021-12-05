@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { ContentsBlock } from '../common/Contents';
 import HospitalList from './HospitalList';
@@ -55,6 +55,7 @@ const ReservationForm = ({
   options,
   list,
   error,
+  list_error,
   loading,
   user,
   handleType,
@@ -63,13 +64,14 @@ const ReservationForm = ({
   handleComplete,
   handleHopsital,
   handleList,
+  setSelectedHospital,
+  onSubmit,
 }) => {
   const today = new Date();
   const [viewAddress, setViewAddress] = useState(true);
   const [address, setAddress] = useState('');
   const [viewList, setViewList] = useState(false);
   const [disable, setDisable] = useState(false);
-  const [hospital, setHospital] = useState('');
 
   // 주소정보 검색 완료 이벤트 헨들러
   const handleCompleteWrapper = (data) => {
@@ -104,24 +106,9 @@ const ReservationForm = ({
     [],
   );
 
-  // const getFormattedDate = (date) => {
-  //   const month = date.toLocaleDateString('ko-KR', {
-  //     month: 'long',
-  //   });
-
-  //   const day = date.toLocaleDateString('ko-KR', {
-  //     day: 'numeric',
-  //   });
-
-  //   return `${month.substr(0, month.length - 1)}/${day.substr(
-  //     0,
-  //     day.length - 1,
-  //   )}`;
-  // };
-
   return user ? (
     <ContentsBlock>
-      <form>
+      <form onSubmit={onSubmit}>
         <InputBlock>
           {viewAddress ? (
             <StyledBox
@@ -190,6 +177,12 @@ const ReservationForm = ({
               handleList(e);
             }}
             fullwidth="true"
+            disabled={
+              !options.residence ||
+              !options.time ||
+              !options.date ||
+              !options.vaccine_type
+            }
           >
             예약가능 병원 보기
           </Button>
@@ -200,9 +193,8 @@ const ReservationForm = ({
               <StyledInput
                 placeholder="병원명 검색"
                 style={{ width: '85%' }}
-                value={hospital}
+                value={options.hospital_name}
                 onChange={(e) => {
-                  setHospital(e.target.value);
                   handleHopsital(e.target.value);
                 }}
               />
@@ -217,7 +209,8 @@ const ReservationForm = ({
             <HospitalList
               type="reservation"
               list={list}
-              hospitalName={hospital}
+              hospitalName={options.hospital_name}
+              setSelectedHospital={setSelectedHospital}
             />
           </>
         )}

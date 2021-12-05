@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import palette from '../../lib/styles/palette';
 import styled, { css } from 'styled-components';
 import Button from '../common/Button';
@@ -40,6 +40,14 @@ const HospitalItem = styled.div`
     css`
       width: 12%;
     `}
+`;
+
+const SelectableItemBlock = styled(ItemBlock)`
+  &:hover {
+    ${HospitalItem} {
+      background-color: ${palette.cyan[0]};
+    }
+  }
 `;
 
 /**
@@ -84,7 +92,15 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-const HospitalList = ({ type, list, error, loading, user, hospitalName }) => {
+const HospitalList = ({
+  type,
+  list,
+  error,
+  loading,
+  user,
+  hospitalName,
+  setSelectedHospital,
+}) => {
   return (
     <>
       <ItemBlock>
@@ -97,7 +113,14 @@ const HospitalList = ({ type, list, error, loading, user, hospitalName }) => {
       {!loading && list && (
         <>
           {list.map((hospital, index) => (
-            <ItemBlock>
+            <SelectableItemBlock
+              key={index}
+              onClick={
+                setSelectedHospital
+                  ? setSelectedHospital(hospital.fk_hospital_name)
+                  : (e) => e
+              }
+            >
               <HospitalItem index={index}>
                 {hospital.fk_hospital_name}
               </HospitalItem>
@@ -118,7 +141,7 @@ const HospitalList = ({ type, list, error, loading, user, hospitalName }) => {
                 <span>{hospital.opening_time}</span>
                 <span> {hospital.closing_time}</span>
               </HospitalItem>
-            </ItemBlock>
+            </SelectableItemBlock>
           ))}
         </>
       )}

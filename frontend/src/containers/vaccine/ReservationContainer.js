@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import ReservationForm from '../../components/vaccine/ReservationForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRemainingVaccine, changeField } from '../../modules/vaccineStatus';
+import {
+  getRemainingVaccine,
+  changeField,
+  reservation,
+  initializeStatus,
+} from '../../modules/vaccineStatus';
 import { check } from '../../modules/user';
+import { withRouter } from 'react-router-dom';
 
-const ReservationContainer = () => {
+const ReservationContainer = ({ history }) => {
+  const [error, setError] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState('');
   const dispatch = useDispatch();
-  const { options, vaccine_list, error, loading, user } = useSelector(
-    ({ vaccine_list, loading, user }) => ({
-      options: vaccine_list,
-      vaccine_list: vaccine_list.vaccine_list,
-      error: vaccine_list.error,
-      loading: loading['vaccine/GET_REMAINING_VACCINE'],
-      user: user.user,
-    }),
-  );
+  const {
+    options,
+    vaccine_list,
+    list_error,
+    loading,
+    user,
+    reserv,
+    reserv_error,
+  } = useSelector(({ vaccine_list, loading, user }) => ({
+    options: vaccine_list,
+    vaccine_list: vaccine_list.vaccine_list,
+    list_error: vaccine_list.error,
+    reserv: vaccine_list.reservation,
+    reserv_error: vaccine_list.reserv_error,
+    loading: loading['vaccine/GET_REMAINING_VACCINE'],
+    user: user.user,
+  }));
 
   useEffect(() => {
     dispatch(check());
+    dispatch(initializeStatus());
   }, [dispatch]);
 
   // 예약 가능 병원 리스트 보기
@@ -79,13 +96,50 @@ const ReservationContainer = () => {
   };
 
   // 예약 이벤트 핸들러
-  const onSubmit = (e) => {};
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const { residence, vaccine_type, date, time } = options;
+    const hospital_name = selectedHospital;
+
+    // 하나라도 비어있다면
+    if ([residence, vaccine_type, date, time, hospital_name].includes('')) {
+      setError('예약 정보가 부족합니다.');
+      return;
+    }
+
+    console.log('예약병원', hospital_name);
+
+    dispatch(
+      reservation({
+        residence,
+        vaccine_type,
+        date,
+        time,
+        hospital_name,
+      }),
+    );
+  };
+
+  // 회원가입 성공 / 실패 처리
+  useEffect(() => {
+    if (reserv_error) {
+      // 기타 이유
+      setError('예약 실패');
+      return;
+    }
+
+    if (reserv) {
+      console.log('예약 성공');
+      history.push('/home'); // 홈 화면으로 이동
+    }
+  }, [reserv_error, reserv, history]);
 
   return (
     <ReservationForm
       options={options}
       list={vaccine_list}
       error={error}
+      list_error={list_error}
       loading={loading}
       user={user}
       handleType={handleType}
@@ -94,8 +148,10 @@ const ReservationContainer = () => {
       handleComplete={handleComplete}
       handleHopsital={handleHopsital}
       handleList={handleList}
+      setSelectedHospital={setSelectedHospital}
+      onSubmit={onSubmit}
     />
   );
 };
 
-export default ReservationContainer;
+export default withRouter(ReservationContainer);

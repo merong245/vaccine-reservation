@@ -29,3 +29,18 @@ export const getResult = ({ option0, option1, option2, option3 }) => {
   console.log(queryString);
   client.get(`/vaccine_result?${queryString}`);
 };
+
+export const reservation = ({
+  residence,
+  vaccine_type,
+  date,
+  time,
+  hospital_name,
+}) =>
+  client.post(`/reservation`, {
+    residence,
+    vaccine_type,
+    date,
+    time,
+    hospital_name,
+  });
