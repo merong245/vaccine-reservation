@@ -510,8 +510,8 @@ router.post("/done_vaccine", (req, res) => {
           // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
           const reserv_date = new Date();
           if (row[0].vaccine_type == "모더나")
-            reserv_date.setDate(today.getDate() + 28);
-          else reserv_date.setDate(today.getDate() + 21);
+            reserv_date.setDate(reserv_date.getDate() + 28);
+          else reserv_date.setDate(reserv_date.getDate() + 21);
           // 새로운 예약 정보
           // (default)대기, 취소, 완료
           const reserv = [
@@ -540,7 +540,21 @@ router.post("/done_vaccine", (req, res) => {
         } else {
           info = { vaccination_number: req.body.vaccination_number };
         }
-
+        // 백신 개수 감소
+        // 백신이 없는 경우 20개 추가 후 1개 감소
+        connection.query(
+            "UPDATE vaccine " +
+            "SET quantity = " +
+            "CASE " +
+            "WHEN quantity> 0 THEN quantity - 1 " +
+            "ELSE quantity + 20 - 1 " +
+            "END " +
+            "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+            [row[0].hospital_name, row[0].vaccine_type],
+            (err) => {
+              if (err) console.log(err);
+            },
+        );
         // 접종 기록에 추가
         const vaccination = [
           row[0].reg,
@@ -719,7 +733,7 @@ router.post("/reservationlist", (req, res, next) => {
 /*예약*/
 router.post("/reservation", (req, res, next) => {
   console.log("백신예약 요청", req.body);
-
+  console.log(req.body.hospital_name);
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
@@ -756,6 +770,21 @@ router.post("/reservation", (req, res, next) => {
           }
         );
       }
+    );
+    // 백신 개수 감소
+    // 백신이 없는 경우 20개 추가 후 1개 감소
+    connection.query(
+        "UPDATE vaccine " +
+        "SET quantity = " +
+        "CASE " +
+        "WHEN quantity> 0 THEN quantity - 1 " +
+        "ELSE quantity + 20 - 1 " +
+        "END " +
+        "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+        [req.body.hospital_name, req.body.vaccine_type],
+        (err) => {
+          if (err) console.log(err);
+        },
     );
   });
 });
