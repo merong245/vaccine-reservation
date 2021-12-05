@@ -730,18 +730,20 @@ router.post("/reservation", (req, res, next) => {
         if (err) console.log(err);
 
         // (default)대기, 취소, 완료
+        const date = new Date(req.body.date);
+        date.setHours(
+          date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)) // 한국시 설정
+        );
+
         const reserv = [
           req.body.hospital_name,
           row[0].reg,
-          req.body.date,
+          date,
           req.body.vaccine_type,
           "대기",
         ];
         console.log(reserv);
-        res.json({
-          success: "success",
-        });
-        return;
+
         // 예약
         connection.query(
           "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
