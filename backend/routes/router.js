@@ -775,15 +775,17 @@ router.get("/vaccine_result", (req, res) => {
     */
     if (option0 === "Pie") {
       if (option2 === "type") {
+        // 백신별 접종 완료자수
         sqlForSelectList =
-          "SELECT r.vaccine_type AS id, COUNT(r.reservation_number) AS value " +
-          "FROM reservation r " +
-          "WHERE r.state='완료'" +
-          "GROUP BY r.vaccine_type";
+            "SELECT vaccine_type AS id, COUNT(*)AS value " +
+            "FROM vaccination " +
+            "WHERE vaccination_number='2' " +
+            "GROUP BY vaccine_type";
       }
-      if (option2 === "age") {
+      else if (option2 === "age") {
         // 연령별 접종 완료자수
-        sqlForSelectList = "SELECT CASE " +
+        sqlForSelectList =
+            "SELECT CASE " +
             "WHEN age < 20 THEN '10대' " +
             "WHEN age < 30 THEN '20대' " +
             "WHEN age < 40 THEN '30대' " +
@@ -797,6 +799,18 @@ router.get("/vaccine_result", (req, res) => {
             "GROUP BY id " +
             "ORDER BY id";
       }
+      else if (option2 === "gender") {
+        // 성별 접종 완료자수
+        sqlForSelectList =
+            "SELECT CASE " +
+            "WHEN sex = 'M' THEN '남성' " +
+            "ELSE '여성' " +
+            "END AS id, COUNT(*) AS value " +
+            "FROM user, vaccination " +
+            "WHERE registration_number = fk_registration_number AND vaccination_number=2 " +
+            "GROUP BY id";
+      }
+
 
       /*sqlForSelectList =
         "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
