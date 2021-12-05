@@ -735,7 +735,7 @@ router.post("/reservationlist", (req, res, next) => {
 /*예약*/
 router.post("/reservation", (req, res, next) => {
   console.log("백신예약 요청", req.body);
-  console.log(req.body.hospital_name);
+
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
@@ -758,6 +758,27 @@ router.post("/reservation", (req, res, next) => {
           "대기",
         ];
         console.log(reserv);
+
+        // 기존 예약 있으면 취소
+        connection.query(
+            "SELECT reservation_id " +
+            "FROM reservation r ,login l " +
+            "WHERE id = " + "'" +  req.user.id + "' " +
+            "AND l.fk_registration_number = r.fk_registration_number " +
+            "AND r.state = '대기'",
+            (err, row) => {
+              if (err) console.log(err);
+              console.log(row);
+              if(row.length){
+                connection.query(
+                    "UPDATE reservation " +
+                    "SET state = '취소' " +
+                    "WHERE reservation_id = " + "'" + row[0].reservation_id + "'",
+                    (err) => {
+                      if (err) console.log(err);
+                    })
+              }
+            });
 
         // 예약
         connection.query(
