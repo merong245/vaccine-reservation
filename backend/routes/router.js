@@ -53,11 +53,31 @@ pool.getConnection(function (err, connection) {
         console.log("success");
       }
     });
+    sql = "DROP trigger insert_vaccination_trigger";
+    connection.query(sql, (err) => {
+      if (err) console.log("trigger does not exist");
+      else {
+        console.log("success");
+      }
+    });
     sql = "TRUNCATE location";
     connection.query(sql, (err) => {
       if (err) console.log(err);
     });
     sql = "SET foreign_key_checks = 1";
+    connection.query(sql, (err) => {
+      if (err) console.log(err);
+    });
+    // 트리거 수정
+    sql =
+      "create trigger insert_vaccination_trigger " +
+      "before update on reservation for each row " +
+      "begin if new.state='완료' and old.state!='완료' and " +
+      "not exists(select vaccination_number from vaccination v where new.fk_registration_number=v.fk_registration_number) " +
+      "then insert into vaccination(fk_registration_number, vaccination_number, vaccine_type) " +
+      "values(new.fk_registration_number, 1, new.vaccine_type); " +
+      "else UPDATE vaccination SET vaccination_number = 2 where fk_registration_number = new.fk_registration_number; " +
+      "end if; end;";
     connection.query(sql, (err) => {
       if (err) console.log(err);
     });
@@ -227,7 +247,7 @@ router.post("/register", (req, res, next) => {
                     location,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
 
                   // sqlForSelectList =
@@ -264,7 +284,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
 
                   // 로그인정보 삽입
@@ -273,7 +293,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err4, row4) => {
                       if (err4) console.log(err4);
-                    }
+                    },
                   );
                   //});
                 } else {
@@ -286,7 +306,7 @@ router.post("/register", (req, res, next) => {
                     user,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                   console.log(login);
                   // 로그인정보 삽입
@@ -295,7 +315,7 @@ router.post("/register", (req, res, next) => {
                     login,
                     (err2, row2) => {
                       if (err2) console.log(err2);
-                    }
+                    },
                   );
                 }
 
@@ -308,7 +328,7 @@ router.post("/register", (req, res, next) => {
                   "temp", // 비밀 키
                   {
                     expiresIn: "7d", // 유효 기간 7일
-                  }
+                  },
                 );
 
                 // 쿠키 설정
@@ -374,7 +394,7 @@ router.post("/login", (req, res) => {
           "temp", // 비밀 키
           {
             expiresIn: "7d", // 유효 기간 7일
-          }
+          },
         );
 
         // 쿠키 설정
@@ -443,7 +463,7 @@ router.get("/info", (req, res) => {
         } else {
           // 접종접보 있음
           console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다."
+            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
           );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
@@ -511,7 +531,7 @@ router.post("/done_vaccine", (req, res) => {
           [row[0].r_id],
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
 
         // 1차 접종인 경우는 2차 자동 예약
@@ -536,7 +556,7 @@ router.post("/done_vaccine", (req, res) => {
             reserv,
             (err) => {
               if (err) console.log(err);
-            }
+            },
           );
           info = {
             vaccination_number: req.body.vaccination_number,
@@ -562,25 +582,13 @@ router.post("/done_vaccine", (req, res) => {
           [row[0].hospital_name, row[0].vaccine_type],
           (err) => {
             if (err) console.log(err);
-          }
+          },
         );
-        // 접종 기록에 추가
-        const vaccination = [
-          row[0].reg,
-          req.body.vaccination_number,
-          row[0].vaccine_type,
-        ];
-        console.log("접종 기록 추가", vaccination);
-        connection.query(
-          "INSERT INTO vaccination(`fk_registration_number`,`vaccination_number`,`vaccine_type`) VALUES (?,?,?)",
-          vaccination,
-          (err) => {
-            if (err) console.log(err);
-          }
-        );
+        // 접종 기록에 추가(트리거 자동 수행)
+
         res.send(info);
         connection.release();
-      }
+      },
     );
   });
 });
@@ -748,7 +756,7 @@ router.post("/reservation", (req, res, next) => {
         // (default)대기, 취소, 완료
         const date = new Date(req.body.date);
         date.setHours(
-          date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)) // 한국시 설정
+          date.getHours() + 9 + parseInt(req.body.time.substring(0, 2)), // 한국시 설정
         );
         const reserv = [
           req.body.hospital_name,
@@ -761,24 +769,32 @@ router.post("/reservation", (req, res, next) => {
 
         // 기존 예약 있으면 취소
         connection.query(
-            "SELECT reservation_id " +
+          "SELECT reservation_id " +
             "FROM reservation r ,login l " +
-            "WHERE id = " + "'" +  req.user.id + "' " +
+            "WHERE id = " +
+            "'" +
+            req.user.id +
+            "' " +
             "AND l.fk_registration_number = r.fk_registration_number " +
             "AND r.state = '대기'",
-            (err, row) => {
-              if (err) console.log(err);
-              console.log(row);
-              if(row.length){
-                connection.query(
-                    "UPDATE reservation " +
-                    "SET state = '취소' " +
-                    "WHERE reservation_id = " + "'" + row[0].reservation_id + "'",
-                    (err) => {
-                      if (err) console.log(err);
-                    })
-              }
-            });
+          (err, row) => {
+            if (err) console.log(err);
+            console.log(row);
+            if (row.length) {
+              connection.query(
+                "UPDATE reservation " +
+                  "SET state = '취소' " +
+                  "WHERE reservation_id = " +
+                  "'" +
+                  row[0].reservation_id +
+                  "'",
+                (err) => {
+                  if (err) console.log(err);
+                },
+              );
+            }
+          },
+        );
 
         // 예약
         connection.query(
@@ -789,9 +805,9 @@ router.post("/reservation", (req, res, next) => {
             res.json({
               success: "success",
             });
-          }
+          },
         );
-      }
+      },
     );
     // 백신 개수 감소
     // 백신이 없는 경우 20개 추가 후 1개 감소
@@ -806,7 +822,7 @@ router.post("/reservation", (req, res, next) => {
       [req.body.hospital_name, req.body.vaccine_type],
       (err) => {
         if (err) console.log(err);
-      }
+      },
     );
   });
 });
