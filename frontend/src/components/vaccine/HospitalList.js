@@ -144,7 +144,7 @@ const HospitalList = ({
                 key={index}
                 onClick={
                   setSelectedHospital
-                    ? setSelectedHospital(hospital.fk_hospital_name)
+                    ? () => setSelectedHospital(hospital.fk_hospital_name)
                     : (e) => e
                 }
               >
