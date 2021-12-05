@@ -606,7 +606,7 @@ router.get("/remaining_vaccine", (req, res) => {
         "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id";
 
     // 병원 이름이 없는 경우
-    if(hospital_name === ''){
+    if(hospital_name === '%undefined%'){
       // 지역,백신 선택안함
       if (!residence && !vaccine_type) {
       }
