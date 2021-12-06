@@ -512,7 +512,7 @@ router.post("/done_vaccine", (req, res) => {
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받아서 접종 기록 가져오기
     connection.query(
-      "SELECT r.reservation_id AS r_id, l.fk_registration_number AS reg, " +
+      "SELECT r.reservation_id AS r_id, l.fk_registration_number AS reg, r.reservation_date AS date, " +
         "r.fk_hospital_name AS hospital_name, r.vaccine_type AS vaccine_type " +
         "FROM login l, reservation r  " +
         "WHERE l.id = ? " +
@@ -537,7 +537,7 @@ router.post("/done_vaccine", (req, res) => {
         // 1차 접종인 경우는 2차 자동 예약
         if (req.body.vaccination_number == 1) {
           // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
-          const reserv_date = new Date();
+          var reserv_date = row[0].date;
           if (row[0].vaccine_type == "모더나")
             reserv_date.setDate(reserv_date.getDate() + 28);
           else reserv_date.setDate(reserv_date.getDate() + 21);

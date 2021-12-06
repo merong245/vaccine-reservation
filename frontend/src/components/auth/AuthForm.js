@@ -169,6 +169,7 @@ const AuthForm = ({
             placeholder="아이디"
             onChange={onChange}
             value={form.id}
+            maxLength={8}
           />
         </InputBlock>
         <InputBlock>
@@ -179,6 +180,7 @@ const AuthForm = ({
             type="password"
             onChange={onChange}
             value={form.password}
+            maxLength={16}
           />
         </InputBlock>
         {type === 'register' && (
@@ -191,6 +193,7 @@ const AuthForm = ({
                 type="password"
                 onChange={onChange}
                 value={form.passwordConfirm}
+                maxLength={16}
               />
             </InputBlock>
             <InputBlock>
@@ -199,6 +202,7 @@ const AuthForm = ({
                 placeholder="이름"
                 onChange={onChange}
                 value={form.name}
+                maxLength={5}
               />
             </InputBlock>
             <InputBlock>
@@ -209,7 +213,6 @@ const AuthForm = ({
                 value={registrationNumber}
               />
             </InputBlock>
-            {/* 나이는 주민번호로 계산 */}
             <InputBlock>
               <StyledToggleButtonGroup name="sex" onChange={handleSex}>
                 <StyledToggleButton id="male" variant="outline-info" value="M">
@@ -273,15 +276,12 @@ const AuthForm = ({
                 </StyledClickBox>
               </StyledBox>
             </InputBlock>
-            {
-              /* 약관 내용 표시는 새 창을 띄우기 등으로 변경가능 */
-              agreeContents && (
-                <StyledBox style={{ marginTop: '-1px', fontSize: '11px' }}>
-                  약관에 동의함으로서 회원가입 시 수집한 개인정보의 보관 및
-                  이용에 동의함.
-                </StyledBox>
-              )
-            }
+            {agreeContents && (
+              <StyledBox style={{ marginTop: '-1px', fontSize: '11px' }}>
+                약관에 동의함으로서 회원가입 시 수집한 개인정보의 보관 및 이용에
+                동의함.
+              </StyledBox>
+            )}
           </>
         )}
         {error && <ErrorMessage>{error}</ErrorMessage>}

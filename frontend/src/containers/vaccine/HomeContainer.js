@@ -25,6 +25,7 @@ const HomeContainer = () => {
   const handleComplete = (e) => {
     const vaccination_number = info ? info.vaccination_number + 1 : 0;
     dispatch(completeReservation({ vaccination_number }));
+    if (user !== null) dispatch(getUserInfo());
   };
 
   const handleCancel = (e) => {
