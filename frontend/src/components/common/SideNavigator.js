@@ -17,14 +17,14 @@ const SideNavigation = ({ history, location }) => {
       },
     },
     {
-      title: '병원별 잔여백신 현황',
+      title: '잔여백신 현황',
       itemId: '/vaccineStatus',
       elemBefore: () => {
         return <MdOutlineLocalHospital />;
       },
     },
     {
-      title: '예약가능 의료기관 조회',
+      title: '백신 예약',
       itemId: '/reservation',
       elemBefore: () => {
         return <FaRegCalendarTimes />;

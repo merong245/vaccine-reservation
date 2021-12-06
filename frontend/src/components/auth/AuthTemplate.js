@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import palette from '../../lib/styles/palette';
-import Navbar from 'react-bootstrap/Navbar';
 
 /**
  * 회원가입 / 로그인 페이지의 레이아웃을 담당하는 컴포넌트입니다.
@@ -11,7 +10,7 @@ import Navbar from 'react-bootstrap/Navbar';
 const AuthTemplateBlock = styled.div`
   position: absolute;
   left: 0;
-  top: 0;
+  top: 4rem;
   bottom: 0;
   right: 0;
   background: ${palette.gray[2]};
@@ -41,9 +40,6 @@ const AuthTemplate = ({ children, center }) => {
           : {}
       }
     >
-      <Navbar bg="light" variant="light" fixed="top">
-        <Navbar.Brand href="/">　백신 접종 예약 시스템</Navbar.Brand>
-      </Navbar>
       <WhiteBox
         style={
           !center

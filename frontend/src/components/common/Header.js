@@ -85,7 +85,7 @@ const UserInfo = styled.div`
   margin-right: 1rem;
 `;
 
-const Header = ({ user, onLogout, title }) => {
+const Header = ({ user, onLogout, title, isAuth }) => {
   return (
     <>
       <HeaderBlock>
@@ -97,19 +97,21 @@ const Header = ({ user, onLogout, title }) => {
             </StyledLink>
           </ItemContainer>
           <Title>{title}</Title>
-          {user ? (
-            <ItemContainer className="right">
-              <UserInfo>{user.id}</UserInfo>
-              <HeaderButton onClick={onLogout}>로그아웃</HeaderButton>
-            </ItemContainer>
-          ) : (
-            <ItemContainer
-              className="right"
-              style={{ justifyContent: 'flex-end' }}
-            >
-              <HeaderButton to="/login">로그인</HeaderButton>
-            </ItemContainer>
-          )}
+
+          {!isAuth &&
+            (user ? (
+              <ItemContainer className="right">
+                <UserInfo>{user.id}</UserInfo>
+                <HeaderButton onClick={onLogout}>로그아웃</HeaderButton>
+              </ItemContainer>
+            ) : (
+              <ItemContainer
+                className="right"
+                style={{ justifyContent: 'flex-end' }}
+              >
+                <HeaderButton to="/login">로그인</HeaderButton>
+              </ItemContainer>
+            ))}
         </Wrapper>
       </HeaderBlock>
       <Spacer />

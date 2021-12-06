@@ -7,10 +7,14 @@ import HomePage from './pages/HomePage';
 import VaccineStatusPage from './pages/VaccineStatusPage';
 import ReservationPage from './pages/ReservationPage';
 import ResultPage from './pages/ResultPage';
+import { Helmet } from 'react-helmet-async';
 
 const App = () => {
   return (
     <>
+      <Helmet>
+        <title>코로나19 백신 접종 예약</title>
+      </Helmet>
       <Route component={HomePage} path="/" exact />
       <Route component={HomePage} path="/home" />
       <Route component={LoginPage} path="/login" />
