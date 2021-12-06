@@ -209,6 +209,7 @@ const ReservationForm = ({
                 </SearchButton>
               </InputBlock>
               <HospitalList
+                info={info}
                 type="reservation"
                 list={list}
                 hospitalName={options.hospital_name}

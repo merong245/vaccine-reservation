@@ -23,7 +23,10 @@ export const completeReservation = createAction(
   COMPLETE_RESERVATION,
   ({ vaccination_number }) => ({ vaccination_number }),
 );
-export const cancelReservation = createAction(CANCEL_RESERVATION);
+export const cancelReservation = createAction(
+  CANCEL_RESERVATION,
+  ({ vaccination_number }) => ({ vaccination_number }),
+);
 
 const getUserInfoSaga = createRequestSaga(
   GET_USER_INFO,

@@ -118,6 +118,7 @@ const TableContainer = styled.div`
 `;
 
 const HospitalList = ({
+  info,
   type,
   list,
   error,
@@ -139,39 +140,48 @@ const HospitalList = ({
       <TableContainer>
         {!loading && list && (
           <>
-            {list.map((hospital, index) => (
-              <SelectableItemBlock
-                key={index}
-                onClick={
-                  setSelectedHospital
-                    ? () => setSelectedHospital(hospital.fk_hospital_name)
-                    : (e) => e
-                }
-              >
-                <HospitalItem left index={index}>
-                  {hospital.fk_hospital_name}
-                </HospitalItem>
-                <HospitalItem location index={index}>
-                  {hospital.district
-                    ? hospital.province +
-                      ' ' +
-                      hospital.city +
-                      ' ' +
-                      hospital.district
-                    : hospital.province + ' ' + hospital.city}
-                </HospitalItem>
-                <HospitalItem vaccine index={index}>
-                  {hospital.vaccine_type}
-                </HospitalItem>
-                <HospitalItem quantity index={index}>
-                  {hospital.quantity}
-                </HospitalItem>
-                <HospitalItem right index={index}>
-                  {hospital.opening_time.substr(0, 5)}~
-                  {hospital.closing_time.substr(0, 5)}
-                </HospitalItem>
-              </SelectableItemBlock>
-            ))}
+            {list.map(
+              (hospital, index) =>
+                ((info &&
+                  info.vaccination_number === null &&
+                  hospital.quantity > 1) ||
+                  (info &&
+                    info.vaccination_number === 1 &&
+                    hospital.quantity !== 0) ||
+                  info === undefined) && (
+                  <SelectableItemBlock
+                    key={index}
+                    onClick={
+                      setSelectedHospital
+                        ? () => setSelectedHospital(hospital.fk_hospital_name)
+                        : (e) => e
+                    }
+                  >
+                    <HospitalItem left index={index}>
+                      {hospital.fk_hospital_name}
+                    </HospitalItem>
+                    <HospitalItem location index={index}>
+                      {hospital.district
+                        ? hospital.province +
+                          ' ' +
+                          hospital.city +
+                          ' ' +
+                          hospital.district
+                        : hospital.province + ' ' + hospital.city}
+                    </HospitalItem>
+                    <HospitalItem vaccine index={index}>
+                      {hospital.vaccine_type}
+                    </HospitalItem>
+                    <HospitalItem quantity index={index}>
+                      {hospital.quantity}
+                    </HospitalItem>
+                    <HospitalItem right index={index}>
+                      {hospital.opening_time.substr(0, 5)}~
+                      {hospital.closing_time.substr(0, 5)}
+                    </HospitalItem>
+                  </SelectableItemBlock>
+                ),
+            )}
           </>
         )}
       </TableContainer>

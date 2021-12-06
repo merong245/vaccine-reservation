@@ -26,10 +26,6 @@ const VaccineStatusContainer = () => {
     dispatch(getRemainingVaccine({ vaccine_type, residence }));
   }, [vaccine_type, residence, dispatch]);
 
-  useEffect(() => {
-    console.log(vaccine_list);
-  }, [vaccine_list]);
-
   // 백신 타입 선택 이벤트 핸들러
   const handleType = (selectedOption) => {
     const value = selectedOption ? selectedOption.value : '';

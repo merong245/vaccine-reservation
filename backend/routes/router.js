@@ -162,8 +162,6 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-  console.log("회원가입 리퀘스트 데이터", req.body);
-
   // 지역정보 추출
   var beforeStr = req.body.residence;
   var afterStr = beforeStr.split(" ");
@@ -217,26 +215,25 @@ router.post("/register", (req, res) => {
         else {
           // 중복 아이디 없음
           if (!row.length) {
-            connection,
-              query(
-                "SELECT * FROM location WHERE location_id=?",
-                [parseInt(location_id)],
-                (err, row) => {
-                  if (err) console.log(err);
-                  else {
-                    // 지역정보 없음
-                    if (!row.length) {
-                      connection.query(
-                        "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
-                        location,
-                        (err, row) => {
-                          if (err) console.log(err);
-                        },
-                      );
-                    }
+            connection.query(
+              "SELECT * FROM location WHERE location_id=?",
+              [parseInt(location_id)],
+              (err, row) => {
+                if (err) console.log(err);
+                else {
+                  // 지역정보 없음
+                  if (!row.length) {
+                    connection.query(
+                      "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
+                      location,
+                      (err, row) => {
+                        if (err) console.log(err);
+                      },
+                    );
                   }
-                },
-              );
+                }
+              },
+            );
             connection.query(
               "SELECT * FROM user WHERE registration_number = ? OR phone_number = ?",
               [regnum, req.body.phone_number],
@@ -326,15 +323,11 @@ router.post("/login", (req, res) => {
       if (err) console.log(err);
 
       if (!row.length) {
-        console.log("로그인 실패");
-        console.log("아이디와 비밀번호를 확인하세요.");
         res.status(401).json({
           error: "LOGIN FAILED",
           code: 1,
         });
       } else if (id == row[0].id && passwd == row[0].passwd) {
-        console.log("로그인 성공", id, row[0].name);
-
         // 토큰 생성
         const token = jwt.sign(
           {
@@ -356,14 +349,11 @@ router.post("/login", (req, res) => {
 
         res.json({ token: token });
       } else {
-        console.log("로그인 실패");
-        console.log("아이디와 비밀번호를 확인하세요.");
         res.status(401).json({
           error: "LOGIN FAILED",
           code: 1,
         });
       }
-      //            console.log(JSON.stringify(row));
     });
 
     connection.release();
@@ -408,13 +398,9 @@ router.get("/info", (req, res) => {
         if (err) console.log(err);
         const { n = null } = row[0];
         // 접종정보 없음
-        if (row.n === NULL) {
-          console.log(row[0].name + "님은 미접종자 입니다.");
+        if (row.n === null) {
         } else {
           // 접종접보 있음
-          console.log(
-            row[0].name + "님은 " + row[0].n + "차 접종을 완료하셨습니다.",
-          );
           sqlForSelectList =
             "SELECT reservation_date AS date, r.fk_hospital_name AS h_name, r.vaccine_type AS type " +
             "FROM login AS l, user AS u  " +
@@ -440,7 +426,6 @@ router.get("/info", (req, res) => {
                 },
               };
             }
-            //console.log(info);
             res.send(info);
           });
         }
@@ -462,8 +447,8 @@ router.post("/done_vaccine", (req, res) => {
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받아서 접종 기록 가져오기
     connection.query(
-      "SELECT r.reservation_id AS r_id, l.fk_registration_number AS reg, r.reservation_date AS date, " +
-        "r.fk_hospital_name AS hospital_name, r.vaccine_type AS vaccine_type " +
+      "SELECT r.reservation_id AS id, l.fk_registration_number AS reg, r.reservation_date AS date, " +
+        "r.fk_hospital_name AS hospital_name, r.vaccine_type AS type " +
         "FROM login l, reservation r  " +
         "WHERE l.id = ? " +
         "AND r.fk_registration_number = l.fk_registration_number " +
@@ -472,74 +457,78 @@ router.post("/done_vaccine", (req, res) => {
       [req.user.id],
       (err, row) => {
         if (err) console.log(err);
-
-        // 기존의 예약상태를 완료로 변경
-        connection.query(
-          "UPDATE reservation " +
-            "SET state = '완료' " +
-            "WHERE reservation_id = ?",
-          [row[0].r_id],
-          (err) => {
-            if (err) console.log(err);
-          },
-        );
-
-        // 1차 접종인 경우는 2차 자동 예약
-        if (req.body.vaccination_number == 1) {
-          // 모더나는 4주 뒤, 나머지는 3주 뒤 재예약
-          var reserv_date = row[0].date;
-          if (row[0].vaccine_type == "모더나")
-            reserv_date.setDate(reserv_date.getDate() + 28);
-          else reserv_date.setDate(reserv_date.getDate() + 21);
-          // 새로운 예약 정보
-          // (default)대기, 취소, 완료
-          const reserv = [
-            row[0].hospital_name,
-            row[0].reg,
-            reserv_date,
-            row[0].vaccine_type,
-            "대기",
-          ];
-
+        else {
+          // 기존의 예약상태를 완료로 변경
           connection.query(
-            "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
-            reserv,
+            "UPDATE reservation " +
+              "SET state = '완료' " +
+              "WHERE reservation_id = ?",
+            [row[0].id],
             (err) => {
               if (err) console.log(err);
+              else {
+                // 1차 접종인 경우, 2차 자동 예약
+                if (req.body.vaccination_number === 1) {
+                  // 모더나는 4주 뒤, 나머지는 3주 뒤 예약
+                  var reserv_date = row[0].date;
+                  if (row[0].type == "모더나")
+                    reserv_date.setDate(reserv_date.getDate() + 28);
+                  else reserv_date.setDate(reserv_date.getDate() + 21);
+                  // 새로운 예약 정보
+                  // (default)대기, 완료
+                  const reserv = [
+                    row[0].hospital_name,
+                    row[0].reg,
+                    reserv_date,
+                    row[0].type,
+                    "대기",
+                  ];
+
+                  connection.query(
+                    "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
+                    reserv,
+                    (err) => {
+                      if (err) console.log(err);
+                    },
+                  );
+                  // 백신 개수 감소
+                  // 백신이 없는 경우 20개 추가 후 1개 감소
+                  connection.query(
+                    "UPDATE vaccine " +
+                      "SET quantity = " +
+                      "CASE " +
+                      "WHEN quantity> 0 THEN quantity - 1 " +
+                      "ELSE quantity + 20 - 1 " +
+                      "END " +
+                      "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+                    [row[0].hospital_name, row[0].type],
+                    (err) => {
+                      if (err) console.log(err);
+                    },
+                  );
+                  info = {
+                    vaccination_number: req.body.vaccination_number,
+                    reservation: {
+                      vaccine_type: row[0].type,
+                      hospital_name: row[0].hospital_name,
+                      date: reserv_date,
+                    },
+                  };
+                  console.log(info);
+                  res.send(info);
+                  // 2차 접종인 경우
+                } else {
+                  info = { vaccination_number: req.body.vaccination_number };
+                  console.log(info);
+                  res.send(info);
+                }
+              }
             },
           );
-          info = {
-            vaccination_number: req.body.vaccination_number,
-            reservation: {
-              vaccine_type: row[0].vaccine_type,
-              hospital_name: row[0].hospital_name,
-              date: reserv_date.toLocaleString(),
-            },
-          };
-        } else {
-          info = { vaccination_number: req.body.vaccination_number };
         }
-        // 백신 개수 감소
-        // 백신이 없는 경우 20개 추가 후 1개 감소
-        connection.query(
-          "UPDATE vaccine " +
-            "SET quantity = " +
-            "CASE " +
-            "WHEN quantity> 0 THEN quantity - 1 " +
-            "ELSE quantity + 20 - 1 " +
-            "END " +
-            "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-          [row[0].hospital_name, row[0].vaccine_type],
-          (err) => {
-            if (err) console.log(err);
-          },
-        );
-        // 접종 기록에 추가(트리거 자동 수행)
-
-        res.send(info);
-        connection.release();
       },
     );
+    connection.release();
   });
 });
 
@@ -556,8 +545,6 @@ router.get("/remaining_vaccine", (req, res) => {
 
   // 글자 포함 문자열
   const hospital_name = "%" + req.query.hospital_name + "%";
-  console.log(hospital_name);
-  console.log(req.query);
 
   pool.getConnection(function (err, connection) {
     var sqlForSelectList =
@@ -620,16 +607,13 @@ router.get("/remaining_vaccine", (req, res) => {
     //     "AND (province='서울시' OR province='경기도' OR province='인천시')";
     // }
 
-    console.log(sqlForSelectList);
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
       if (!row.length) {
-        console.log("조건에 맞는 병원이 없습니다.");
       } else {
         // for (var i = 0; i < row.length; i++) {
         //   console.log(row[i]);
         // }
-        console.log("조회 성공");
       }
       res.send(row);
     });
@@ -677,13 +661,12 @@ router.post("/reservationlist", (req, res, next) => {
     connection.query(selectquery, remain, (err, row) => {
       if (err) console.log(err);
       if (!row.length) {
-        console.log("조건에 맞는 병원이 없습니다.");
         res.render("reservationlist");
       } else {
         for (var i = 0; i < row.length; i++) {
           console.log(row[i]);
         }
-        console.log("조회 성공");
+
         res.redirect("/");
       }
     });
@@ -692,8 +675,6 @@ router.post("/reservationlist", (req, res, next) => {
 
 /*예약*/
 router.post("/reservation", (req, res, next) => {
-  console.log("백신예약 요청", req.body);
-
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
@@ -702,7 +683,7 @@ router.post("/reservation", (req, res, next) => {
       (err, row) => {
         if (err) console.log(err);
 
-        // (default)대기, 취소, 완료
+        // (default)대기, 완료
         const date = new Date(req.body.date);
         date.setHours(
           date.getHours() + parseInt(req.body.time.substring(0, 2)),
@@ -725,7 +706,6 @@ router.post("/reservation", (req, res, next) => {
           [req.user.id],
           (err, row) => {
             if (err) console.log(err);
-            console.log(row);
             // 기존 예약 있는 경우
             if (row.length) {
               connection.query(
@@ -754,32 +734,38 @@ router.post("/reservation", (req, res, next) => {
           reserv,
           (err) => {
             if (err) console.log(err);
-            res.json({
-              success: "success",
-            });
+            else {
+              // 백신 개수 감소
+              // 백신이 없는 경우 20개 추가 후 1개 감소
+              connection.query(
+                "UPDATE vaccine " +
+                  "SET quantity = " +
+                  "CASE " +
+                  "WHEN quantity> 0 THEN quantity - 1 " +
+                  "ELSE quantity + 20 - 1 " +
+                  "END " +
+                  "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+                [req.body.hospital_name, req.body.vaccine_type],
+                (err) => {
+                  if (err) console.log(err);
+                  else {
+                    res.json({
+                      success: "success",
+                    });
+                  }
+                },
+              );
+            }
           },
         );
       },
     );
-    // 백신 개수 감소
-    // 백신이 없는 경우 20개 추가 후 1개 감소
-    connection.query(
-      "UPDATE vaccine " +
-        "SET quantity = " +
-        "CASE " +
-        "WHEN quantity> 0 THEN quantity - 1 " +
-        "ELSE quantity + 20 - 1 " +
-        "END " +
-        "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-      [req.body.hospital_name, req.body.vaccine_type],
-      (err) => {
-        if (err) console.log(err);
-      },
-    );
+    connection.release();
   });
 });
 
 router.post("/cancel", (req, res) => {
+  var info;
   pool.getConnection(function (err, connection) {
     connection.query(
       "SELECT reservation_id, fk_hospital_name, vaccine_type " +
@@ -790,31 +776,33 @@ router.post("/cancel", (req, res) => {
       [req.user.id],
       (err, row) => {
         if (err) console.log(err);
-        console.log(row);
-        // 기존 예약 있는 경우
-        if (row.length) {
-          connection.query(
-            "UPDATE vaccine " +
-              "SET quantity = quantity + 1 " +
-              "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-            [row[0].fk_hospital_name, row[0].vaccine_type],
-            (err) => {
-              if (err) console.log(err);
-            },
-          );
-          connection.query(
-            "delete from reservation where reservation_id = ?",
-            [row[0].reservation_id],
-            (err) => {
-              if (err) console.log(err);
-            },
-          );
-          res.json({
-            success: "success",
-          });
+        else {
+          // 기존 예약 있는 경우
+          if (row.length) {
+            connection.query(
+              "UPDATE vaccine " +
+                "SET quantity = quantity + 1 " +
+                "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+              [row[0].fk_hospital_name, row[0].vaccine_type],
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            connection.query(
+              "delete from reservation where reservation_id = ?",
+              [row[0].reservation_id],
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            info = { vaccination_number: req.body.vaccination_number - 1 };
+            console.log(info);
+            res.send(info);
+          }
         }
       },
     );
+    connection.release();
   });
 });
 

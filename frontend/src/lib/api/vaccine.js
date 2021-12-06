@@ -45,4 +45,5 @@ export const reservation = ({
     hospital_name,
   });
 
-export const cancelReservation = () => client.post('/cancel');
+export const cancelReservation = ({ vaccination_number }) =>
+  client.post(`/cancel`, { vaccination_number });
