@@ -859,7 +859,7 @@ router.get("/vaccine_result", (req, res) => {
         sqlForSelectList =
           "SELECT vaccine_type AS id, COUNT(*)AS value " +
           "FROM vaccination " +
-          "WHERE vaccination_number>='2' " +
+          "WHERE vaccination_number='2' " +
           "GROUP BY vaccine_type";
       } else if (option2 === "age") {
         // 연령별 접종 완료자수
@@ -874,7 +874,7 @@ router.get("/vaccine_result", (req, res) => {
           "ELSE '70세 이상' " +
           "END AS id ,COUNT(*) AS value " +
           "FROM user u, vaccination v " +
-          "WHERE u.registration_number = v.fk_registration_number AND v.vaccination_number>=2 " +
+          "WHERE u.registration_number = v.fk_registration_number AND v.vaccination_number=2 " +
           "GROUP BY id " +
           "ORDER BY id";
       } else if (option2 === "gender") {
@@ -885,7 +885,7 @@ router.get("/vaccine_result", (req, res) => {
           "ELSE '여성' " +
           "END AS id, COUNT(*) AS value " +
           "FROM user, vaccination " +
-          "WHERE registration_number = fk_registration_number AND vaccination_number>=2 " +
+          "WHERE registration_number = fk_registration_number AND vaccination_number=2 " +
           "GROUP BY id";
       }
 
@@ -922,12 +922,14 @@ router.get("/vaccine_result", (req, res) => {
         }
         // 날짜별 접종 완료자 수
         sqlForSelectList =
-          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS time, COUNT(*) AS 2차 " +
+          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS time, " +
+          "COUNT(CASE WHEN vaccination_number = 1 THEN 1 END) AS 1차, " +
+          "COUNT(CASE WHEN vaccination_number = 2 THEN 1 END) AS 2차 " +
           "FROM reservation r, vaccination v, user u " +
           "WHERE r.state = '완료' " +
           "AND r.fk_registration_number = u.registration_number " +
           "AND v.fk_registration_number = u.registration_number " +
-          "AND v.vaccination_number >= 2 " +
+          "AND v.vaccination_number >= 1 " +
           "GROUP BY time " +
           "ORDER BY time";
       }
@@ -943,11 +945,13 @@ router.get("/vaccine_result", (req, res) => {
 
         // 지역별 접종 완료자 수
         sqlForSelectList =
-          "SELECT l.province AS residence, COUNT(*) AS 2차 " +
+          "SELECT l.province AS residence," +
+          "COUNT(CASE WHEN vaccination_number = 1 THEN 1 END) AS 1차, " +
+          "COUNT(CASE WHEN vaccination_number = 2 THEN 1 END) AS 2차 " +
           "FROM location l, vaccination v, user u " +
           "WHERE v.fk_registration_number = u.registration_number " +
           "AND u.fk_location_id = l.location_id " +
-          "AND v.vaccination_number >= 2 " +
+          "AND v.vaccination_number >= 1 " +
           "GROUP BY residence ";
       }
     }
