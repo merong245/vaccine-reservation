@@ -11,7 +11,7 @@ const InfoTag = styled.div`
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
   border: 1px solid ${palette.gray[7]};
-  width: 40%;
+  width: 31%;
   padding: 1rem;
   align-items: center;
   text-align: center;
@@ -21,7 +21,7 @@ const InfoContent = styled.div`
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
   border: 1px solid ${palette.gray[7]};
-  width: 60%;
+  width: 69%;
   padding: 1rem;
   align-items: center;
   text-align: center;

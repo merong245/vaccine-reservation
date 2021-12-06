@@ -109,7 +109,7 @@ const ReservationForm = ({
 
   return user ? (
     (info && info.vaccination_number !== 2) || info === undefined ? (
-      <ContentsBlock>
+      <ContentsBlock style={{ width: '700px' }}>
         <form onSubmit={onSubmit}>
           <InputBlock>
             {viewAddress ? (

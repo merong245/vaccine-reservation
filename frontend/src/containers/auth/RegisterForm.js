@@ -91,7 +91,7 @@ const RegisterForm = ({ history }) => {
         residence,
       ].includes('')
     ) {
-      setError('빈 칸을 모두 입력하세요.');
+      setError('모든 정보를 입력하세요.');
       return;
     }
 
@@ -137,9 +137,9 @@ const RegisterForm = ({ history }) => {
   // 회원가입 성공 / 실패 처리
   useEffect(() => {
     if (authError) {
-      // 계정명이 이미 존재할 때
+      // 중복 값 존재
       if (authError.response.status === 409) {
-        setError('이미 존재하는 계정명입니다.');
+        setError(authError.response.data.error);
         return;
       }
       // 기타 이유

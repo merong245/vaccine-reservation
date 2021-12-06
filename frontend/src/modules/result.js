@@ -37,7 +37,7 @@ const initialState = {
   options: {
     option0: 'Pie',
     option1: '',
-    option2: '',
+    option2: 'number',
     option3: false,
   },
   result: null,

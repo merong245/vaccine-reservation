@@ -452,9 +452,9 @@ const Visualization = ({
   // 그래프 선택
   const graphOptions = useMemo(
     () => [
+      { value: 'Pie', label: '원형' },
       { value: 'Bar', label: '막대형' },
       { value: 'Line', label: '선형' },
-      { value: 'Pie', label: '원형' },
     ],
     [],
   );
@@ -462,7 +462,7 @@ const Visualization = ({
   // 표시 옵션
   const criteriaOptions = useMemo(
     () => [
-      { value: 'time', label: '시간별' },
+      { value: 'time', label: '일자별' },
       { value: 'residence', label: '지역별' },
     ],
     [],
@@ -518,7 +518,6 @@ const Visualization = ({
       },
     ];
     setLineDataSet(dataSet);
-    console.log(lineDataSet);
   }, [options.option1, result]);
 
   // useEffect(() => {
@@ -543,7 +542,7 @@ const Visualization = ({
             setGraph(selectedOption.value);
             graphChange(selectedOption);
           }}
-          defaultValue={graphOptions[2]}
+          defaultValue={graphOptions[0]}
           options={graphOptions}
           placeholder="그래프"
         />
@@ -555,6 +554,7 @@ const Visualization = ({
         />
         <StyledSelect
           onChange={infoChange}
+          defaultValue={infoOptions[0]}
           options={infoOptions}
           placeholder="표시 정보"
           isDisabled={graph !== 'Pie'}

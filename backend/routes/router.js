@@ -104,9 +104,11 @@ pool.getConnection(function (err, connection) {
           `LOAD DATA INFILE ? ` +
           "INTO TABLE location " +
           "FIELDS TERMINATED BY ',' " +
-          `ENCLOSED BY '"' ` +
+          `OPTIONALLY ENCLOSED BY '' ` +
           `LINES TERMINATED BY '\\r\\n' ` +
-          "IGNORE 1 ROWS";
+          "IGNORE 1 ROWS " +
+          "(location_id,province,city,@district) " +
+          "SET district = IF(@district='', NULL, @district)";
         sql = mysql.format(sql, [MySQLPath + "/location_data.csv"]);
         connection.query(sql, (err, row) => {
           if (err) console.log("Failed to load location data. ");
@@ -159,22 +161,20 @@ router.get("/register", (req, res) => {
   } else res.render("register");
 });
 
-router.post("/register", (req, res, next) => {
+router.post("/register", (req, res) => {
   console.log("회원가입 리퀘스트 데이터", req.body);
 
   // 지역정보 추출
   var beforeStr = req.body.residence;
   var afterStr = beforeStr.split(" ");
 
+  var location_id = afterStr[0];
+  var province = afterStr[1];
+  var city = afterStr[2];
+  var district;
   if (afterStr[3] == undefined) {
-    location_id = afterStr[0];
-    province = afterStr[1];
-    city = afterStr[2];
     district = null;
   } else {
-    location_id = afterStr[0];
-    province = afterStr[1];
-    city = afterStr[2];
     district = afterStr[3];
   }
 
@@ -201,150 +201,100 @@ router.post("/register", (req, res, next) => {
     age,
     req.body.sex,
     req.body.phone_number,
+    parseInt(location_id),
   ];
   const login = [req.body.id, req.body.password, req.body.registration_number];
   const location = [parseInt(location_id), province, city, district];
-  console.log("유저정보", user);
-  console.log("로그인정보", login);
-  console.log("지역정보", location);
 
   pool.getConnection(function (err, connection) {
     if (err) console.log(err);
     else {
-      var sqlForSelectList = "SELECT * FROM login WHERE id=?";
+      var sql = "SELECT * FROM login WHERE id=?";
 
       // 중복 id 확인
-      connection.query(sqlForSelectList, [req.body.id], (err, row) => {
+      connection.query(sql, [req.body.id], (err, row) => {
         if (err) console.log(err);
         else {
           // 중복 아이디 없음
           if (!row.length) {
-            if (district !== null) {
-              sqlForSelectList =
-                "SELECT location_id FROM location WHERE province=? AND city=? AND district=?";
-              sqlForSelectList = mysql.format(sqlForSelectList, [
-                province,
-                city,
-                district,
-              ]);
-            } else {
-              sqlForSelectList =
-                "SELECT location_id FROM location WHERE province=? AND city=? AND district IS NULL";
-              sqlForSelectList = mysql.format(sqlForSelectList, [
-                province,
-                city,
-              ]);
-            }
+            connection,
+              query(
+                "SELECT * FROM location WHERE location_id=?",
+                [parseInt(location_id)],
+                (err, row) => {
+                  if (err) console.log(err);
+                  else {
+                    // 지역정보 없음
+                    if (!row.length) {
+                      connection.query(
+                        "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
+                        location,
+                        (err, row) => {
+                          if (err) console.log(err);
+                        },
+                      );
+                    }
+                  }
+                },
+              );
+            connection.query(
+              "SELECT * FROM user WHERE registration_number = ? OR phone_number = ?",
+              [regnum, req.body.phone_number],
+              (err, row) => {
+                if (err) console.log(err);
+                else {
+                  // 중복 정보 없음
+                  if (!row.length) {
+                    connection.query(
+                      "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
+                      user,
+                      (err, row) => {
+                        if (err) console.log(err);
+                        else {
+                          connection.query(
+                            "INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
+                            login,
+                            (err, row) => {
+                              if (err) console.log(err);
+                              else {
+                                // 토큰 생성
+                                const token = jwt.sign(
+                                  {
+                                    id: req.body.id,
+                                    name: req.body.name, // 토큰의 내용(payload)
+                                  },
+                                  "temp", // 비밀 키
+                                  {
+                                    expiresIn: "7d", // 유효 기간 7일
+                                  },
+                                );
 
-            // 지역정보 있는지 확인
-            connection.query(sqlForSelectList, (err1, row1) => {
-              if (err1) console.log(err1);
-              else {
-                // 지역정보 없으면 삽입
-                if (!row1.length) {
-                  connection.query(
-                    "INSERT INTO location(`location_id`,`province`,`city`,`district`) VALUES (?,?,?,?)",
-                    location,
-                    (err2, row2) => {
-                      if (err2) console.log(err2);
-                    },
-                  );
+                                // 쿠키 설정
+                                res.cookie("access_token", token, {
+                                  maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+                                  httpOnly: true,
+                                  SameSite: "secure",
+                                });
 
-                  // sqlForSelectList =
-                  //   "SELECT location_id FROM location WHERE " +
-                  //   "province=" +
-                  //   "'" +
-                  //   province +
-                  //   "' AND " +
-                  //   "city = " +
-                  //   "'" +
-                  //   city +
-                  //   "' AND " +
-                  //   "district = " +
-                  //   "'" +
-                  //   district +
-                  //   "'";
-
-                  // // 지역정보 id 받기
-                  // connection.query(sqlForSelectList, (err3, row3) => {
-                  //   if (err3) console.log(err3);
-                  //   const user = [
-                  //     req.body.name,
-                  //     req.body.registration_number,
-                  //     req.body.age,
-                  //     req.body.sex,
-                  //     req.body.phone_number,
-                  //     row3[0].location_id,
-                  //   ];
-
-                  // 유저정보 삽입
-                  user.push(parseInt(location_id));
-                  connection.query(
-                    "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
-                    user,
-                    (err4, row4) => {
-                      if (err4) console.log(err4);
-                    },
-                  );
-
-                  // 로그인정보 삽입
-                  connection.query(
-                    "INSERT INTO login(`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
-                    login,
-                    (err4, row4) => {
-                      if (err4) console.log(err4);
-                    },
-                  );
-                  //});
-                } else {
-                  // 지역정보 이미 있으면
-
-                  // 유저정보 삽입
-                  user.push(parseInt(row1[0].location_id));
-                  connection.query(
-                    "INSERT INTO user(`name`,`registration_number`,`age`,`sex`,`phone_number`, `fk_location_id`) VALUES (?,?,?,?,?,?)",
-                    user,
-                    (err2, row2) => {
-                      if (err2) console.log(err2);
-                    },
-                  );
-                  console.log(login);
-                  // 로그인정보 삽입
-                  connection.query(
-                    "INSERT INTO login (`id`,`passwd`,`fk_registration_number`) VALUES (?,?,?)",
-                    login,
-                    (err2, row2) => {
-                      if (err2) console.log(err2);
-                    },
-                  );
+                                res.json({ token: token });
+                              }
+                            },
+                          );
+                        }
+                      },
+                    );
+                  } else {
+                    res.status(409).json({
+                      error: "이미 존재하는 주민번호 또는 전화번호입니다.",
+                      code: 9,
+                    });
+                  }
                 }
-
-                // 토큰 생성
-                const token = jwt.sign(
-                  {
-                    id: req.body.id,
-                    name: req.body.name, // 토큰의 내용(payload)
-                  },
-                  "temp", // 비밀 키
-                  {
-                    expiresIn: "7d", // 유효 기간 7일
-                  },
-                );
-
-                // 쿠키 설정
-                res.cookie("access_token", token, {
-                  maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-                  httpOnly: true,
-                  SameSite: "secure",
-                });
-
-                res.json({ token: token });
-              }
-            });
+              },
+            );
           } else {
-            console.log("이미 존재하는 아이디입니다.");
             res.status(409).json({
-              error: "LOGIN FAILED",
+              error: "이미 존재하는 아이디입니다.",
               code: 9,
             });
           }
