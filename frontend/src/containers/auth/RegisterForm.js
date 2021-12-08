@@ -94,10 +94,22 @@ const RegisterForm = ({ history }) => {
       setError('모든 정보를 입력하세요.');
       return;
     }
+    if (id.length < 4) {
+      setError('아이디는 최소 4자리입니다.');
+      changeField({ form: 'register', key: 'id', value: '' });
+      return;
+    }
 
     // 비밀번호가 일치하지 않는다면
     if (password !== passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.');
+      changeField({ form: 'register', key: 'password', value: '' });
+      changeField({ form: 'register', key: 'passwordConfirm', value: '' });
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('비밀번호는 최소 8자리입니다.');
       changeField({ form: 'register', key: 'password', value: '' });
       changeField({ form: 'register', key: 'passwordConfirm', value: '' });
       return;

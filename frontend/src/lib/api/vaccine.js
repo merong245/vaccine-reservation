@@ -37,7 +37,7 @@ export const reservation = ({
   time,
   hospital_name,
 }) =>
-  client.post(`/reservation`, {
+  client.post(`/api/reservation`, {
     residence,
     vaccine_type,
     date,

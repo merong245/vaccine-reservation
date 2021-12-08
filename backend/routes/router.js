@@ -148,7 +148,7 @@ pool.getConnection(function (err, connection) {
   connection.release();
 });
 
-router.post("/register", (req, res) => {
+router.post("/auth/register", (req, res) => {
   // 지역정보 추출
   var beforeStr = req.body.residence;
   var afterStr = beforeStr.split(" ");
@@ -289,7 +289,7 @@ router.post("/register", (req, res) => {
   });
 });
 
-router.post("/login", (req, res) => {
+router.post("/auth/login", (req, res) => {
   const id = req.body.id;
   const passwd = req.body.password;
 
@@ -342,7 +342,7 @@ router.post("/login", (req, res) => {
 /*
   로그인 체크
 */
-router.get("/check", (req, res) => {
+router.get("/auth/check", (req, res) => {
   const user = req.user;
   if (!user) {
     // 로그인 X
@@ -355,7 +355,7 @@ router.get("/check", (req, res) => {
 /**
  * 로그아웃
  */
-router.post("/logout", (req, res) => {
+router.post("/auth/logout", (req, res) => {
   res.cookie("access_token", "").json({ logoutSuccess: true });
 });
 
@@ -593,7 +593,7 @@ router.get("/remaining_vaccine", (req, res) => {
 });
 
 /*예약*/
-router.post("/reservation", (req, res, next) => {
+router.post("/api/reservation", (req, res, next) => {
   pool.getConnection(function (err, connection) {
     // 유저 id 에서 주민번호 받기
     connection.query(
