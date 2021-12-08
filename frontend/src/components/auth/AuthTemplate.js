@@ -44,7 +44,7 @@ const AuthTemplate = ({ children, center }) => {
         style={
           !center
             ? {
-                marginTop: '56px',
+                marginTop: '4px',
               }
             : {}
         }
