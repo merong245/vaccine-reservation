@@ -19,66 +19,6 @@ pool.getConnection(function (err, connection) {
     const vaccineFilePath =
       path.parse(__dirname).dir + "\\public\\csv\\vaccine_data.csv";
 
-    /* hospital 테이블, vaccine 테이블 create table문에서 병원명 길이 변경해주시면 아래 코드 지워주세요
-      여기서 부터 */
-    var sql = "SET foreign_key_checks = 0";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-    });
-    sql =
-      "ALTER TABLE hospital MODIFY COLUMN hospital_name varchar(25) NOT NULL";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-      else {
-        console.log("success");
-      }
-    });
-    sql =
-      "ALTER TABLE vaccine MODIFY COLUMN fk_hospital_name varchar(25) NOT NULL";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-      else {
-        console.log("success");
-      }
-    });
-    sql =
-      "ALTER TABLE reservation MODIFY COLUMN fk_hospital_name varchar(25) NOT NULL";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-      else {
-        console.log("success");
-      }
-    });
-    sql = "DROP trigger insert_vaccination_trigger";
-    connection.query(sql, (err) => {
-      if (err) console.log("trigger does not exist");
-      else {
-        console.log("success");
-      }
-    });
-    sql = "TRUNCATE location";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-    });
-    sql = "SET foreign_key_checks = 1";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-    });
-    // 트리거 수정
-    sql =
-      "create trigger insert_vaccination_trigger " +
-      "before update on reservation for each row " +
-      "begin if new.state='완료' and old.state!='완료' and " +
-      "not exists(select vaccination_number from vaccination v where new.fk_registration_number=v.fk_registration_number) " +
-      "then insert into vaccination(fk_registration_number, vaccination_number, vaccine_type) " +
-      "values(new.fk_registration_number, 1, new.vaccine_type); " +
-      "else UPDATE vaccination SET vaccination_number = 2 where fk_registration_number = new.fk_registration_number; " +
-      "end if; end;";
-    connection.query(sql, (err) => {
-      if (err) console.log(err);
-    });
-    /* 여기까지 */
-
     // MySQL 경로 질의
     sql = `SHOW VARIABLES LIKE "secure_file_priv"`;
     connection.query(sql, (err, row) => {
@@ -107,9 +47,9 @@ pool.getConnection(function (err, connection) {
           "SET district = IF(@district='', NULL, @district)";
         sql = mysql.format(sql, [MySQLPath + "/location_data.csv"]);
         connection.query(sql, (err, row) => {
-          if (err) console.log("Failed to load location data. ");
+          if (err) console.log("Location data already exists.");
           else {
-            console.log("success");
+            console.log("Location data load success.");
           }
         });
         // hospital 데이터 로드
@@ -122,9 +62,9 @@ pool.getConnection(function (err, connection) {
           "IGNORE 1 ROWS";
         sql = mysql.format(sql, [MySQLPath + "/hospital_data.csv"]);
         connection.query(sql, (err, row) => {
-          if (err) console.log("Failed to load hospital data.");
+          if (err) console.log("Hospital data already exists.");
           else {
-            console.log("success");
+            console.log("Hospital data load success.");
           }
         });
         // vaccine 데이터 로드
@@ -137,9 +77,9 @@ pool.getConnection(function (err, connection) {
           "IGNORE 1 ROWS";
         sql = mysql.format(sql, [MySQLPath + "/vaccine_data.csv"]);
         connection.query(sql, (err, row) => {
-          if (err) console.log("Failed to load vaccine data. ");
+          if (err) console.log("Vaccine data already exists.");
           else {
-            console.log("success");
+            console.log("Vaccine data load success.");
           }
         });
       }
