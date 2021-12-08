@@ -1,13 +1,9 @@
 const pool = require("./config");
 const mysql = require("mysql");
 const router = require(".");
-const { NULL, TIMESTAMP } = require("mysql/lib/protocol/constants/types");
 const path = require("path");
 const fs = require("fs");
-
 const jwt = require("jsonwebtoken");
-const { off } = require("process");
-const e = require("express");
 
 // 서버 시작 시 실행
 // location 데이터, hospital 데이터, vaccine 데이터 로드
@@ -152,15 +148,6 @@ pool.getConnection(function (err, connection) {
   connection.release();
 });
 
-// 회원가입
-router.get("/register", (req, res) => {
-  console.log("회원가입 페이지");
-  if (req.user.id) {
-    console.log("이미 로그인 되어있습니다.");
-    res.render("index");
-  } else res.render("register");
-});
-
 router.post("/register", (req, res) => {
   // 지역정보 추출
   var beforeStr = req.body.residence;
@@ -302,14 +289,6 @@ router.post("/register", (req, res) => {
   });
 });
 
-// 로그인
-router.get("/login", (req, res) => {
-  if (req.user.id) {
-    console.log("이미 로그인 되어있습니다.");
-    res.render("index");
-  } else res.render("login");
-});
-
 router.post("/login", (req, res) => {
   const id = req.body.id;
   const passwd = req.body.password;
@@ -434,11 +413,6 @@ router.get("/info", (req, res) => {
     }
   });
 });
-
-/* 접종 완료 */
-router.get("/done_vaccine", (req, res) => {
-  res.render("/info");
-});
 /* 자동 2차 접종 예약 */
 /* 최근 예약 기록한 병원에서 같은 백신으로 예약 */
 router.post("/done_vaccine", (req, res) => {
@@ -536,10 +510,6 @@ router.post("/done_vaccine", (req, res) => {
  * 잔여 백신 조회
  */
 router.get("/remaining_vaccine", (req, res) => {
-  //   //res.render("remaining_vaccine");
-  // });
-
-  // router.post("/remaining_vaccine", (req, res) => {
   const vaccine_type = req.query.vaccine_type;
   const residence = req.query.residence;
 
@@ -619,57 +589,6 @@ router.get("/remaining_vaccine", (req, res) => {
     });
 
     connection.release();
-  });
-});
-
-/*예약가능 의료기관 조회*/
-router.get("/reservationlist", (req, res) => {
-  res.render("reservationlist");
-});
-
-router.post("/reservationlist", (req, res, next) => {
-  pool.getConnection(function (err, connection) {
-    var beforeStr = req.body.residence;
-    var afterStr = beforeStr.split(" ");
-
-    if (afterStr[1] == undefined) {
-      province = afterStr[0];
-      city = null;
-      district = null;
-    } else if (afterStr[2] == undefined) {
-      province = afterStr[0];
-      city = afterStr[1];
-      district = null;
-    } else {
-      province = afterStr[0];
-      city = afterStr[1];
-      district = afterStr[2];
-    }
-    const remain = [
-      req.body.vaccine_type,
-      province,
-      city,
-      district,
-      req.body.time,
-    ];
-
-    var selectquery =
-      "SELECT h.hospital_name, l.province, l.city, l.district ,v.vaccine_type, v.quantity, h.opening_time, h.closing_time " +
-      "FROM hospital h,vaccine v,location l " +
-      "WHERE hospital_name=fk_hospital_name AND fk_location=location_id AND vaccine_type=? AND province=? AND city=? AND district=? AND (? BETWEEN opening_time AND closing_time) AND quantity>0";
-
-    connection.query(selectquery, remain, (err, row) => {
-      if (err) console.log(err);
-      if (!row.length) {
-        res.render("reservationlist");
-      } else {
-        for (var i = 0; i < row.length; i++) {
-          console.log(row[i]);
-        }
-
-        res.redirect("/");
-      }
-    });
   });
 });
 
