@@ -506,16 +506,6 @@ router.get("/remaining_vaccine", (req, res) => {
       ]);
     }
 
-    // else if (province == "수도권") {
-    //   var sqlForSelectList =
-    //     "SELECT * FROM vaccine JOIN hospital ON " +
-    //     "fk_hospital_name = hospital_name JOIN location ON fk_location_id = location_id" +
-    //     " WHERE vaccine_type=" +
-    //     "'" +
-    //     vaccine_type +
-    //     "'" +
-    //     "AND (province='서울시' OR province='경기도' OR province='인천시')";
-    // }
 
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
@@ -736,11 +726,6 @@ router.get("/vaccine_result", (req, res) => {
           "GROUP BY id";
       }
 
-      /*sqlForSelectList =
-        "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
-        "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
-        "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
-        "GROUP BY l.province";*/
     }
     /*
       막대 그래프
@@ -833,11 +818,6 @@ router.get("/vaccine_result", (req, res) => {
         if (option2 === "age") {
         }
         if (option2 === "gender") {
-          // sqlForSelectList =
-          //   "SELECT l.province AS id,COUNT(v.fk_registration_number) AS value " +
-          //   "FROM user u JOIN location l ON l.location_id = u.fk_location_id " +
-          //   "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number AND v.vaccination_number = 2 " +
-          //   "GROUP BY l.province";
         }
         if (option2 === "number") {
         }
@@ -859,11 +839,6 @@ router.get("/vaccine_result", (req, res) => {
         if (option2 === "age") {
         }
         if (option2 === "gender") {
-          // sqlForSelectList =
-          //   "SELECT u.sex AS id,l.province AS x,COUNT(v.fk_registration_number) AS y " +
-          //   "FROM location l LEFT OUTER JOIN user u ON l.location_id = u.fk_location_id " +
-          //   "LEFT OUTER JOIN vaccination v ON v.fk_registration_number = u.registration_number " +
-          //   "GROUP BY l.province, u.sex ";
         }
         if (option2 === "number") {
         }
@@ -887,89 +862,6 @@ router.get("/vaccine_result", (req, res) => {
 
     connection.release();
   });
-  /*pool.getConnection(function (err, connection) {
-    if (option1 === "time") {
-      // 1차 접종
-      sqlForSelectList =
-        "SELECT r.reservation_date, COUNT(DISTINCT v.fk_registration_number) " +
-        "FROM reservation r, vaccination v, user u " +
-        "WHERE r.state = '완료' AND " +
-        "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-        "AND v.vaccination_number = 1 " +
-        "GROUP BY r.reservation_date " +
-        "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList, (err, row1) => {
-        if (err) console.log(err);
-        var d = new Date(row1[0].reservation_date);
-        // 년 월 일
-        console.log(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      });
-      // 2차 접종
-      sqlForSelectList =
-        "SELECT r.reservation_date,COUNT(DISTINCT v.fk_registration_number) " +
-        "FROM reservation r, vaccination v, user u " +
-        "WHERE r.state = '완료' AND " +
-        "r.fk_registration_number = u.registration_number AND v.fk_registration_number = u.registration_number " +
-        "AND v.vaccination_number = 2 " +
-        "GROUP BY r.reservation_date " +
-        "ORDER BY r.reservation_date";
-      connection.query(sqlForSelectList, (err, row2) => {
-        if (err) console.log(err);
-      });
-    } else if (option == "백신별") {
-      // 1차접종
-      sqlForSelectList =
-        "SELECT vaccine_type,COUNT(DISTINCT fk_registration_number) " +
-        "FROM vaccination " +
-        "WHERE vaccination_number = 1 " +
-        "GROUP BY vaccine_type";
-
-      connection.query(sqlForSelectList, (err, row3) => {
-        if (err) console.log(err);
-        console.log(row3);
-      });
-
-      // 2차접종
-      sqlForSelectList =
-        "SELECT vaccine_type, COUNT(DISTINCT fk_registration_number) " +
-        "FROM vaccination " +
-        "WHERE vaccination_number = 2 " +
-        "GROUP BY vaccine_type";
-      connection.query(sqlForSelectList, (err, row4) => {
-        if (err) console.log(err);
-        console.log(row4);
-      });
-    } else if (option == "지역별") {
-      // 1차 접종
-      sqlForSelectList =
-        "SELECT l.province, COUNT(DISTINCT v.fk_registration_number) " +
-        "FROM location l, reservation r, user u, vaccination v " +
-        "WHERE l.location_id = u.fk_location_id AND v.fk_registration_number = u.registration_number " +
-        "AND u.registration_number = r.fk_registration_number " +
-        "AND r.state = '완료' " +
-        "AND v.vaccination_number = 1 " +
-        "GROUP BY l.province";
-      connection.query(sqlForSelectList, (err, row5) => {
-        if (err) console.log(err);
-        console.log(row5);
-      });
-      // 2차 접종
-      sqlForSelectList =
-        "SELECT l.province, COUNT(DISTINCT v.fk_registration_number) " +
-        "FROM location l, reservation r, user u, vaccination v " +
-        "WHERE l.location_id = u.fk_location_id AND v.fk_registration_number = u.registration_number " +
-        "AND u.registration_number = r.fk_registration_number " +
-        "AND r.state = '완료' " +
-        "AND v.vaccination_number = 2 " +
-        "GROUP BY l.province";
-
-      connection.query(sqlForSelectList, (err, row6) => {
-        if (err) console.log(err);
-        console.log(row6);
-      });
-    }
-    connection.release();
-  });*/
 });
 
 module.exports = router;
