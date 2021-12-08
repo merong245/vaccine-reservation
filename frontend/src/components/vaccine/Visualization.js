@@ -513,7 +513,7 @@ const Visualization = ({
   useEffect(() => {
     const dataSet = [
       {
-        id: options.option1 === 'time' ? '1차' : '2차',
+        id: '접종완료',
         data: result,
       },
     ];
