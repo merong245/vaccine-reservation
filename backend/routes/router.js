@@ -372,73 +372,80 @@ router.post("/done_vaccine", (req, res) => {
       (err, row) => {
         if (err) console.log(err);
         else {
-          // 기존의 예약상태를 완료로 변경
-          connection.query(
-            "UPDATE reservation " +
-              "SET state = '완료' " +
-              "WHERE reservation_id = ?",
-            [row[0].id],
-            (err) => {
-              if (err) console.log(err);
-              else {
-                // 1차 접종인 경우, 2차 자동 예약
-                if (req.body.vaccination_number === 1) {
-                  // 모더나는 4주 뒤, 나머지는 3주 뒤 예약
-                  var reserv_date = row[0].date;
-                  if (row[0].type == "모더나")
-                    reserv_date.setDate(reserv_date.getDate() + 28);
-                  else reserv_date.setDate(reserv_date.getDate() + 21);
-                  // 새로운 예약 정보
-                  // (default)대기, 완료
-                  const reserv = [
-                    row[0].hospital_name,
-                    row[0].reg,
-                    reserv_date,
-                    row[0].type,
-                    "대기",
-                  ];
+          // 1차 접종인 경우, 2차 자동 예약
+          if (req.body.vaccination_number === 1) {
+            // 기존의 예약상태를 완료로 변경
+            connection.query(
+              "UPDATE reservation " +
+                "SET state = '1차완료' " +
+                "WHERE reservation_id = ?",
+              [row[0].id],
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            // 모더나는 4주 뒤, 나머지는 3주 뒤 예약
+            var reserv_date = row[0].date;
+            if (row[0].type == "모더나")
+              reserv_date.setDate(reserv_date.getDate() + 28);
+            else reserv_date.setDate(reserv_date.getDate() + 21);
+            // 새로운 예약 정보
+            // (default)대기, 완료
+            const reserv = [
+              row[0].hospital_name,
+              row[0].reg,
+              reserv_date,
+              row[0].type,
+              "대기",
+            ];
 
-                  connection.query(
-                    "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
-                    reserv,
-                    (err) => {
-                      if (err) console.log(err);
-                    },
-                  );
-                  // 백신 개수 감소
-                  // 백신이 없는 경우 20개 추가 후 1개 감소
-                  connection.query(
-                    "UPDATE vaccine " +
-                      "SET quantity = " +
-                      "CASE " +
-                      "WHEN quantity> 0 THEN quantity - 1 " +
-                      "ELSE quantity + 20 - 1 " +
-                      "END " +
-                      "WHERE fk_hospital_name = ? AND vaccine_type = ?",
-                    [row[0].hospital_name, row[0].type],
-                    (err) => {
-                      if (err) console.log(err);
-                    },
-                  );
-                  info = {
-                    vaccination_number: req.body.vaccination_number,
-                    reservation: {
-                      vaccine_type: row[0].type,
-                      hospital_name: row[0].hospital_name,
-                      date: reserv_date,
-                    },
-                  };
-                  console.log(info);
-                  res.send(info);
-                  // 2차 접종인 경우
-                } else {
-                  info = { vaccination_number: req.body.vaccination_number };
-                  console.log(info);
-                  res.send(info);
-                }
-              }
-            },
-          );
+            connection.query(
+              "INSERT INTO reservation(`fk_hospital_name`,`fk_registration_number`,`reservation_date`,`vaccine_type`,`state`) VALUES (?,?,?,?,?)",
+              reserv,
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            // 백신 개수 감소
+            // 백신이 없는 경우 20개 추가 후 1개 감소
+            connection.query(
+              "UPDATE vaccine " +
+                "SET quantity = " +
+                "CASE " +
+                "WHEN quantity> 0 THEN quantity - 1 " +
+                "ELSE quantity + 20 - 1 " +
+                "END " +
+                "WHERE fk_hospital_name = ? AND vaccine_type = ?",
+              [row[0].hospital_name, row[0].type],
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            info = {
+              vaccination_number: req.body.vaccination_number,
+              reservation: {
+                vaccine_type: row[0].type,
+                hospital_name: row[0].hospital_name,
+                date: reserv_date,
+              },
+            };
+            console.log(info);
+            res.send(info);
+            // 2차 접종인 경우
+          } else {
+            connection.query(
+              "UPDATE reservation " +
+                "SET state = '2차완료' " +
+                "WHERE reservation_id = ?",
+              [row[0].id],
+              (err) => {
+                if (err) console.log(err);
+              },
+            );
+            info = { vaccination_number: req.body.vaccination_number };
+            console.log(info);
+            res.send(info);
+          }
         }
       },
     );
@@ -505,7 +512,6 @@ router.get("/remaining_vaccine", (req, res) => {
         hospital_name,
       ]);
     }
-
 
     connection.query(sqlForSelectList, (err, row) => {
       if (err) console.log(err);
@@ -660,24 +666,11 @@ router.get("/vaccine_result", (req, res) => {
   // option0 : Bar / Line / Pie
   // option1 : time / residence
   // option2 : number / type / age / gender
-  // option3 : 누적 t/f
   const { option0, option1, option2, option3 } = req.query;
   console.log(req.query);
   var sqlForSelectList = "";
 
   pool.getConnection(function (err, connection) {
-    /*
-      원형 그래프
-      옵션 2만 사용 (1, 3 disable)
-      데이터의 기준을 id
-      접종자수를 value
-      
-      예시
-      {
-        id: '서울',
-        value: 13
-      }
-    */
     if (option0 === "Pie") {
       if (option2 === "number") {
         // 미접종자와 1차 접종자 와 완료자 수
@@ -725,59 +718,27 @@ router.get("/vaccine_result", (req, res) => {
           "WHERE registration_number = fk_registration_number AND vaccination_number=2 " +
           "GROUP BY id";
       }
-
     }
-    /*
-      막대 그래프
-      가로축 option1
-      세로축 접종자수
-      하나의 막대를 option2로 구분
-      
-      property 정확해야됨
 
-      예시
-      {
-        time: '7월',
-        1치 접종: 10,
-        2차 접종: 21,
-      }
-    */
     if (option0 === "Bar") {
       if (option1 === "time") {
-        if (option2 === "type") {
-        }
-        if (option2 === "age") {
-        }
-        if (option2 === "gender") {
-        }
-        if (option2 === "number") {
-        }
         // 날짜별 접종 완료자 수
         sqlForSelectList =
-          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS time, " +
-          "COUNT(CASE WHEN vaccination_number = 1 THEN 1 END) AS 1차, " +
-          "COUNT(CASE WHEN vaccination_number = 2 THEN 1 END) AS 2차 " +
+          "SELECT DATE_FORMAT(r.reservation_date, '%y-%m-%d') AS time, " +
+          "COUNT(CASE WHEN vaccination_number = 1 and state = '1차완료' THEN 1 END) AS 1차, " +
+          "COUNT(CASE WHEN vaccination_number = 2 and state = '2차완료' THEN 1 END) AS 2차 " +
           "FROM reservation r, vaccination v, user u " +
-          "WHERE r.state = '완료' " +
-          "AND r.fk_registration_number = u.registration_number " +
+          "WHERE r.fk_registration_number = u.registration_number " +
           "AND v.fk_registration_number = u.registration_number " +
           "AND v.vaccination_number >= 1 " +
           "GROUP BY time " +
+          "HAVING 2차>0 or 1차>0 " +
           "ORDER BY time";
       }
       if (option1 === "residence") {
-        if (option2 === "type") {
-        }
-        if (option2 === "age") {
-        }
-        if (option2 === "gender") {
-        }
-        if (option2 === "number") {
-        }
-
         // 지역별 접종 완료자 수
         sqlForSelectList =
-          "SELECT l.province AS residence," +
+          "SELECT l.province AS residence, " +
           "COUNT(CASE WHEN vaccination_number = 1 THEN 1 END) AS 1차, " +
           "COUNT(CASE WHEN vaccination_number = 2 THEN 1 END) AS 2차 " +
           "FROM location l, vaccination v, user u " +
@@ -787,46 +748,14 @@ router.get("/vaccine_result", (req, res) => {
           "GROUP BY residence ";
       }
     }
-    /*
-      선 그래프
-      
-      각 id당 한줄씩 그려짐
-      id가 option2
-      data x가 option1
-      data y가 접종자수
 
-      예시
-      {
-        id: '남자',
-        data: [
-          {
-            x: '경기도',
-            y: 63,
-          },
-          {
-            x: '강원도',
-            y: 32,
-          },
-          ...
-        ],
-      },
-    */
     if (option0 === "Line") {
       if (option1 === "time") {
-        if (option2 === "type") {
-        }
-        if (option2 === "age") {
-        }
-        if (option2 === "gender") {
-        }
-        if (option2 === "number") {
-        }
-
-        // 날짜별 1차 접종자 수
+        // 날짜별 접종 완료자 수
         sqlForSelectList =
-          "SELECT DATE_FORMAT(r.reservation_date, '%m-%d') AS x, COUNT(*) AS y " +
+          "SELECT DATE_FORMAT(r.reservation_date, '%y-%m-%d') AS x, COUNT(*) AS y " +
           "FROM reservation r, vaccination v, user u " +
-          "WHERE r.state = '완료' " +
+          "WHERE r.state = '2차완료' " +
           "AND r.fk_registration_number = u.registration_number " +
           "AND v.fk_registration_number = u.registration_number " +
           "AND v.vaccination_number >= 2 " +
@@ -834,15 +763,6 @@ router.get("/vaccine_result", (req, res) => {
           "ORDER BY x ";
       }
       if (option1 === "residence") {
-        if (option2 === "type") {
-        }
-        if (option2 === "age") {
-        }
-        if (option2 === "gender") {
-        }
-        if (option2 === "number") {
-        }
-
         // 지역별 접종 완료자 수
         sqlForSelectList =
           "SELECT l.province AS x, COUNT(*) AS y " +
@@ -853,7 +773,6 @@ router.get("/vaccine_result", (req, res) => {
           "GROUP BY x";
       }
     }
-    console.log("결과 조회 쿼리", sqlForSelectList);
 
     connection.query(sqlForSelectList, (err, row1) => {
       if (err) console.log(err);
