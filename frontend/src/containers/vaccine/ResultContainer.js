@@ -17,8 +17,7 @@ const ResultContainer = () => {
   useEffect(() => {
     console.log(options);
     if (
-      (options.option0 !== 'Pie' &&
-      options.option1) ||
+      (options.option0 !== 'Pie' && options.option1) ||
       (options.option0 === 'Pie' && options.option2)
     )
       dispatch(getResult(options));
@@ -71,18 +70,6 @@ const ResultContainer = () => {
     );
   };
 
-  // 누적 선택
-  const accumulateChange = (selectedOption) => {
-    const value = selectedOption ? selectedOption.value : false;
-    dispatch(
-      changeField({
-        options: 'options',
-        key: 'option3',
-        value: value,
-      }),
-    );
-  };
-
   return (
     <Visualization
       options={options}
@@ -92,7 +79,6 @@ const ResultContainer = () => {
       graphChange={graphChange}
       criteriaChange={criteriaChange}
       infoChange={infoChange}
-      accumulateChange={accumulateChange}
     />
   );
 };
