@@ -1,8 +1,8 @@
 # Vaccine reservation project
 
-> Visit [here](https://youtu.be/xO4xTASq6-U/) to view youtube video of this project.
+> Visit<a href="https://youtu.be/xO4xTASq6-U/" target="_blank"> here</a> to view youtube video of this project.
 
-> Visit [here](https://secret-wave-38005.herokuapp.com/) to view this project actual working.
+> Visit<a href="https://secret-wave-38005.herokuapp.com/" target="_blank"> here</a> to view this project actual working.
 
 ---
 
